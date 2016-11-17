@@ -5446,7 +5446,7 @@ void Application::takeSnapshot(bool notify, bool includeAnimated, float aspectRa
             emit DependencyManager::get<WindowScriptingInterface>()->snapshotTaken(path, "", notify);
         } else {
             // Get an animated GIF snapshot and save it
-            SnapshotAnimated::saveSnapshotAnimated(path, aspectRatio, qApp, DependencyManager::get<WindowScriptingInterface>());
+            snapshotAnimatedSetupAndRun(path, aspectRatio, qApp, DependencyManager::get<WindowScriptingInterface>());
         }
     });
 }

@@ -15,7 +15,6 @@
 #include <Application.h>
 #include <DependencyManager.h>
 #include <GifCreator.h>
-#include <qtimer.h>
 #include "scripting/WindowScriptingInterface.h"
 
 // If the snapshot width or the framerate are too high for the
@@ -31,18 +30,30 @@
 #define SNAPSNOT_ANIMATED_INITIAL_WRITE_DURATION_MSEC (20)
 #define SNAPSNOT_ANIMATED_NUM_FRAMES (SNAPSNOT_ANIMATED_DURATION_SECS * SNAPSNOT_ANIMATED_TARGET_FRAMERATE)
 
-class SnapshotAnimated {
+void snapshotAnimatedSetupAndRun(QString pathStill, float aspectRatio, Application* app, QSharedPointer<WindowScriptingInterface> dm);
+
+class SnapshotAnimated : public GenericThread {
 private:
-    static QTimer snapshotAnimatedTimer;
-    static GifWriter snapshotAnimatedGifWriter;
-    static qint64 snapshotAnimatedTimestamp;
-    static qint64 snapshotAnimatedFirstFrameTimestamp;
-    static qint64 snapshotAnimatedLastWriteFrameDuration;
-    static bool snapshotAnimatedTimerRunning;
-    static QString snapshotAnimatedPath;
-    static QString snapshotStillPath;
+    GifWriter snapshotAnimatedGifWriter;
+    qint64 snapshotAnimatedTimestamp;
+    qint64 snapshotAnimatedFirstFrameTimestamp;
+    qint64 snapshotAnimatedLastWriteFrameDuration;
+    bool snapshotAnimatedTimerRunning;
+    QString snapshotAnimatedPath;
+    QString snapshotStillPath;
+    float snapshotAnimatedAspectRatio;
+    Application* snapshotAnimatedApp;
+    QSharedPointer<WindowScriptingInterface> snapshotAnimatedDM;
+
+    void processFrame();
+
 public:
-    static void saveSnapshotAnimated(QString pathStill, float aspectRatio, Application* app, QSharedPointer<WindowScriptingInterface> dm);
+    SnapshotAnimated(QString pathStill, float aspectRatio, Application* app, QSharedPointer<WindowScriptingInterface> dm);
+    void saveSnapshotAnimated();
+
+protected:
+    /// Implements generic processing behavior for this thread.
+    virtual bool process() override;
 };
 
 #endif // hifi_SnapshotAnimated_h
