@@ -41,26 +41,15 @@ private:
     static QString snapshotAnimatedPath;
     static QVector<QImage> snapshotAnimatedFrameVector;
     static QVector<qint64> snapshotAnimatedFrameDelayVector;
+    static QSharedPointer<WindowScriptingInterface> snapshotAnimatedDM;
+
+    static GifWriter snapshotAnimatedGifWriter;
+
+    static void processFrames();
 public:
     static void saveSnapshotAnimated(QString pathStill, float aspectRatio, Application* app, QSharedPointer<WindowScriptingInterface> dm);
     static Setting::Handle<bool> alsoTakeAnimatedSnapshot;
     static Setting::Handle<float> snapshotAnimatedDuration;
-};
-
-class SnapshotAnimatedProcessor : public GenericThread {
-public:
-    SnapshotAnimatedProcessor(QString outputPathStill, QString outputPath, QVector<QImage>* frameVector, QVector<qint64>* frameDelayVector, QSharedPointer<WindowScriptingInterface> dm);
-private:
-    static GifWriter snapshotAnimatedGifWriter;
-    QString snapshotStillPath;
-    QString snapshotAnimatedPath;
-    QVector<QImage>* snapshotAnimatedFrameVector;
-    QVector<qint64>* snapshotAnimatedFrameDelayVector;
-    QSharedPointer<WindowScriptingInterface> snapshotAnimatedDM;
-protected:
-    /// Implements generic processing behavior for this thread.
-    virtual bool process() override;
-
 };
 
 #endif // hifi_SnapshotAnimated_h
