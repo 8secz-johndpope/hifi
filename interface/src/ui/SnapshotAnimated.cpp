@@ -17,7 +17,6 @@
 #include "SnapshotAnimated.h"
 
 QTimer SnapshotAnimated::snapshotAnimatedTimer;
-GifWriter SnapshotAnimated::snapshotAnimatedGifWriter;
 qint64 SnapshotAnimated::snapshotAnimatedTimestamp = 0;
 qint64 SnapshotAnimated::snapshotAnimatedFirstFrameTimestamp = 0;
 bool SnapshotAnimated::snapshotAnimatedTimerRunning = false;
@@ -25,6 +24,8 @@ QString SnapshotAnimated::snapshotAnimatedPath;
 QString SnapshotAnimated::snapshotStillPath;
 QVector<QImage> SnapshotAnimated::snapshotAnimatedFrameVector;
 QVector<qint64> SnapshotAnimated::snapshotAnimatedFrameDelayVector;
+
+GifWriter SnapshotAnimatedProcessor::snapshotAnimatedGifWriter;
 
 
 Setting::Handle<bool> SnapshotAnimated::alsoTakeAnimatedSnapshot("alsoTakeAnimatedSnapshot", true);
@@ -67,26 +68,9 @@ void SnapshotAnimated::saveSnapshotAnimated(QString pathStill, float aspectRatio
 
                     // If that was the last frame...
                     if ((SnapshotAnimated::snapshotAnimatedTimestamp - SnapshotAnimated::snapshotAnimatedFirstFrameTimestamp) >= (SnapshotAnimated::snapshotAnimatedDuration.get() * MSECS_PER_SECOND)) {
-                        // Create the GIF from the temporary files
-                        // Write out the header and beginning of the GIF file
-                        GifBegin(&(SnapshotAnimated::snapshotAnimatedGifWriter), qPrintable(SnapshotAnimated::snapshotAnimatedPath), snapshotAnimatedFrameVector[0].width(), snapshotAnimatedFrameVector[0].height(), SNAPSNOT_ANIMATED_FRAME_DELAY_MSEC / 10);
-                        for (int itr = 0; itr < snapshotAnimatedFrameVector.size(); itr++) {
-                            // Write each frame to the GIF
-                            GifWriteFrame(&(SnapshotAnimated::snapshotAnimatedGifWriter),
-                                (uint8_t*)snapshotAnimatedFrameVector[itr].convertToFormat(QImage::Format_RGBA8888).bits(),
-                                snapshotAnimatedFrameVector[itr].width(),
-                                snapshotAnimatedFrameVector[itr].height(),
-                                snapshotAnimatedFrameDelayVector[itr]);
-                        }
-                        // Write out the end of the GIF
-                        GifEnd(&(SnapshotAnimated::snapshotAnimatedGifWriter));
-
                         // Reset the current frame timestamp
                         SnapshotAnimated::snapshotAnimatedTimestamp = 0;
                         SnapshotAnimated::snapshotAnimatedFirstFrameTimestamp = 0;
-                        // Clear out the frame and frame delay vectors
-                        SnapshotAnimated::snapshotAnimatedFrameVector.clear();
-                        SnapshotAnimated::snapshotAnimatedFrameDelayVector.clear();
 
                         // Stop the snapshot QTimer. This action by itself DOES NOT GUARANTEE
                         // that the slot will not be called again in the future.
@@ -94,8 +78,14 @@ void SnapshotAnimated::saveSnapshotAnimated(QString pathStill, float aspectRatio
                         SnapshotAnimated::snapshotAnimatedTimer.stop();
                         SnapshotAnimated::snapshotAnimatedTimerRunning = false;
 
-                        // Let the dependency manager know that the snapshots have been taken.
-                        emit dm->snapshotTaken(SnapshotAnimated::snapshotStillPath, SnapshotAnimated::snapshotAnimatedPath, false);
+                        // Kick off the thread that'll pack the frames into the GIF
+                        SnapshotAnimatedProcessor* snapshotAnimatedGifProcessor = new SnapshotAnimatedProcessor(
+                            SnapshotAnimated::snapshotStillPath,
+                            SnapshotAnimated::snapshotAnimatedPath,
+                            &SnapshotAnimated::snapshotAnimatedFrameVector,
+                            &SnapshotAnimated::snapshotAnimatedFrameDelayVector,
+                            dm);
+                        snapshotAnimatedGifProcessor->initialize();
                     }
                 }
             }
@@ -109,4 +99,45 @@ void SnapshotAnimated::saveSnapshotAnimated(QString pathStill, float aspectRatio
         // Just tell the dependency manager that the capture of the still snapshot has taken place.
         emit dm->snapshotTaken(pathStill, "", false);
     }
+}
+
+SnapshotAnimatedProcessor::SnapshotAnimatedProcessor(QString outputPathStill, QString outputPathAnimated, QVector<QImage>* frameVector, QVector<qint64>* frameDelayVector, QSharedPointer<WindowScriptingInterface> dm){
+    snapshotStillPath = outputPathStill;
+    snapshotAnimatedPath = outputPathAnimated;
+    snapshotAnimatedFrameVector = frameVector;
+    snapshotAnimatedFrameDelayVector = frameDelayVector;
+    snapshotAnimatedDM = dm;
+}
+
+bool SnapshotAnimatedProcessor::process() {
+    // Create the GIF from the temporary files
+    // Write out the header and beginning of the GIF file
+    GifBegin(
+        &(SnapshotAnimatedProcessor::snapshotAnimatedGifWriter),
+        qPrintable(snapshotAnimatedPath),
+        (*snapshotAnimatedFrameVector)[0].width(),
+        (*snapshotAnimatedFrameVector)[0].height(),
+        SNAPSNOT_ANIMATED_FRAME_DELAY_MSEC / 10);
+    for (int itr = 0; itr < (*snapshotAnimatedFrameVector).size(); itr++) {
+        // Write each frame to the GIF
+        GifWriteFrame(&(SnapshotAnimatedProcessor::snapshotAnimatedGifWriter),
+            (uint8_t*)(*snapshotAnimatedFrameVector)[itr].convertToFormat(QImage::Format_RGBA8888).bits(),
+            (*snapshotAnimatedFrameVector)[itr].width(),
+            (*snapshotAnimatedFrameVector)[itr].height(),
+            (*snapshotAnimatedFrameDelayVector)[itr]);
+    }
+    // Write out the end of the GIF
+    GifEnd(&(SnapshotAnimatedProcessor::snapshotAnimatedGifWriter));
+
+    // Clear out the frame and frame delay vectors
+    (*snapshotAnimatedFrameVector).clear();
+    (*snapshotAnimatedFrameDelayVector).clear();
+
+    // Let the dependency manager know that the snapshots have been taken.
+    emit snapshotAnimatedDM->snapshotTaken(snapshotStillPath, snapshotAnimatedPath, false);
+
+    this->terminate();
+    delete this;
+
+    return true;
 }
