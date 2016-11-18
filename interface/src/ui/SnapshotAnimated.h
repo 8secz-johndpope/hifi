@@ -44,8 +44,8 @@ private:
     static bool snapshotAnimatedTimerRunning;
     static QString snapshotAnimatedPath;
     static QString snapshotStillPath;
-    static quint32 snapshotAnimatedFrameNumber;
-    static QTemporaryDir* snapshotAnimatedTempDir;
+    static QVector<QImage> snapshotAnimatedFrameVector;
+    static QVector<qint64> snapshotAnimatedFrameDelayVector;
 public:
     static void saveSnapshotAnimated(QString pathStill, float aspectRatio, Application* app, QSharedPointer<WindowScriptingInterface> dm);
     static Setting::Handle<bool> alsoTakeAnimatedSnapshot;
