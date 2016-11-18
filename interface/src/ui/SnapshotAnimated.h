@@ -12,6 +12,8 @@
 #ifndef hifi_SnapshotAnimated_h
 #define hifi_SnapshotAnimated_h
 
+#include <QtCore/QTemporaryDir>
+#include <QtCore/QVector>
 #include <Application.h>
 #include <DependencyManager.h>
 #include <GifCreator.h>
@@ -42,6 +44,8 @@ private:
     static bool snapshotAnimatedTimerRunning;
     static QString snapshotAnimatedPath;
     static QString snapshotStillPath;
+    static quint32 snapshotAnimatedFrameNumber;
+    static QTemporaryDir* snapshotAnimatedTempDir;
 public:
     static void saveSnapshotAnimated(QString pathStill, float aspectRatio, Application* app, QSharedPointer<WindowScriptingInterface> dm);
     static Setting::Handle<bool> alsoTakeAnimatedSnapshot;
