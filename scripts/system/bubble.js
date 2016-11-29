@@ -13,42 +13,84 @@
 /* global Toolbars, Script, Users, Overlays, AvatarList, Controller, Camera, getControllerWorldLocation */
 
 
-(function() { // BEGIN LOCAL_SCOPE
+(function () { // BEGIN LOCAL_SCOPE
 
-// grab the toolbar
-var toolbar = Toolbars.getToolbar("com.highfidelity.interface.toolbar.system");
+    // grab the toolbar
+    var toolbar = Toolbars.getToolbar("com.highfidelity.interface.toolbar.system");
+    var bubbleOverlay = {};
+    var updateConnected = null;
 
-var ASSETS_PATH = Script.resolvePath("assets");
-var TOOLS_PATH = Script.resolvePath("assets/images/tools/");
+    var ASSETS_PATH = Script.resolvePath("assets");
+    var TOOLS_PATH = Script.resolvePath("assets/images/tools/");
 
-function buttonImageURL() {
-    return TOOLS_PATH + 'bubble.svg';
-}
+    function buttonImageURL() {
+        return TOOLS_PATH + 'bubble.svg';
+    }
 
-function onBubbleToggled() {
-    var bubbleActive = Users.getIgnoreRadiusEnabled();
-    button.writeProperty('buttonState', bubbleActive ? 0 : 1);
-    button.writeProperty('defaultState', bubbleActive ? 0 : 1);
-    button.writeProperty('hoverState', bubbleActive ? 2 : 3);
-}
+    update = function () {
+        Overlays.editOverlay(bubbleOverlay.id, {
+            position: MyAvatar.position,
+            size: MyAvatar.scale * 3
+        });
+    };
 
-// setup the mod button and add it to the toolbar
-var button = toolbar.addButton({
-    objectName: 'bubble',
-    imageURL: buttonImageURL(),
-    visible: true,
-    alpha: 0.9
-});
-onBubbleToggled();
+    function createOverlays() {
+        bubbleOverlay.id = Overlays.addOverlay("sphere", {
+            position: MyAvatar.position,
+            size: MyAvatar.scale * 3,
+            color: {
+                red: 66,
+                green: 173,
+                blue: 244
+            },
+            alpha: 0.5,
+            solid: true,
+            visible: true
+        });
+    }
 
-button.clicked.connect(Users.toggleIgnoreRadius);
-Users.ignoreRadiusEnabledChanged.connect(onBubbleToggled);
+    function deleteOverlays() {
+        Overlays.deleteOverlay(bubbleOverlay.id);
+    }
 
-// cleanup the toolbar button and overlays when script is stopped
-Script.scriptEnding.connect(function() {
-    toolbar.removeButton('bubble');
-    button.clicked.disconnect(Users.toggleIgnoreRadius);
-    Users.ignoreRadiusEnabledChanged.disconnect(onBubbleToggled);
-});
+    function onBubbleToggled() {
+        var bubbleActive = Users.getIgnoreRadiusEnabled();
+        button.writeProperty('buttonState', bubbleActive ? 0 : 1);
+        button.writeProperty('defaultState', bubbleActive ? 0 : 1);
+        button.writeProperty('hoverState', bubbleActive ? 2 : 3);
+        if (bubbleActive) {
+            createOverlays();
+            Script.update.connect(update);
+            updateConnected = true;
+        } else {
+            deleteOverlays();
+            if (updateConnected === true) {
+                Script.update.disconnect(update);
+            }
+        }
+    }
+
+    // setup the mod button and add it to the toolbar
+    var button = toolbar.addButton({
+        objectName: 'bubble',
+        imageURL: buttonImageURL(),
+        visible: true,
+        alpha: 0.9
+    });
+    onBubbleToggled();
+
+    button.clicked.connect(Users.toggleIgnoreRadius);
+    Users.ignoreRadiusEnabledChanged.connect(onBubbleToggled);
+
+    // cleanup the toolbar button and overlays when script is stopped
+    Script.scriptEnding.connect(function () {
+        toolbar.removeButton('bubble');
+        button.clicked.disconnect(Users.toggleIgnoreRadius);
+        Users.ignoreRadiusEnabledChanged.disconnect(onBubbleToggled);
+        deleteOverlays();
+        if (updateConnected !== null) {
+            Script.update.disconnect(update);
+        }
+    });
 
 }()); // END LOCAL_SCOPE
