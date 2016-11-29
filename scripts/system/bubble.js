@@ -17,7 +17,8 @@
 
     // grab the toolbar
     var toolbar = Toolbars.getToolbar("com.highfidelity.interface.toolbar.system");
-    var bubbleOverlay = {};
+    var yawOverlayRotation = Quat.fromVec3Degrees({ x: 90, y: 0, z: 0 });
+    var bubbleOverlayArray = [];
     var updateConnected = null;
 
     var ASSETS_PATH = Script.resolvePath("assets");
@@ -27,31 +28,40 @@
         return TOOLS_PATH + 'bubble.svg';
     }
 
-    update = function () {
-        Overlays.editOverlay(bubbleOverlay.id, {
-            position: MyAvatar.position,
-            size: MyAvatar.scale * 3
-        });
-    };
-
     function createOverlays() {
-        bubbleOverlay.id = Overlays.addOverlay("sphere", {
+        bubbleOverlayArray.push(Overlays.addOverlay("circle3d", {
             position: MyAvatar.position,
-            size: MyAvatar.scale * 3,
+            outerRadius: MyAvatar.scale, // Need to replace this with the actual radius of the Bubble
+            innerRadius: MyAvatar.scale * 0.75, // Need to replace this with a fraction of the actual radius of the Bubble
+            rotation: yawOverlayRotation,
             color: {
                 red: 66,
                 green: 173,
                 blue: 244
             },
-            alpha: 0.5,
+            alpha: 0.7,
             solid: true,
-            visible: true
-        });
+            visible: true,
+            ignoreRayIntersection: true
+        }));
     }
 
     function deleteOverlays() {
-        Overlays.deleteOverlay(bubbleOverlay.id);
+        for (var i = 0; i < bubbleOverlayArray.length; i++) {
+            Overlays.deleteOverlay(bubbleOverlayArray[i]);
+        }
+        bubbleOverlayArray = [];
     }
+
+    update = function () {
+        for (var i = 0; i < bubbleOverlayArray.length; i++) {
+            Overlays.editOverlay(bubbleOverlayArray[i], {
+                position: MyAvatar.position,
+                outerRadius: MyAvatar.scale, // Need to replace this with the actual radius of the Bubble
+                innerRadius: MyAvatar.scale * 0.75,// Need to replace this with a fraction of the actual radius of the Bubble
+            });
+        }
+    };
 
     function onBubbleToggled() {
         var bubbleActive = Users.getIgnoreRadiusEnabled();
