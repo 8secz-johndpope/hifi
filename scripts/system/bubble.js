@@ -29,21 +29,23 @@
     }
 
     function createOverlays() {
-        bubbleOverlayArray.push(Overlays.addOverlay("circle3d", {
-            position: MyAvatar.position,
-            outerRadius: MyAvatar.scale, // Need to replace this with the actual radius of the Bubble
-            innerRadius: MyAvatar.scale * 0.75, // Need to replace this with a fraction of the actual radius of the Bubble
-            rotation: yawOverlayRotation,
-            color: {
-                red: 66,
-                green: 173,
-                blue: 244
-            },
-            alpha: 0.7,
-            solid: true,
-            visible: true,
-            ignoreRayIntersection: true
-        }));
+        for (var i = 0; i < 8; i++) {
+            bubbleOverlayArray.push(Overlays.addOverlay("circle3d", {
+                position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.15) - MyAvatar.scale * 0.5, z: MyAvatar.position.z },
+                outerRadius: MyAvatar.scale, // Need to replace this with the actual radius of the Bubble
+                innerRadius: MyAvatar.scale * 0.75, // Need to replace this with a fraction of the actual radius of the Bubble
+                rotation: yawOverlayRotation,
+                color: {
+                    red: 66,
+                    green: 173,
+                    blue: 244
+                },
+                alpha: 0.7,
+                solid: true,
+                visible: true,
+                ignoreRayIntersection: true
+            }));
+        }
     }
 
     function deleteOverlays() {
@@ -56,7 +58,7 @@
     update = function () {
         for (var i = 0; i < bubbleOverlayArray.length; i++) {
             Overlays.editOverlay(bubbleOverlayArray[i], {
-                position: MyAvatar.position,
+                position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.15) - MyAvatar.scale * 0.5, z: MyAvatar.position.z },
                 outerRadius: MyAvatar.scale, // Need to replace this with the actual radius of the Bubble
                 innerRadius: MyAvatar.scale * 0.75,// Need to replace this with a fraction of the actual radius of the Bubble
             });
