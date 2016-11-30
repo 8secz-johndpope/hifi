@@ -17,9 +17,9 @@
 
     // grab the toolbar
     var toolbar = Toolbars.getToolbar("com.highfidelity.interface.toolbar.system");
-    var yawOverlayRotation = Quat.fromVec3Degrees({ x: 90, y: 0, z: 0 });
     var bubbleOverlayTimestamp;
     var bubbleOverlayArray = [];
+    var bubbleOverlayRotation = Quat.fromVec3Degrees({ x: 90, y: 0, z: 0 });
     var updateConnected = null;
 
     var ASSETS_PATH = Script.resolvePath("assets");
@@ -29,19 +29,26 @@
         return TOOLS_PATH + 'bubble.svg';
     }
 
+    function deleteOverlays() {
+        for (var i = 0; i < bubbleOverlayArray.length; i++) {
+            Overlays.deleteOverlay(bubbleOverlayArray[i]);
+        }
+        bubbleOverlayArray = [];
+    }
+
     function createOverlays() {
-        for (var i = 0; i < 8; i++) {
+        for (var i = 0; i < 25; i++) {
             bubbleOverlayArray.push(Overlays.addOverlay("circle3d", {
-                position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.15) - MyAvatar.scale * 0.5, z: MyAvatar.position.z },
-                outerRadius: MyAvatar.scale, // Need to replace this with the actual radius of the Bubble
-                innerRadius: MyAvatar.scale * 0.75, // Need to replace this with a fraction of the actual radius of the Bubble
-                rotation: yawOverlayRotation,
+                position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.07) - MyAvatar.scale * 0.8, z: MyAvatar.position.z },
+                outerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale,
+                innerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale * 0.75,
+                rotation: bubbleOverlayRotation,
                 color: {
                     red: 66,
                     green: 173,
                     blue: 244
                 },
-                alpha: 0.7,
+                alpha: 0.9,
                 solid: true,
                 visible: true,
                 ignoreRayIntersection: true
@@ -50,21 +57,14 @@
         bubbleOverlayTimestamp = Date.now();
     }
 
-    function deleteOverlays() {
-        for (var i = 0; i < bubbleOverlayArray.length; i++) {
-            Overlays.deleteOverlay(bubbleOverlayArray[i]);
-        }
-        bubbleOverlayArray = [];
-    }
-
     update = function () {
-        var overlayAlpha = 0.7 - ((Date.now() - bubbleOverlayTimestamp) / 5000);
+        var overlayAlpha = 0.9 - ((Date.now() - bubbleOverlayTimestamp) / 5000);
         if (overlayAlpha > 0) {
             for (var i = 0; i < bubbleOverlayArray.length; i++) {
                 Overlays.editOverlay(bubbleOverlayArray[i], {
-                    position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.15) - MyAvatar.scale * 0.5, z: MyAvatar.position.z },
-                    outerRadius: MyAvatar.scale, // Need to replace this with the actual radius of the Bubble
-                    innerRadius: MyAvatar.scale * 0.75, // Need to replace this with a fraction of the actual radius of the Bubble
+                    position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.07) - MyAvatar.scale * 0.8, z: MyAvatar.position.z },
+                    outerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale,
+                    innerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale * 0.75,
                     alpha: overlayAlpha
                 });
             }
