@@ -228,11 +228,11 @@ void AvatarManager::removeAvatar(const QUuid& sessionUUID) {
 
     auto removedAvatar = _avatarHash.take(sessionUUID);
     if (removedAvatar) {
-        handleRemovedAvatar(removedAvatar);
+        handleRemovedAvatar(removedAvatar, KillAvatarReason::NoReason);
     }
 }
 
-void AvatarManager::handleRemovedAvatar(const AvatarSharedPointer& removedAvatar) {
+void AvatarManager::handleRemovedAvatar(const AvatarSharedPointer& removedAvatar, KillAvatarReason removalReason) {
     AvatarHashMap::handleRemovedAvatar(removedAvatar);
 
     // removedAvatar is a shared pointer to an AvatarData but we need to get to the derived Avatar
@@ -247,6 +247,9 @@ void AvatarManager::handleRemovedAvatar(const AvatarSharedPointer& removedAvatar
         _motionStatesToRemoveFromPhysics.push_back(motionState);
     }
 
+    if (removalReason == KillAvatarReason::AvatarIgnored) {
+        emit DependencyManager::get<UsersScriptingInterface>()->enteredIgnoreRadius();
+    }
     _avatarFades.push_back(removedAvatar);
 }
 

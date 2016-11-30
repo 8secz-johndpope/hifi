@@ -37,6 +37,11 @@
     }
 
     function createOverlays() {
+        if (updateConnected === true) {
+            deleteOverlays();
+            updateConnected = false;
+            Script.update.disconnect(update);
+        }
         for (var i = 0; i < 25; i++) {
             bubbleOverlayArray.push(Overlays.addOverlay("circle3d", {
                 position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.07) - MyAvatar.scale * 0.8, z: MyAvatar.position.z },
@@ -48,17 +53,23 @@
                     green: 173,
                     blue: 244
                 },
-                alpha: 0.9,
+                alpha: 0.7,
                 solid: true,
                 visible: true,
                 ignoreRayIntersection: true
             }));
         }
         bubbleOverlayTimestamp = Date.now();
+        Script.update.connect(update);
+        updateConnected = true;
+    }
+
+    function enteredIgnoreRadius() {
+        createOverlays();
     }
 
     update = function () {
-        var overlayAlpha = 0.9 - ((Date.now() - bubbleOverlayTimestamp) / 5000);
+        var overlayAlpha = 0.7 - ((Date.now() - bubbleOverlayTimestamp) / 4500);
         if (overlayAlpha > 0) {
             for (var i = 0; i < bubbleOverlayArray.length; i++) {
                 Overlays.editOverlay(bubbleOverlayArray[i], {
@@ -72,6 +83,7 @@
             deleteOverlays();
             if (updateConnected === true) {
                 Script.update.disconnect(update);
+                updateConnected = false;
             }
         }
     };
@@ -83,8 +95,6 @@
         button.writeProperty('hoverState', bubbleActive ? 2 : 3);
         if (bubbleActive) {
             createOverlays();
-            Script.update.connect(update);
-            updateConnected = true;
         } else {
             deleteOverlays();
             if (updateConnected === true) {
@@ -104,12 +114,14 @@
 
     button.clicked.connect(Users.toggleIgnoreRadius);
     Users.ignoreRadiusEnabledChanged.connect(onBubbleToggled);
+    Users.enteredIgnoreRadius.connect(enteredIgnoreRadius);
 
     // cleanup the toolbar button and overlays when script is stopped
     Script.scriptEnding.connect(function () {
         toolbar.removeButton('bubble');
         button.clicked.disconnect(Users.toggleIgnoreRadius);
         Users.ignoreRadiusEnabledChanged.disconnect(onBubbleToggled);
+        Users.enteredIgnoreRadius.disconnect(enteredIgnoreRadius);
         deleteOverlays();
         if (updateConnected !== null) {
             Script.update.disconnect(update);

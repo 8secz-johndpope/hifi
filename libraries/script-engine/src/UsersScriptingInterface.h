@@ -101,6 +101,12 @@ public slots:
 signals:
     void canKickChanged(bool canKick);
     void ignoreRadiusEnabledChanged(bool isEnabled);
+
+    /**jsdoc
+    * Notifies scripts that another user has entered the ignore radius
+    * @function Users.enteredIgnoreRadius
+    */
+    void enteredIgnoreRadius();
 };
 
 
