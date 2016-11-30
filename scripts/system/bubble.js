@@ -42,23 +42,32 @@
             updateConnected = false;
             Script.update.disconnect(update);
         }
-        for (var i = 0; i < 25; i++) {
-            bubbleOverlayArray.push(Overlays.addOverlay("circle3d", {
-                position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.07) - MyAvatar.scale * 0.8, z: MyAvatar.position.z },
-                outerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale,
-                innerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale * 0.75,
-                rotation: bubbleOverlayRotation,
-                color: {
-                    red: 66,
-                    green: 173,
-                    blue: 244
-                },
-                alpha: 0.7,
-                solid: true,
-                visible: true,
-                ignoreRayIntersection: true
-            }));
-        }
+        bubbleOverlayArray.push(Overlays.addOverlay("model", {
+            url: Script.resolvePath("assets/models/bubble-v1.fbx"),
+            dimensions: { x: 2.03, y: 0.73, z: 2.03 },
+            position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.1, z: MyAvatar.position.z },
+            scale: { x: MyAvatar.scale, y: 1, z: MyAvatar.scale },
+            alpha: 1.0,
+            visible: true,
+            ignoreRayIntersection: true
+        }));
+        //for (var i = 0; i < 25; i++) {
+        //    bubbleOverlayArray.push(Overlays.addOverlay("circle3d", {
+        //        position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.07) - MyAvatar.scale * 0.8, z: MyAvatar.position.z },
+        //        outerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale,
+        //        innerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale * 0.75,
+        //        rotation: bubbleOverlayRotation,
+        //        color: {
+        //            red: 66,
+        //            green: 173,
+        //            blue: 244
+        //        },
+        //        alpha: 0.7,
+        //        solid: true,
+        //        visible: true,
+        //        ignoreRayIntersection: true
+        //    }));
+        //}
         bubbleOverlayTimestamp = Date.now();
         Script.update.connect(update);
         updateConnected = true;
@@ -69,16 +78,24 @@
     }
 
     update = function () {
-        var overlayAlpha = 0.7 - ((Date.now() - bubbleOverlayTimestamp) / 4500);
+        var overlayAlpha = 1.0 - ((Date.now() - bubbleOverlayTimestamp) / 5000);
         if (overlayAlpha > 0) {
-            for (var i = 0; i < bubbleOverlayArray.length; i++) {
-                Overlays.editOverlay(bubbleOverlayArray[i], {
-                    position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.07) - MyAvatar.scale * 0.8, z: MyAvatar.position.z },
-                    outerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale,
-                    innerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale * 0.75,
-                    alpha: overlayAlpha
-                });
-            }
+            Overlays.editOverlay(bubbleOverlayArray[0], {
+                position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.1, z: MyAvatar.position.z },
+                scale: { x: MyAvatar.scale, y: 1, z: MyAvatar.scale },
+                alpha: overlayAlpha
+            });
+            //for (var i = 1; i < bubbleOverlayArray.length; i++) {
+            //    Overlays.editOverlay(bubbleOverlayArray[i], {
+            //        position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.1, z: MyAvatar.position.z },
+            //        scale: { x: MyAvatar.scale, y: 1, z: MyAvatar.scale },
+            //        alpha: overlayAlpha
+            //        //position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.07) - MyAvatar.scale * 0.8, z: MyAvatar.position.z },
+            //        //outerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale,
+            //        //innerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale * 0.75,
+            //        //alpha: overlayAlpha
+            //    });
+            //}
         } else {
             deleteOverlays();
             if (updateConnected === true) {
