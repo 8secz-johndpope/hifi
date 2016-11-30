@@ -395,8 +395,9 @@ void AvatarMixer::nodeKilled(SharedNodePointer killedNode) {
 
         // this was an avatar we were sending to other people
         // send a kill packet for it to our other nodes
-        auto killPacket = NLPacket::create(PacketType::KillAvatar, NUM_BYTES_RFC4122_UUID);
+        auto killPacket = NLPacket::create(PacketType::KillAvatar, NUM_BYTES_RFC4122_UUID + sizeof(KillAvatarReason));
         killPacket->write(killedNode->getUUID().toRfc4122());
+        killPacket->writePrimitive(KillAvatarReason::AvatarDisconnected);
 
         nodeList->broadcastToNodes(std::move(killPacket), NodeSet() << NodeType::Agent);
 

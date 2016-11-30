@@ -133,6 +133,12 @@ enum KeyState {
     DELETE_KEY_DOWN
 };
 
+enum KillAvatarReason : uint8_t {
+    NoReason = 0,
+    AvatarDisconnected,
+    AvatarIgnored
+};
+
 class QDataStream;
 
 class AttachmentData;
