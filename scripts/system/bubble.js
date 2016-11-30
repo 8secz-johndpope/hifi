@@ -18,6 +18,7 @@
     // grab the toolbar
     var toolbar = Toolbars.getToolbar("com.highfidelity.interface.toolbar.system");
     var yawOverlayRotation = Quat.fromVec3Degrees({ x: 90, y: 0, z: 0 });
+    var bubbleOverlayTimestamp;
     var bubbleOverlayArray = [];
     var updateConnected = null;
 
@@ -46,6 +47,7 @@
                 ignoreRayIntersection: true
             }));
         }
+        bubbleOverlayTimestamp = Date.now();
     }
 
     function deleteOverlays() {
@@ -56,12 +58,21 @@
     }
 
     update = function () {
-        for (var i = 0; i < bubbleOverlayArray.length; i++) {
-            Overlays.editOverlay(bubbleOverlayArray[i], {
-                position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.15) - MyAvatar.scale * 0.5, z: MyAvatar.position.z },
-                outerRadius: MyAvatar.scale, // Need to replace this with the actual radius of the Bubble
-                innerRadius: MyAvatar.scale * 0.75,// Need to replace this with a fraction of the actual radius of the Bubble
-            });
+        var overlayAlpha = 0.7 - ((Date.now() - bubbleOverlayTimestamp) / 5000);
+        if (overlayAlpha > 0) {
+            for (var i = 0; i < bubbleOverlayArray.length; i++) {
+                Overlays.editOverlay(bubbleOverlayArray[i], {
+                    position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.15) - MyAvatar.scale * 0.5, z: MyAvatar.position.z },
+                    outerRadius: MyAvatar.scale, // Need to replace this with the actual radius of the Bubble
+                    innerRadius: MyAvatar.scale * 0.75, // Need to replace this with a fraction of the actual radius of the Bubble
+                    alpha: overlayAlpha
+                });
+            }
+        } else {
+            deleteOverlays();
+            if (updateConnected === true) {
+                Script.update.disconnect(update);
+            }
         }
     };
 
