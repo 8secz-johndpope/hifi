@@ -22,7 +22,8 @@
     var bubbleButtonTimestamp;
     var bubbleOverlayArray = [];
     var bubbleOverlayRotation = Quat.fromVec3Degrees({ x: 90, y: 0, z: 0 });
-    var updateConnected = null;
+    var bubbleActivateSound = SoundCache.getSound(Script.resolvePath("assets/sounds/bubble.wav"));
+    var updateConnected = false;
 
     var ASSETS_PATH = Script.resolvePath("assets");
     var TOOLS_PATH = Script.resolvePath("assets/images/tools/");
@@ -40,6 +41,10 @@
     }
 
     function createOverlays() {
+        Audio.playSound(bubbleActivateSound, {
+            localOnly: true,
+            volume: 0.5
+        });
         if (updateConnected === true) {
             deleteOverlays();
             updateConnected = false;
@@ -48,8 +53,8 @@
         bubbleOverlayArray.push(Overlays.addOverlay("model", {
             url: Script.resolvePath("assets/models/bubble-v1.fbx"),
             dimensions: { x: 2.03, y: 0.73, z: 2.03 },
-            position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.1, z: MyAvatar.position.z },
-            scale: { x: Settings.getValue("IgnoreRadius") / 2, y: 1, z: Settings.getValue("IgnoreRadius") / 2 },
+            position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.4, z: MyAvatar.position.z },
+            scale: { x: Settings.getValue("IgnoreRadius") / 2, y: 0.5, z: Settings.getValue("IgnoreRadius") / 2 },
             alpha: 1.0,
             visible: true,
             ignoreRayIntersection: true
@@ -95,8 +100,8 @@
             }
 
             Overlays.editOverlay(bubbleOverlayArray[0], {
-                position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.1, z: MyAvatar.position.z },
-                scale: { x: Settings.getValue("IgnoreRadius") / 2, y: 1, z: Settings.getValue("IgnoreRadius") / 2 },
+                position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.4, z: MyAvatar.position.z },
+                scale: { x: Settings.getValue("IgnoreRadius") / 2, y: 0.5, z: Settings.getValue("IgnoreRadius") / 2 },
                 alpha: overlayAlpha
             });
             //for (var i = 1; i < bubbleOverlayArray.length; i++) {
@@ -156,7 +161,7 @@
         Users.ignoreRadiusEnabledChanged.disconnect(onBubbleToggled);
         Users.enteredIgnoreRadius.disconnect(enteredIgnoreRadius);
         deleteOverlays();
-        if (updateConnected !== null) {
+        if (updateConnected === true) {
             Script.update.disconnect(update);
         }
     });
