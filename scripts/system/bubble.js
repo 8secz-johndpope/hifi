@@ -18,6 +18,8 @@
     // grab the toolbar
     var toolbar = Toolbars.getToolbar("com.highfidelity.interface.toolbar.system");
     var bubbleOverlayTimestamp;
+    var bubbleButtonFlashState = false;
+    var bubbleButtonTimestamp;
     var bubbleOverlayArray = [];
     var bubbleOverlayRotation = Quat.fromVec3Degrees({ x: 90, y: 0, z: 0 });
     var updateConnected = null;
@@ -34,6 +36,7 @@
             Overlays.deleteOverlay(bubbleOverlayArray[i]);
         }
         bubbleOverlayArray = [];
+        bubbleButtonFlashState = false;
     }
 
     function createOverlays() {
@@ -46,7 +49,7 @@
             url: Script.resolvePath("assets/models/bubble-v1.fbx"),
             dimensions: { x: 2.03, y: 0.73, z: 2.03 },
             position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.1, z: MyAvatar.position.z },
-            scale: { x: MyAvatar.scale, y: 1, z: MyAvatar.scale },
+            scale: { x: Settings.getValue("IgnoreRadius") / 2, y: 1, z: Settings.getValue("IgnoreRadius") / 2 },
             alpha: 1.0,
             visible: true,
             ignoreRayIntersection: true
@@ -62,13 +65,14 @@
         //            green: 173,
         //            blue: 244
         //        },
-        //        alpha: 0.7,
+        //        alpha: 1.0,
         //        solid: true,
         //        visible: true,
         //        ignoreRayIntersection: true
         //    }));
         //}
         bubbleOverlayTimestamp = Date.now();
+        bubbleButtonTimestamp = bubbleOverlayTimestamp;
         Script.update.connect(update);
         updateConnected = true;
     }
@@ -78,22 +82,29 @@
     }
 
     update = function () {
-        var overlayAlpha = 1.0 - ((Date.now() - bubbleOverlayTimestamp) / 5000);
+        var timestamp = Date.now();
+        var overlayAlpha = 1.0 - ((timestamp - bubbleOverlayTimestamp) / 5000);
         if (overlayAlpha > 0) {
+            // Flash button
+            if ((timestamp - bubbleButtonTimestamp) >= 500) {
+                button.writeProperty('buttonState', bubbleButtonFlashState ? 1 : 0);
+                button.writeProperty('defaultState', bubbleButtonFlashState ? 1 : 0);
+                button.writeProperty('hoverState', bubbleButtonFlashState ? 3 : 2);
+                bubbleButtonTimestamp = timestamp;
+                bubbleButtonFlashState = !bubbleButtonFlashState;
+            }
+
             Overlays.editOverlay(bubbleOverlayArray[0], {
                 position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.1, z: MyAvatar.position.z },
-                scale: { x: MyAvatar.scale, y: 1, z: MyAvatar.scale },
+                scale: { x: Settings.getValue("IgnoreRadius") / 2, y: 1, z: Settings.getValue("IgnoreRadius") / 2 },
                 alpha: overlayAlpha
             });
             //for (var i = 1; i < bubbleOverlayArray.length; i++) {
             //    Overlays.editOverlay(bubbleOverlayArray[i], {
-            //        position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.1, z: MyAvatar.position.z },
-            //        scale: { x: MyAvatar.scale, y: 1, z: MyAvatar.scale },
+            //        position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.07) - MyAvatar.scale * 0.8, z: MyAvatar.position.z },
+            //        outerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale,
+            //        innerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale * 0.75,
             //        alpha: overlayAlpha
-            //        //position: { x: MyAvatar.position.x, y: MyAvatar.position.y + i * (MyAvatar.scale * 0.07) - MyAvatar.scale * 0.8, z: MyAvatar.position.z },
-            //        //outerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale,
-            //        //innerRadius: Settings.getValue("IgnoreRadius") * MyAvatar.scale * 0.75,
-            //        //alpha: overlayAlpha
             //    });
             //}
         } else {
@@ -102,6 +113,10 @@
                 Script.update.disconnect(update);
                 updateConnected = false;
             }
+            var bubbleActive = Users.getIgnoreRadiusEnabled();
+            button.writeProperty('buttonState', bubbleActive ? 0 : 1);
+            button.writeProperty('defaultState', bubbleActive ? 0 : 1);
+            button.writeProperty('hoverState', bubbleActive ? 2 : 3);
         }
     };
 
@@ -116,6 +131,7 @@
             deleteOverlays();
             if (updateConnected === true) {
                 Script.update.disconnect(update);
+                updateConnected = false;
             }
         }
     }
