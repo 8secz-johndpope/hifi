@@ -247,7 +247,7 @@ void AvatarManager::handleRemovedAvatar(const AvatarSharedPointer& removedAvatar
         _motionStatesToRemoveFromPhysics.push_back(motionState);
     }
 
-    if (removalReason == KillAvatarReason::AvatarEnteredBubble) {
+    if (removalReason == KillAvatarReason::TheirAvatarEnteredYourBubble) {
         emit DependencyManager::get<UsersScriptingInterface>()->enteredIgnoreRadius();
     }
     _avatarFades.push_back(removedAvatar);
