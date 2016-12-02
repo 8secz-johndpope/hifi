@@ -80,7 +80,7 @@ AvatarManager::AvatarManager(QObject* parent) :
 
     // when we hear that the user has ignored an avatar by session UUID
     // immediately remove that avatar instead of waiting for the absence of packets from avatar mixer
-    connect(nodeList.data(), &NodeList::ignoredNode, this, &AvatarManager::removeAvatar);
+    connect(nodeList.data(), "ignoredNode", this, "removeAvatar");
 }
 
 AvatarManager::~AvatarManager() {
@@ -223,12 +223,12 @@ AvatarSharedPointer AvatarManager::addAvatar(const QUuid& sessionUUID, const QWe
 }
 
 // virtual
-void AvatarManager::removeAvatar(const QUuid& sessionUUID) {
+void AvatarManager::removeAvatar(const QUuid& sessionUUID, KillAvatarReason removalReason) {
     QWriteLocker locker(&_hashLock);
 
     auto removedAvatar = _avatarHash.take(sessionUUID);
     if (removedAvatar) {
-        handleRemovedAvatar(removedAvatar, KillAvatarReason::NoReason);
+        handleRemovedAvatar(removedAvatar, removalReason);
     }
 }
 
@@ -247,7 +247,7 @@ void AvatarManager::handleRemovedAvatar(const AvatarSharedPointer& removedAvatar
         _motionStatesToRemoveFromPhysics.push_back(motionState);
     }
 
-    if (removalReason == KillAvatarReason::AvatarIgnored) {
+    if (removalReason == KillAvatarReason::AvatarEnteredBubble) {
         emit DependencyManager::get<UsersScriptingInterface>()->enteredIgnoreRadius();
     }
     _avatarFades.push_back(removedAvatar);

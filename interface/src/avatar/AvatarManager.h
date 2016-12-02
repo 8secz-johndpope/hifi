@@ -79,7 +79,7 @@ public slots:
     void updateAvatarRenderStatus(bool shouldRenderAvatars);
 
 private slots:
-    virtual void removeAvatar(const QUuid& sessionUUID);
+    virtual void removeAvatar(const QUuid& sessionUUID, KillAvatarReason removalReason = KillAvatarReason::NoReason) override;
 
 private:
     explicit AvatarManager(QObject* parent = 0);
