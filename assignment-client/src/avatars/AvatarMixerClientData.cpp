@@ -47,7 +47,7 @@ void AvatarMixerClientData::ignoreOther(SharedNodePointer self, SharedNodePointe
         addToRadiusIgnoringSet(other->getUUID());
         auto killPacket = NLPacket::create(PacketType::KillAvatar, NUM_BYTES_RFC4122_UUID + sizeof(KillAvatarReason));
         killPacket->write(other->getUUID().toRfc4122());
-        killPacket->writePrimitive(KillAvatarReason::AvatarIgnored);
+        killPacket->writePrimitive(KillAvatarReason::AvatarEnteredBubble);
         DependencyManager::get<NodeList>()->sendUnreliablePacket(*killPacket, *self);
         _hasReceivedFirstPacketsFrom.erase(other->getUUID());
     }
