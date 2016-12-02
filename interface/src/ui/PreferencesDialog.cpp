@@ -73,11 +73,11 @@ void setupPreferences() {
         auto setter = [=](float value) {
             nodeList->ignoreNodesInRadius(value, nodeList->getIgnoreRadiusEnabled());
         };
-        auto preference = new SpinnerPreference(AVATAR_BASICS, "Personal space bubble radius (default is 1m)", getter, setter);
-        preference->setMin(0.01f);
-        preference->setMax(99.9f);
-        preference->setDecimals(2);
-        preference->setStep(0.25);
+        auto preference = new SpinnerPreference(AVATAR_BASICS, "Personal space bubble radius", getter, setter);
+        preference->setMin(1.0f);
+        preference->setMax(15.0f);
+        preference->setDecimals(1);
+        preference->setStep(0.5f);
         preferences->addPreference(preference);
     }
 
