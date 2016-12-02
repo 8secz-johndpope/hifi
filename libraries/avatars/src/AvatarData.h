@@ -137,7 +137,8 @@ enum KillAvatarReason : uint8_t {
     NoReason = 0,
     AvatarDisconnected,
     AvatarIgnored,
-    AvatarEnteredBubble
+    TheirAvatarEnteredYourBubble,
+    YourAvatarEnteredTheirBubble
 };
 Q_DECLARE_METATYPE(KillAvatarReason);
 

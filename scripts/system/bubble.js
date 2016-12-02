@@ -21,9 +21,9 @@
     var bubbleButtonFlashState = false;
     var bubbleButtonTimestamp;
     var bubbleOverlay = Overlays.addOverlay("model", {
-        url: Script.resolvePath("assets/models/bubble-v2.fbx"),
+        url: Script.resolvePath("assets/models/bubble-v3.fbx"),
         dimensions: { x: 1.0, y: 0.5, z: 1.0 },
-        position: { x: MyAvatar.position.x, y: (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
+        position: { x: MyAvatar.position.x, y: (-MyAvatar.scale * 2) + (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
         rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
         scale: { x: Settings.getValue("IgnoreRadius"), y: MyAvatar.scale, z: Settings.getValue("IgnoreRadius") },
         visible: false,
@@ -50,7 +50,7 @@
         Audio.playSound(bubbleActivateSound, {
             position: { x: MyAvatar.position.x, y: MyAvatar.position.y, z: MyAvatar.position.z },
             localOnly: true,
-            volume: 0.5
+            volume: 0.4
         });
         if (updateConnected === true) {
             hideOverlays();
@@ -74,22 +74,22 @@
     update = function () {
         var timestamp = Date.now();
         var delay = (timestamp - bubbleOverlayTimestamp);
-        var overlayAlpha = 1.0 - (delay / 5000);
+        var overlayAlpha = 1.0 - (delay / 3000);
         if (overlayAlpha > 0) {
             // Flash button
             if ((timestamp - bubbleButtonTimestamp) >= 500) {
-                button.writeProperty('buttonState', bubbleButtonFlashState ? 1 : 0);
-                button.writeProperty('defaultState', bubbleButtonFlashState ? 1 : 0);
-                button.writeProperty('hoverState', bubbleButtonFlashState ? 3 : 2);
+                button.writeProperty('buttonState', bubbleButtonFlashState ? 0 : 1);
+                button.writeProperty('defaultState', bubbleButtonFlashState ? 0 : 1);
+                button.writeProperty('hoverState', bubbleButtonFlashState ? 2 : 3);
                 bubbleButtonTimestamp = timestamp;
                 bubbleButtonFlashState = !bubbleButtonFlashState;
             }
 
-            if (delay >= 3000) {
+            if (delay < 750) {
                 Overlays.editOverlay(bubbleOverlay, {
-                    position: { x: MyAvatar.position.x, y: (MyAvatar.position.y + MyAvatar.scale * 0.35) - ((1 - ((5000 - delay) / 2000)) * MyAvatar.scale * 2), z: MyAvatar.position.z },
+                    position: { x: MyAvatar.position.x, y: ((-((750 - delay) / 750)) * MyAvatar.scale * 2) + (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
                     rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-                    scale: { x: Settings.getValue("IgnoreRadius"), y: ((2 - ((5000 - delay) / 2000)) * MyAvatar.scale), z: Settings.getValue("IgnoreRadius") }
+                    scale: { x: Settings.getValue("IgnoreRadius"), y: ((1 - ((750 - delay) / 750)) * MyAvatar.scale), z: Settings.getValue("IgnoreRadius") }
                 });
             } else {
                 Overlays.editOverlay(bubbleOverlay, {
