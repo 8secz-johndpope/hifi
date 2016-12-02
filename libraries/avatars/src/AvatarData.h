@@ -139,6 +139,7 @@ enum KillAvatarReason : uint8_t {
     AvatarIgnored,
     AvatarEnteredBubble
 };
+Q_DECLARE_METATYPE(KillAvatarReason);
 
 class QDataStream;
 

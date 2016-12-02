@@ -20,11 +20,17 @@
     var bubbleOverlayTimestamp;
     var bubbleButtonFlashState = false;
     var bubbleButtonTimestamp;
-    var bubbleOverlayArray = [];
-    var bubbleOverlayRotation = Quat.fromVec3Degrees({ x: 90, y: 0, z: 0 });
+    var bubbleOverlay = Overlays.addOverlay("model", {
+        url: Script.resolvePath("assets/models/bubble-v2.fbx"),
+        dimensions: { x: 1.0, y: 0.5, z: 1.0 },
+        position: { x: MyAvatar.position.x, y: (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
+        rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
+        scale: { x: Settings.getValue("IgnoreRadius"), y: MyAvatar.scale, z: Settings.getValue("IgnoreRadius") },
+        visible: false,
+        ignoreRayIntersection: true
+    });
     var bubbleActivateSound = SoundCache.getSound(Script.resolvePath("assets/sounds/bubble.wav"));
     var updateConnected = false;
-    var overlayScale, overlayYRotation, overlayYPos;
 
     var ASSETS_PATH = Script.resolvePath("assets");
     var TOOLS_PATH = Script.resolvePath("assets/images/tools/");
@@ -33,11 +39,10 @@
         return TOOLS_PATH + 'bubble.svg';
     }
 
-    function deleteOverlays() {
-        for (var i = 0; i < bubbleOverlayArray.length; i++) {
-            Overlays.deleteOverlay(bubbleOverlayArray[i]);
-        }
-        bubbleOverlayArray = [];
+    function hideOverlays() {
+        Overlays.editOverlay(bubbleOverlay, {
+            visible: false
+        });
         bubbleButtonFlashState = false;
     }
 
@@ -45,53 +50,17 @@
         Audio.playSound(bubbleActivateSound, {
             position: { x: MyAvatar.position.x, y: MyAvatar.position.y, z: MyAvatar.position.z },
             localOnly: true,
-            volume: 0.7
+            volume: 0.5
         });
         if (updateConnected === true) {
-            deleteOverlays();
+            hideOverlays();
             updateConnected = false;
             Script.update.disconnect(update);
         }
 
-        overlayScale = Settings.getValue("IgnoreRadius");
-        overlayYPos = MyAvatar.position.y + MyAvatar.scale * 0.4;
-
-        bubbleOverlayArray.push(Overlays.addOverlay("model", {
-            url: Script.resolvePath("assets/models/bubble-v3.fbx"),
-            dimensions: { x: 1.0, y: 0.5, z: 1.0 },
-            position: { x: MyAvatar.position.x, y: overlayYPos, z: MyAvatar.position.z },
-            rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-            scale: { x: overlayScale, y: 1.0, z: overlayScale },
-            visible: true,
-            ignoreRayIntersection: true
-        }));
-        bubbleOverlayArray.push(Overlays.addOverlay("model", {
-            url: Script.resolvePath("assets/models/ring-v1.fbx"),
-            dimensions: { x: 1.0, y: 0.0025, z: 1.0 },
-            position: { x: MyAvatar.position.x, y: overlayYPos + 0.2, z: MyAvatar.position.z },
-            rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-            scale: { x: overlayScale * 1.1, y: 1.0, z: overlayScale * 1.1 },
-            visible: true,
-            ignoreRayIntersection: true
-        }));
-        bubbleOverlayArray.push(Overlays.addOverlay("model", {
-            url: Script.resolvePath("assets/models/ring-v1.fbx"),
-            dimensions: { x: 1.0, y: 0.0025, z: 1.0 },
-            position: { x: MyAvatar.position.x, y: overlayYPos, z: MyAvatar.position.z },
-            rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-            scale: { x: overlayScale * 1.1, y: 1.0, z: overlayScale * 1.1 },
-            visible: true,
-            ignoreRayIntersection: true
-        }));
-        bubbleOverlayArray.push(Overlays.addOverlay("model", {
-            url: Script.resolvePath("assets/models/ring-v1.fbx"),
-            dimensions: { x: 1.0, y: 0.0025, z: 1.0 },
-            position: { x: MyAvatar.position.x, y: overlayYPos - 0.2, z: MyAvatar.position.z },
-            rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-            scale: { x: overlayScale * 1.1, y: 1.0, z: overlayScale * 1.1 },
-            visible: true,
-            ignoreRayIntersection: true
-        }));
+        Overlays.editOverlay(bubbleOverlay, {
+            visible: true
+        });
         bubbleOverlayTimestamp = Date.now();
         bubbleButtonTimestamp = bubbleOverlayTimestamp;
         Script.update.connect(update);
@@ -116,71 +85,21 @@
                 bubbleButtonFlashState = !bubbleButtonFlashState;
             }
 
-            overlayScale = Settings.getValue("IgnoreRadius") * ((5000 - delay) / 1500);
-            overlayYPos = MyAvatar.position.y + MyAvatar.scale * 0.4;
-            overlayYRotation = delay / 100;
-            var avatarXPos = MyAvatar.position.x;
-            var avatarZPos = MyAvatar.position.z;
-            var avatarPitch = MyAvatar.bodyPitch;
-            var avatarRoll = MyAvatar.bodyRoll;
-
-            if (delay >= 3500) {
-                Overlays.editOverlay(bubbleOverlayArray[0], {
-                    position: { x: avatarXPos, y: overlayYPos, z: avatarZPos },
-                    rotation: Quat.fromPitchYawRollDegrees(avatarPitch, 0, avatarRoll),
-                    scale: {
-                        x: overlayScale,
-                        y: 1.0,
-                        z: overlayScale
-                    },
-                });
-                Overlays.editOverlay(bubbleOverlayArray[1], {
-                    position: { x: avatarXPos, y: overlayYPos + 0.2, z: avatarZPos },
-                    rotation: Quat.fromPitchYawRollDegrees(avatarPitch, -overlayYRotation, avatarRoll),
-                    scale: {
-                        x: overlayScale,
-                        y: 1.0,
-                        z: overlayScale
-                    },
-                });
-                Overlays.editOverlay(bubbleOverlayArray[2], {
-                    position: { x: avatarXPos, y: overlayYPos, z: avatarZPos },
-                    rotation: Quat.fromPitchYawRollDegrees(avatarPitch, overlayYRotation, avatarRoll),
-                    scale: {
-                        x: overlayScale,
-                        y: 1.0,
-                        z: overlayScale
-                    },
-                });
-                Overlays.editOverlay(bubbleOverlayArray[3], {
-                    position: { x: avatarXPos, y: overlayYPos - 0.2, z: avatarZPos },
-                    rotation: Quat.fromPitchYawRollDegrees(avatarPitch, -overlayYRotation, avatarRoll),
-                    scale: {
-                        x: overlayScale,
-                        y: 1.0,
-                        z: overlayScale
-                    },
+            if (delay >= 3000) {
+                Overlays.editOverlay(bubbleOverlay, {
+                    position: { x: MyAvatar.position.x, y: (MyAvatar.position.y + MyAvatar.scale * 0.35) - ((1 - ((5000 - delay) / 2000)) * MyAvatar.scale * 2), z: MyAvatar.position.z },
+                    rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
+                    scale: { x: Settings.getValue("IgnoreRadius"), y: ((2 - ((5000 - delay) / 2000)) * MyAvatar.scale), z: Settings.getValue("IgnoreRadius") }
                 });
             } else {
-                Overlays.editOverlay(bubbleOverlayArray[0], {
-                    position: { x: avatarXPos, y: overlayYPos, z: avatarZPos },
-                    rotation: Quat.fromPitchYawRollDegrees(avatarPitch, 0, avatarRoll),
-                });
-                Overlays.editOverlay(bubbleOverlayArray[1], {
-                    position: { x: avatarXPos, y: overlayYPos + 0.2, z: avatarZPos },
-                    rotation: Quat.fromPitchYawRollDegrees(avatarPitch, -(delay / 100), avatarRoll),
-                });
-                Overlays.editOverlay(bubbleOverlayArray[2], {
-                    position: { x: avatarXPos, y: overlayYPos, z: avatarZPos },
-                    rotation: Quat.fromPitchYawRollDegrees(avatarPitch, (delay / 100), avatarRoll),
-                });
-                Overlays.editOverlay(bubbleOverlayArray[3], {
-                    position: { x: avatarXPos, y: overlayYPos - 0.2, z: avatarZPos },
-                    rotation: Quat.fromPitchYawRollDegrees(avatarPitch, -(delay / 100), avatarRoll),
+                Overlays.editOverlay(bubbleOverlay, {
+                    position: { x: MyAvatar.position.x, y: (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
+                    rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
+                    scale: { x: Settings.getValue("IgnoreRadius"), y: MyAvatar.scale, z: Settings.getValue("IgnoreRadius") }
                 });
             }
         } else {
-            deleteOverlays();
+            hideOverlays();
             if (updateConnected === true) {
                 Script.update.disconnect(update);
                 updateConnected = false;
@@ -200,7 +119,7 @@
         if (bubbleActive) {
             createOverlays();
         } else {
-            deleteOverlays();
+            hideOverlays();
             if (updateConnected === true) {
                 Script.update.disconnect(update);
                 updateConnected = false;
@@ -227,7 +146,8 @@
         button.clicked.disconnect(Users.toggleIgnoreRadius);
         Users.ignoreRadiusEnabledChanged.disconnect(onBubbleToggled);
         Users.enteredIgnoreRadius.disconnect(enteredIgnoreRadius);
-        deleteOverlays();
+        Overlays.deleteOverlay(bubbleOverlay);
+        bubbleButtonFlashState = false;
         if (updateConnected === true) {
             Script.update.disconnect(update);
         }
