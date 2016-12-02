@@ -136,7 +136,8 @@ enum KeyState {
 enum KillAvatarReason : uint8_t {
     NoReason = 0,
     AvatarDisconnected,
-    AvatarIgnored
+    AvatarIgnored,
+    AvatarEnteredBubble
 };
 
 class QDataStream;
