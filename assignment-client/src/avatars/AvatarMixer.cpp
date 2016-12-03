@@ -242,7 +242,7 @@ void AvatarMixer::broadcastAvatarData() {
                         AvatarMixerClientData* nodeData = reinterpret_cast<AvatarMixerClientData*>(node->getLinkedData());
                         // check to see if we're ignoring in radius
                         if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
-                            float ignoreRadius = glm::min(node->getIgnoreRadius(), otherNode->getIgnoreRadius());
+                            float ignoreRadius = glm::max(node->getIgnoreRadius(), otherNode->getIgnoreRadius());
                             if (glm::distance(nodeData->getPosition(), otherData->getPosition()) < ignoreRadius) {
                                 nodeData->ignoreOther(node, otherNode);
                                 otherData->ignoreOther(otherNode, node);
