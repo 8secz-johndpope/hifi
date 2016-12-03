@@ -20,12 +20,13 @@
     var bubbleOverlayTimestamp;
     var bubbleButtonFlashState = false;
     var bubbleButtonTimestamp;
+    var ignoreRadius = Settings.getValue("IgnoreRadius");
     var bubbleOverlay = Overlays.addOverlay("model", {
         url: Script.resolvePath("assets/models/bubble-v3.fbx"),
         dimensions: { x: 1.0, y: 0.5, z: 1.0 },
         position: { x: MyAvatar.position.x, y: (-MyAvatar.scale * 2) + (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
         rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-        scale: { x: Settings.getValue("IgnoreRadius"), y: MyAvatar.scale, z: Settings.getValue("IgnoreRadius") },
+        scale: { x: ignoreRadius, y: MyAvatar.scale, z: ignoreRadius },
         visible: false,
         ignoreRayIntersection: true
     });
@@ -47,6 +48,7 @@
     }
 
     function createOverlays() {
+        ignoreRadius = Settings.getValue("IgnoreRadius");
         Audio.playSound(bubbleActivateSound, {
             position: { x: MyAvatar.position.x, y: MyAvatar.position.y, z: MyAvatar.position.z },
             localOnly: true,
@@ -89,13 +91,13 @@
                 Overlays.editOverlay(bubbleOverlay, {
                     position: { x: MyAvatar.position.x, y: ((-((750 - delay) / 750)) * MyAvatar.scale * 2) + (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
                     rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-                    scale: { x: Settings.getValue("IgnoreRadius"), y: ((1 - ((750 - delay) / 750)) * MyAvatar.scale), z: Settings.getValue("IgnoreRadius") }
+                    scale: { x: ignoreRadius, y: ((1 - ((750 - delay) / 750)) * MyAvatar.scale), z: ignoreRadius }
                 });
             } else {
                 Overlays.editOverlay(bubbleOverlay, {
                     position: { x: MyAvatar.position.x, y: (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
                     rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-                    scale: { x: Settings.getValue("IgnoreRadius"), y: MyAvatar.scale, z: Settings.getValue("IgnoreRadius") }
+                    scale: { x: ignoreRadius, y: MyAvatar.scale, z: ignoreRadius }
                 });
             }
         } else {
