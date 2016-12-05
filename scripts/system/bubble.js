@@ -22,9 +22,9 @@
     var bubbleButtonTimestamp;
     var ignoreRadius = Settings.getValue("IgnoreRadius");
     var bubbleOverlay = Overlays.addOverlay("model", {
-        url: Script.resolvePath("assets/models/bubble-v3.fbx"),
+        url: Script.resolvePath("assets/models/bubble-v12.fbx"),
         dimensions: { x: 1.0, y: 0.5, z: 1.0 },
-        position: { x: MyAvatar.position.x, y: (-MyAvatar.scale * 2) + (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
+        position: { x: MyAvatar.position.x*2, y: (-MyAvatar.scale * 2) + (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z*2 },
         rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
         scale: { x: ignoreRadius, y: MyAvatar.scale, z: ignoreRadius },
         visible: false,
@@ -89,13 +89,13 @@
 
             if (delay < 750) {
                 Overlays.editOverlay(bubbleOverlay, {
-                    position: { x: MyAvatar.position.x, y: ((-((750 - delay) / 750)) * MyAvatar.scale * 2) + (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
+                    position: { x: MyAvatar.position.x*2, y: ((-((750 - delay) / 750)) * MyAvatar.scale * 2) + (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z*2 },
                     rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
                     scale: { x: ignoreRadius, y: ((1 - ((750 - delay) / 750)) * MyAvatar.scale), z: ignoreRadius }
                 });
             } else {
                 Overlays.editOverlay(bubbleOverlay, {
-                    position: { x: MyAvatar.position.x, y: (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z },
+                    position: { x: MyAvatar.position.x*2, y: (MyAvatar.position.y + MyAvatar.scale * 0.35), z: MyAvatar.position.z*2 },
                     rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
                     scale: { x: ignoreRadius, y: MyAvatar.scale, z: ignoreRadius }
                 });
