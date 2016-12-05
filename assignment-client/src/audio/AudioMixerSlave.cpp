@@ -211,21 +211,25 @@ bool AudioMixerSlave::prepareMix(const SharedNodePointer& node) {
         if (otherData
             && !node->isIgnoringNodeWithID(otherNode->getUUID()) && !otherNode->isIgnoringNodeWithID(node->getUUID()))  {
 
-            // check if distance is inside ignore radius
+            // check to see if we're ignoring in radius
+            bool insideIgnoreRadius = false;
             if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
-                float ignoreRadius = glm::min(node->getIgnoreRadius(), otherNode->getIgnoreRadius());
+                AudioMixerClientData* otherData = reinterpret_cast<AudioMixerClientData*>(otherNode->getLinkedData());
+                AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
+                float ignoreRadius = glm::max(node->getIgnoreRadius(), otherNode->getIgnoreRadius());
                 if (glm::distance(nodeData->getPosition(), otherData->getPosition()) < ignoreRadius) {
-                    // skip, distance is inside ignore radius
-                    return;
+                    insideIgnoreRadius = true;
                 }
             }
 
-            // enumerate the ARBs attached to the otherNode and add all that should be added to mix
-            auto streamsCopy = otherData->getAudioStreams();
+            // enumerate the ARBs attached to the otherNode
+            auto streamsCopy = otherNodeClientData->getAudioStreams();
             for (auto& streamPair : streamsCopy) {
                 auto otherNodeStream = streamPair.second;
-                if (*otherNode != *node || otherNodeStream->shouldLoopbackForNode()) {
-                    addStreamToMix(*nodeData, otherNode->getUUID(), *nodeAudioStream, *otherNodeStream);
+                // add all audio streams that should be added to the mix
+                if (*otherNode != *node || otherNodeStream->shouldLoopbackForNode() || !insideIgnoreRadius) {
+                    addStreamToMixForListeningNodeWithStream(*listenerNodeData, *otherNodeStream, otherNode->getUUID(),
+                                                                *nodeAudioStream);
                 }
             }
         }
