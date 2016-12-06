@@ -408,8 +408,9 @@ bool AudioMixer::prepareMixForListeningNode(Node* node) {
             auto streamsCopy = otherNodeClientData->getAudioStreams();
             for (auto& streamPair : streamsCopy) {
                 auto otherNodeStream = streamPair.second;
+                bool isSelfWithEcho = (*otherNode == *node) && (otherNodeStream->shouldLoopbackForNode());
                 // add all audio streams that should be added to the mix
-                if (*otherNode != *node || otherNodeStream->shouldLoopbackForNode() || !insideIgnoreRadius) {
+                if (isSelfWithEcho || (!isSelfWithEcho && !insideIgnoreRadius)) {
                     addStreamToMixForListeningNodeWithStream(*listenerNodeData, *otherNodeStream, otherNode->getUUID(),
                                                                 *nodeAudioStream);
                 }
