@@ -46,7 +46,7 @@ AvatarMixer::AvatarMixer(ReceivedMessage& message) :
     packetReceiver.registerListener(PacketType::AvatarIdentity, this, "handleAvatarIdentityPacket");
     packetReceiver.registerListener(PacketType::KillAvatar, this, "handleKillAvatarPacket");
     packetReceiver.registerListener(PacketType::NodeIgnoreRequest, this, "handleNodeIgnoreRequestPacket");
-    packetReceiver.registerListener(PacketType::RadiusIgnoreRequest, this, "handleRadiusIgnoreRequestPacket");
+    packetReceiver.registerListener(PacketType::SpaceBubbleIgnoreRequest, this, "handleSpaceBubbleIgnoreRequestPacket");
 
     auto nodeList = DependencyManager::get<NodeList>();
     connect(nodeList.data(), &NodeList::packetVersionMismatch, this, &AvatarMixer::handlePacketVersionMismatch);
@@ -241,9 +241,9 @@ void AvatarMixer::broadcastAvatarData() {
                         AvatarMixerClientData* otherData = reinterpret_cast<AvatarMixerClientData*>(otherNode->getLinkedData());
                         AvatarMixerClientData* nodeData = reinterpret_cast<AvatarMixerClientData*>(node->getLinkedData());
                         // check to see if we're ignoring in radius
-                        if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
-                            float ignoreRadius = glm::max(node->getIgnoreRadius(), otherNode->getIgnoreRadius());
-                            if (glm::distance(nodeData->getPosition(), otherData->getPosition()) < ignoreRadius) {
+                        if (node->isSpaceBubbleEnabled() || otherNode->isSpaceBubbleEnabled()) {
+                            float spaceBubbleScaleFactor = glm::max(node->getSpaceBubbleScaleFactor(), otherNode->getSpaceBubbleScaleFactor());
+                            if (glm::distance(nodeData->getPosition(), otherData->getPosition()) < spaceBubbleScaleFactor) {
                                 nodeData->ignoreOther(node, otherNode);
                                 otherData->ignoreOther(otherNode, node);
                                 return false;
@@ -458,8 +458,8 @@ void AvatarMixer::handleNodeIgnoreRequestPacket(QSharedPointer<ReceivedMessage> 
     senderNode->parseIgnoreRequestMessage(message);
 }
 
-void AvatarMixer::handleRadiusIgnoreRequestPacket(QSharedPointer<ReceivedMessage> packet, SharedNodePointer sendingNode) {
-    sendingNode->parseIgnoreRadiusRequestMessage(packet);
+void AvatarMixer::handleSpaceBubbleIgnoreRequestPacket(QSharedPointer<ReceivedMessage> packet, SharedNodePointer sendingNode) {
+    sendingNode->parseSpaceBubbleIgnoreRequestMessage(packet);
 }
 
 void AvatarMixer::sendStatsPacket() {

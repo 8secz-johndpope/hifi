@@ -59,54 +59,54 @@ public slots:
     bool getCanKick();
 
     /**jsdoc
-    * Toggle the state of the ignore in radius feature
-    * @function Users.toggleIgnoreRadius
+    * Toggle the state of the space bubble feature
+    * @function Users.toggleSpaceBubble
     */
-    void toggleIgnoreRadius();
+    void toggleSpaceBubble();
 
     /**jsdoc
-    * Enables the ignore radius feature.
-    * @function Users.enableIgnoreRadius
+    * Enables the space bubble feature.
+    * @function Users.enableSpaceBubble
     */
-    void enableIgnoreRadius();
+    void enableSpaceBubble();
 
     /**jsdoc
-    * Disables the ignore radius feature.
-    * @function Users.disableIgnoreRadius
+    * Disables the space bubble feature.
+    * @function Users.disableSpaceBubble
     */
-    void disableIgnoreRadius();
+    void disableSpaceBubble();
 
     /**jsdoc
-    * sets the parameters for the ignore radius feature.
-    * @function Users.setIgnoreRadius
-    * @param {number} radius The radius for the auto ignore in radius feature
-    * @param {bool} [enabled=true] Whether the ignore in radius feature should be enabled
+    * sets the parameters for the space bubble feature.
+    * @function Users.setSpaceBubble
+    * @param {number} spaceBubbleScaleFactor The scale factor for the auto-ignore-in-space-bubble feature
+    * @param {bool} [enabled=true] Whether the space bubble feature should be enabled
     */
-    void setIgnoreRadius(float radius, bool enabled = true);
+    void setSpaceBubbleScaleFactor(float spaceBubbleScaleFactor, bool enabled = true);
 
     /**jsdoc
-    * Returns the effective radius of the ingore radius feature if it is enabled.
-    * @function Users.getIgnoreRadius
-    * @return {number} radius of the ignore feature
+    * Returns the scale factor of the space bubble if it is enabled.
+    * @function Users.getSpaceBubbleScaleFactor
+    * @return {number} scale factor of the ignore feature
     */
-    float getIgnoreRadius();
+    float getSpaceBubbleScaleFactor();
 
     /**jsdoc
     * Returns `true` if the ignore in radius feature is enabled
-    * @function Users.getIgnoreRadiusEnabled
-    * @return {bool} `true` if the ignore in radius feature is enabled, `false` if not.
+    * @function Users.getSpaceBubbleEnabled
+    * @return {bool} `true` if the space bubble feature is enabled, `false` if not.
     */
-    bool getIgnoreRadiusEnabled();
+    bool getSpaceBubbleEnabled();
 
 signals:
     void canKickChanged(bool canKick);
-    void ignoreRadiusEnabledChanged(bool isEnabled);
+    void spaceBubbleEnabledChanged(bool isEnabled);
 
     /**jsdoc
-    * Notifies scripts that another user has entered the ignore radius
-    * @function Users.enteredIgnoreRadius
+    * Notifies scripts that another user has entered your space bubble
+    * @function Users.enteredSpaceBubble
     */
-    void enteredIgnoreRadius();
+    void enteredSpaceBubble();
 };
 
 

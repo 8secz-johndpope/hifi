@@ -64,7 +64,6 @@ Node::Node(const QUuid& uuid, NodeType_t type, const HifiSockAddr& publicSocket,
 {
     // Update socket's object name
     setType(_type);
-    _ignoreRadiusEnabled = false;
 }
 
 void Node::setType(char type) {
@@ -100,15 +99,6 @@ void Node::addIgnoredNode(const QUuid& otherNodeID) {
     } else {
         qCWarning(networking) << "Node::addIgnoredNode called with null ID or ID of ignoring node.";
     }
-}
-
-void Node::parseIgnoreRadiusRequestMessage(QSharedPointer<ReceivedMessage> message) {
-    bool enabled;
-    float radius;
-    message->readPrimitive(&enabled);
-    message->readPrimitive(&radius);
-    _ignoreRadiusEnabled = enabled;
-    _ignoreRadius = radius;
 }
 
 QDataStream& operator<<(QDataStream& out, const Node& node) {

@@ -50,6 +50,7 @@
 #include <AccountManager.h>
 #include <AddressManager.h>
 #include <AnimDebugDraw.h>
+#include <AvatarSpaceBubble.h>
 #include <BuildInfo.h>
 #include <AssetClient.h>
 #include <AutoUpdater.h>
@@ -2512,7 +2513,7 @@ void Application::keyPressEvent(QKeyEvent* event) {
 
             case Qt::Key_N:
                 if (!isOption && !isShifted && isMeta) {
-                    DependencyManager::get<NodeList>()->toggleIgnoreRadius();
+                    DependencyManager::get<AvatarSpaceBubble>()->toggleSpaceBubble();
                 }
                 break;
 

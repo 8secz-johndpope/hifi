@@ -100,8 +100,8 @@ public:
         MoreEntityShapes,
         NodeKickRequest,
         NodeMuteRequest,
-        RadiusIgnoreRequest,
-        LAST_PACKET_TYPE = RadiusIgnoreRequest
+        SpaceBubbleIgnoreRequest,
+        LAST_PACKET_TYPE = SpaceBubbleIgnoreRequest
     };
 };
 

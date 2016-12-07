@@ -20,7 +20,7 @@
     var bubbleOverlayTimestamp;
     var bubbleButtonFlashState = false;
     var bubbleButtonTimestamp;
-    var ignoreRadius = Settings.getValue("IgnoreRadius");
+    var ignoreRadius = 1.5; // CHANGE THIS
     var bubbleOverlay = Overlays.addOverlay("model", {
         url: Script.resolvePath("assets/models/bubble-v12.fbx"),
         dimensions: { x: 1.0, y: 0.75, z: 1.0 },
@@ -48,7 +48,7 @@
     }
 
     function createOverlays() {
-        ignoreRadius = Settings.getValue("IgnoreRadius");
+        ignoreRadius = 1.5; // CHANGE THIS
         Audio.playSound(bubbleActivateSound, {
             position: { x: MyAvatar.position.x, y: MyAvatar.position.y, z: MyAvatar.position.z },
             localOnly: true,
@@ -72,7 +72,7 @@
         updateConnected = true;
     }
 
-    function enteredIgnoreRadius() {
+    function enteredSpaceBubble() {
         createOverlays();
     }
 
@@ -109,7 +109,7 @@
                 Script.update.disconnect(update);
                 updateConnected = false;
             }
-            var bubbleActive = Users.getIgnoreRadiusEnabled();
+            var bubbleActive = Users.getSpaceBubbleEnabled();
             button.writeProperty('buttonState', bubbleActive ? 0 : 1);
             button.writeProperty('defaultState', bubbleActive ? 0 : 1);
             button.writeProperty('hoverState', bubbleActive ? 2 : 3);
@@ -117,7 +117,7 @@
     };
 
     function onBubbleToggled() {
-        var bubbleActive = Users.getIgnoreRadiusEnabled();
+        var bubbleActive = Users.getSpaceBubbleEnabled();
         button.writeProperty('buttonState', bubbleActive ? 0 : 1);
         button.writeProperty('defaultState', bubbleActive ? 0 : 1);
         button.writeProperty('hoverState', bubbleActive ? 2 : 3);
@@ -141,16 +141,16 @@
     });
     onBubbleToggled();
 
-    button.clicked.connect(Users.toggleIgnoreRadius);
-    Users.ignoreRadiusEnabledChanged.connect(onBubbleToggled);
-    Users.enteredIgnoreRadius.connect(enteredIgnoreRadius);
+    button.clicked.connect(Users.toggleSpaceBubble);
+    Users.spaceBubbleEnabledChanged.connect(onBubbleToggled);
+    Users.enteredSpaceBubble.connect(enteredSpaceBubble);
 
     // cleanup the toolbar button and overlays when script is stopped
     Script.scriptEnding.connect(function () {
         toolbar.removeButton('bubble');
-        button.clicked.disconnect(Users.toggleIgnoreRadius);
-        Users.ignoreRadiusEnabledChanged.disconnect(onBubbleToggled);
-        Users.enteredIgnoreRadius.disconnect(enteredIgnoreRadius);
+        button.clicked.disconnect(Users.toggleSpaceBubble);
+        Users.spaceBubbleEnabledChanged.disconnect(onBubbleToggled);
+        Users.enteredSpaceBubble.disconnect(enteredSpaceBubble);
         Overlays.deleteOverlay(bubbleOverlay);
         bubbleButtonFlashState = false;
         if (updateConnected === true) {

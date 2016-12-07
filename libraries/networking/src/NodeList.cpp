@@ -750,28 +750,6 @@ bool NodeList::sockAddrBelongsToDomainOrNode(const HifiSockAddr& sockAddr) {
     return _domainHandler.getSockAddr() == sockAddr || LimitedNodeList::sockAddrBelongsToNode(sockAddr);
 }
 
-void NodeList::ignoreNodesInRadius(float radiusToIgnore, bool enabled) {
-    bool isEnabledChange = _ignoreRadiusEnabled.get() != enabled;
-    _ignoreRadiusEnabled.set(enabled);
-    _ignoreRadius.set(radiusToIgnore);
-
-    eachMatchingNode([](const SharedNodePointer& node)->bool {
-        return (node->getType() == NodeType::AudioMixer || node->getType() == NodeType::AvatarMixer);
-    }, [this](const SharedNodePointer& destinationNode) {
-        sendIgnoreRadiusStateToNode(destinationNode);
-    });
-    if (isEnabledChange) {
-        emit ignoreRadiusEnabledChanged(enabled);
-    }
-}
-
-void NodeList::sendIgnoreRadiusStateToNode(const SharedNodePointer& destinationNode) {
-    auto ignorePacket = NLPacket::create(PacketType::RadiusIgnoreRequest, sizeof(bool) + sizeof(float), true);
-    ignorePacket->writePrimitive(_ignoreRadiusEnabled.get());
-    ignorePacket->writePrimitive(_ignoreRadius.get());
-    sendPacket(std::move(ignorePacket), *destinationNode);
-}
-
 void NodeList::ignoreNodeBySessionID(const QUuid& nodeID) {
     // enumerate the nodes to send a reliable ignore packet to each that can leverage it
     if (!nodeID.isNull() && _sessionUUID != nodeID) {
@@ -834,7 +812,7 @@ void NodeList::maybeSendIgnoreSetToNode(SharedNodePointer newNode) {
         }
 
         // also send them the current ignore radius state.
-        sendIgnoreRadiusStateToNode(newNode);
+        sendSpaceBubbleStateToNode(newNode);
     }
 }
 

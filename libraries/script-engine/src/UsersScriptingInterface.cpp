@@ -12,12 +12,13 @@
 #include "UsersScriptingInterface.h"
 
 #include <NodeList.h>
+#include <AvatarSpaceBubble.h>
 
 UsersScriptingInterface::UsersScriptingInterface() {
     // emit a signal when kick permissions have changed
     auto nodeList = DependencyManager::get<NodeList>();
     connect(nodeList.data(), &LimitedNodeList::canKickChanged, this, &UsersScriptingInterface::canKickChanged);
-    connect(nodeList.data(), &NodeList::ignoreRadiusEnabledChanged, this, &UsersScriptingInterface::ignoreRadiusEnabledChanged);
+    connect(nodeList.data(), &AvatarSpaceBubble::spaceBubbleEnabledChanged, this, &UsersScriptingInterface::spaceBubbleEnabledChanged);
 }
 
 void UsersScriptingInterface::ignore(const QUuid& nodeID) {
@@ -40,26 +41,26 @@ bool UsersScriptingInterface::getCanKick() {
     return DependencyManager::get<NodeList>()->getThisNodeCanKick();
 }
 
-void UsersScriptingInterface::toggleIgnoreRadius() {
-    DependencyManager::get<NodeList>()->toggleIgnoreRadius();
+void UsersScriptingInterface::toggleSpaceBubble() {
+    DependencyManager::get<AvatarSpaceBubble>()->toggleSpaceBubble();
 }
 
-void UsersScriptingInterface::enableIgnoreRadius() {
-    DependencyManager::get<NodeList>()->enableIgnoreRadius();
+void UsersScriptingInterface::enableSpaceBubble() {
+    DependencyManager::get<AvatarSpaceBubble>()->enableSpaceBubble();
 }
 
-void UsersScriptingInterface::disableIgnoreRadius() {
-    DependencyManager::get<NodeList>()->disableIgnoreRadius();
+void UsersScriptingInterface::disableSpaceBubble() {
+    DependencyManager::get<AvatarSpaceBubble>()->disableSpaceBubble();
 }
 
-void UsersScriptingInterface::setIgnoreRadius(float radius, bool enabled) {
-    DependencyManager::get<NodeList>()->ignoreNodesInRadius(radius, enabled);
+void UsersScriptingInterface::setSpaceBubbleScaleFactor(float spaceBubbleScaleFactor, bool enabled) {
+    DependencyManager::get<AvatarSpaceBubble>()->ignoreNodesInSpaceBubble(spaceBubbleScaleFactor, enabled);
 }
 
- float UsersScriptingInterface::getIgnoreRadius() {
-    return DependencyManager::get<NodeList>()->getIgnoreRadius();
+float UsersScriptingInterface::getSpaceBubbleScaleFactor() {
+    return DependencyManager::get<AvatarSpaceBubble>()->getSpaceBubbleScaleFactor();
 }
 
-bool UsersScriptingInterface::getIgnoreRadiusEnabled() {
-    return DependencyManager::get<NodeList>()->getIgnoreRadiusEnabled();
+bool UsersScriptingInterface::getSpaceBubbleEnabled() {
+    return DependencyManager::get<AvatarSpaceBubble>()->getSpaceBubbleEnabled();
 }

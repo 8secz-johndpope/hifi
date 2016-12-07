@@ -95,7 +95,7 @@ AudioMixer::AudioMixer(ReceivedMessage& message) :
     packetReceiver.registerListener(PacketType::NodeIgnoreRequest, this, "handleNodeIgnoreRequestPacket");
     packetReceiver.registerListener(PacketType::KillAvatar, this, "handleKillAvatarPacket");
     packetReceiver.registerListener(PacketType::NodeMuteRequest, this, "handleNodeMuteRequestPacket");
-    packetReceiver.registerListener(PacketType::RadiusIgnoreRequest, this, "handleRadiusIgnoreRequestPacket");
+    packetReceiver.registerListener(PacketType::SpaceBubbleIgnoreRequest, this, "handleSpaceBubbleIgnoreRequestPacket");
     connect(nodeList.data(), &NodeList::nodeKilled, this, &AudioMixer::handleNodeKilled);
 }
 
@@ -394,13 +394,13 @@ bool AudioMixer::prepareMixForListeningNode(Node* node) {
             AudioMixerClientData* otherNodeClientData = (AudioMixerClientData*) otherNode->getLinkedData();
 
             // check to see if we're ignoring in radius
-            bool insideIgnoreRadius = false;
-            if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
+            bool insideSpaceBubble = false;
+            if (node->isSpaceBubbleEnabled() || otherNode->isSpaceBubbleEnabled()) {
                 AudioMixerClientData* otherData = reinterpret_cast<AudioMixerClientData*>(otherNode->getLinkedData());
                 AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
-                float ignoreRadius = glm::max(node->getIgnoreRadius(), otherNode->getIgnoreRadius());
-                if (glm::distance(nodeData->getPosition(), otherData->getPosition()) < ignoreRadius) {
-                    insideIgnoreRadius = true;
+                float spaceBubbleScaleFactor = glm::max(node->getSpaceBubbleScaleFactor(), otherNode->getSpaceBubbleScaleFactor());
+                if (glm::distance(nodeData->getPosition(), otherData->getPosition()) < spaceBubbleScaleFactor) {
+                    insideSpaceBubble = true;
                 }
             }
 
@@ -410,7 +410,7 @@ bool AudioMixer::prepareMixForListeningNode(Node* node) {
                 auto otherNodeStream = streamPair.second;
                 bool isSelfWithEcho = (*otherNode == *node) && (otherNodeStream->shouldLoopbackForNode());
                 // add all audio streams that should be added to the mix
-                if (isSelfWithEcho || (!isSelfWithEcho && !insideIgnoreRadius)) {
+                if (isSelfWithEcho || (!isSelfWithEcho && !insideSpaceBubble)) {
                     addStreamToMixForListeningNodeWithStream(*listenerNodeData, *otherNodeStream, otherNode->getUUID(),
                                                                 *nodeAudioStream);
                 }
@@ -648,8 +648,8 @@ void AudioMixer::handleNodeIgnoreRequestPacket(QSharedPointer<ReceivedMessage> p
     sendingNode->parseIgnoreRequestMessage(packet);
 }
 
-void AudioMixer::handleRadiusIgnoreRequestPacket(QSharedPointer<ReceivedMessage> packet, SharedNodePointer sendingNode) {
-    sendingNode->parseIgnoreRadiusRequestMessage(packet);
+void AudioMixer::handleSpaceBubbleIgnoreRequestPacket(QSharedPointer<ReceivedMessage> packet, SharedNodePointer sendingNode) {
+    sendingNode->parseSpaceBubbleIgnoreRequestMessage(packet);
 }
 
 void AudioMixer::removeHRTFsForFinishedInjector(const QUuid& streamID) {
