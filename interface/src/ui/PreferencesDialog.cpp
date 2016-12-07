@@ -34,6 +34,7 @@ void setupPreferences() {
     auto preferences = DependencyManager::get<Preferences>();
     auto nodeList = DependencyManager::get<NodeList>();
     auto myAvatar = DependencyManager::get<AvatarManager>()->getMyAvatar();
+    auto avatarSpaceBubble = DependencyManager::get<AvatarSpaceBubble>();
     static const QString AVATAR_BASICS { "Avatar Basics" };
     {
         auto getter = [=]()->QString { return myAvatar->getDisplayName(); };
@@ -69,9 +70,9 @@ void setupPreferences() {
         preferences->addPreference(new CheckPreference(AVATAR_BASICS, "Clear overlays when moving", getter, setter));
     }
     {
-        auto getter = [=]()->float { return nodeList->getSpaceBubbleScaleFactor(); };
+        auto getter = [=]()->float { return avatarSpaceBubble->getSpaceBubbleScaleFactor(); };
         auto setter = [=](float value) {
-            nodeList->ignoreNodesInSpaceBubble(value, nodeList->getSpaceBubbleEnabled());
+            avatarSpaceBubble->updateNodesSpaceBubbleParameters(value, avatarSpaceBubble->getSpaceBubbleEnabled());
         };
         auto preference = new SpinnerPreference(AVATAR_BASICS, "Personal space bubble scale factor", getter, setter);
         preference->setMin(0.5f);

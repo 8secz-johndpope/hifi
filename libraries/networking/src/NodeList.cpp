@@ -22,6 +22,7 @@
 
 #include <LogHandler.h>
 #include <UUID.h>
+#include <AvatarSpaceBubble.h>
 
 #include "AccountManager.h"
 #include "AddressManager.h"
@@ -812,7 +813,7 @@ void NodeList::maybeSendIgnoreSetToNode(SharedNodePointer newNode) {
         }
 
         // also send them the current ignore radius state.
-        sendSpaceBubbleStateToNode(newNode);
+        DependencyManager::get<AvatarSpaceBubble>()->sendSpaceBubbleStateToNode(newNode);
     }
 }
 
