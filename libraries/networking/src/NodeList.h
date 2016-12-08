@@ -156,7 +156,7 @@ private:
 
     void sendIgnoreRadiusStateToNode(const SharedNodePointer& destinationNode);
     Setting::Handle<bool> _ignoreRadiusEnabled { "IgnoreRadiusEnabled", true };
-    Setting::Handle<float> _ignoreRadius { "IgnoreRadius", 1.5f };
+    Setting::Handle<float> _ignoreRadius { "IgnoreRadius", 1.0f };
 
 #if (PR_BUILD || DEV_BUILD)
     bool _shouldSendNewerVersion { false };

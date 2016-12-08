@@ -236,9 +236,9 @@ void MyAvatar::simulateAttachments(float deltaTime) {
 QByteArray MyAvatar::toByteArray(bool cullSmallChanges, bool sendAll) {
     CameraMode mode = qApp->getCamera()->getMode();
     _globalPosition = getPosition();
-    _globalBoundingBoxCorner.x = _globalPosition.x - (_characterController.getCapsuleRadius());
-    _globalBoundingBoxCorner.y = _globalPosition.y - (_characterController.getCapsuleHalfHeight());
-    _globalBoundingBoxCorner.z = _globalPosition.z - (_characterController.getCapsuleRadius());
+    _globalBoundingBoxCorner.x = max(0.15f, _characterController.getCapsuleRadius());
+    _globalBoundingBoxCorner.y = max(0.65f, _characterController.getCapsuleHalfHeight());
+    _globalBoundingBoxCorner.z = max(0.15f, _characterController.getCapsuleRadius());
     if (mode == CAMERA_MODE_THIRD_PERSON || mode == CAMERA_MODE_INDEPENDENT) {
         // fake the avatar position that is sent up to the AvatarMixer
         glm::vec3 oldPosition = getPosition();

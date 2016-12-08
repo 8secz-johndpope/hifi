@@ -243,23 +243,17 @@ void AvatarMixer::broadcastAvatarData() {
                         AvatarMixerClientData* nodeData = reinterpret_cast<AvatarMixerClientData*>(node->getLinkedData());
                         // check to see if we're ignoring in radius
                         if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
-                            AABox nodeBox;
-                            AABox otherNodeBox;
-                            glm::vec3 minBoxDimensions(0.3f, 1.3f / 2, 0.3f);
+                            AABox nodeBox(nodeData->getGlobalBoundingBoxCorner(), (nodeData->getPosition() - nodeData->getGlobalBoundingBoxCorner()) * 2.0f);
+                            AABox otherNodeBox(otherData->getGlobalBoundingBoxCorner(), (otherData->getPosition() - otherData->getGlobalBoundingBoxCorner()) * 2.0f);
+                            AABox* nodeBoxToUse = &nodeBox;
+                            float ignoreRadiusToUse = node->getIgnoreRadius();
 
-                            if (glm::any(glm::lessThan((nodeData->getPosition() - nodeData->getGlobalBoundingBoxCorner()) * 2.0f, minBoxDimensions))) {
-                                nodeBox.setBox(nodeData->getPosition() - minBoxDimensions, minBoxDimensions * 2.0f);
-                            } else {
-                                nodeBox.setBox(nodeData->getGlobalBoundingBoxCorner(), (nodeData->getPosition() - nodeData->getGlobalBoundingBoxCorner()) * 2.0f);
+                            if (otherNode->getIgnoreRadius() > ignoreRadiusToUse) {
+                                ignoreRadiusToUse = otherNode->getIgnoreRadius();
+                                nodeBoxToUse = &otherNodeBox;
                             }
-                            nodeBox.scale(node->getIgnoreRadius());
-
-                            if (glm::any(glm::lessThan((otherData->getPosition() - otherData->getGlobalBoundingBoxCorner()) * 2.0f, minBoxDimensions))) {
-                                otherNodeBox.setBox(otherData->getPosition() - minBoxDimensions, minBoxDimensions * 2.0f);
-                            } else {
-                                otherNodeBox.setBox(otherData->getGlobalBoundingBoxCorner(), (otherData->getPosition() - otherData->getGlobalBoundingBoxCorner()) * 2.0f);
-                            }
-                            otherNodeBox.scale(otherNode->getIgnoreRadius());
+                            ignoreRadiusToUse = ignoreRadiusToUse / nodeBoxToUse.getScale().x * 2.0f;
+                            nodeBoxToUse->embiggen(glm::vec3(ignoreRadiusToUse, 2.0f, ignoreRadiusToUse));
 
                             if (nodeBox.touches(otherNodeBox)) {
                                 nodeData->ignoreOther(node, otherNode);
