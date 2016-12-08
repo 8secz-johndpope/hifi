@@ -362,6 +362,7 @@ public:
     void fromJson(const QJsonObject& json);
 
     glm::vec3 getClientGlobalPosition() { return _globalPosition; }
+    glm::vec3 getGlobalBoundingBoxCorner() { return _globalBoundingBoxCorner; }
 
     Q_INVOKABLE AvatarEntityMap getAvatarEntityData() const;
     Q_INVOKABLE void setAvatarEntityData(const AvatarEntityMap& avatarEntityData);
@@ -445,6 +446,7 @@ protected:
     // where Entities are located.  This is currently only used by the mixer to decide how often to send
     // updates about one avatar to another.
     glm::vec3 _globalPosition;
+    glm::vec3 _globalBoundingBoxCorner;
 
     mutable ReadWriteLockable _avatarEntitiesLock;
     AvatarEntityIDs _avatarEntityDetached; // recently detached from this avatar

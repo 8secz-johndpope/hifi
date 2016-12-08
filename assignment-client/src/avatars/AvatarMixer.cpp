@@ -19,6 +19,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 
+#include <AABox.h>
 #include <LogHandler.h>
 #include <NodeList.h>
 #include <udt/PacketHeaders.h>
@@ -243,7 +244,13 @@ void AvatarMixer::broadcastAvatarData() {
                         // check to see if we're ignoring in radius
                         if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
                             float ignoreRadius = glm::max(node->getIgnoreRadius(), otherNode->getIgnoreRadius());
-                            if (glm::distance(nodeData->getPosition(), otherData->getPosition()) < ignoreRadius) {
+
+                            AABox nodeBox(nodeData->getBoundingBoxCorner(), (nodeData->getPosition() - nodeData->getBoundingBoxCorner()) * 2.0f);
+                            nodeBox.scale(ignoreRadius);
+                            AABox otherNodeBox(otherData->getBoundingBoxCorner(), (otherData->getPosition() - otherData->getBoundingBoxCorner()) * 2.0f);
+                            otherNodeBox.scale(ignoreRadius ? ignoreRadius : 1.0f);
+
+                            if (nodeBox.touches(otherNodeBox)) {
                                 nodeData->ignoreOther(node, otherNode);
                                 otherData->ignoreOther(otherNode, node);
                                 return false;

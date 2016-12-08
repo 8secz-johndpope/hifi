@@ -76,6 +76,12 @@
         createOverlays();
     }
 
+    function writeButtonProperties(parameter) {
+        button.writeProperty('buttonState', parameter ? 0 : 1);
+        button.writeProperty('defaultState', parameter ? 0 : 1);
+        button.writeProperty('hoverState', parameter ? 2 : 3);
+    }
+
     update = function () {
         var timestamp = Date.now();
         var delay = (timestamp - bubbleOverlayTimestamp);
@@ -83,9 +89,7 @@
         if (overlayAlpha > 0) {
             // Flash button
             if ((timestamp - bubbleButtonTimestamp) >= 500) {
-                button.writeProperty('buttonState', bubbleButtonFlashState ? 0 : 1);
-                button.writeProperty('defaultState', bubbleButtonFlashState ? 0 : 1);
-                button.writeProperty('hoverState', bubbleButtonFlashState ? 2 : 3);
+                writeButtonProperties(bubbleButtonFlashState);
                 bubbleButtonTimestamp = timestamp;
                 bubbleButtonFlashState = !bubbleButtonFlashState;
             }
@@ -110,17 +114,13 @@
                 updateConnected = false;
             }
             var bubbleActive = Users.getIgnoreRadiusEnabled();
-            button.writeProperty('buttonState', bubbleActive ? 0 : 1);
-            button.writeProperty('defaultState', bubbleActive ? 0 : 1);
-            button.writeProperty('hoverState', bubbleActive ? 2 : 3);
+            writeButtonProperties(bubbleActive);
         }
     };
 
     function onBubbleToggled() {
         var bubbleActive = Users.getIgnoreRadiusEnabled();
-        button.writeProperty('buttonState', bubbleActive ? 0 : 1);
-        button.writeProperty('defaultState', bubbleActive ? 0 : 1);
-        button.writeProperty('hoverState', bubbleActive ? 2 : 3);
+        writeButtonProperties(bubbleActive);
         if (bubbleActive) {
             createOverlays();
         } else {
