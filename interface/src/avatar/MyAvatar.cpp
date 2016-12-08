@@ -236,12 +236,9 @@ void MyAvatar::simulateAttachments(float deltaTime) {
 QByteArray MyAvatar::toByteArray(bool cullSmallChanges, bool sendAll) {
     CameraMode mode = qApp->getCamera()->getMode();
     _globalPosition = getPosition();
-    //_globalBoundingBoxCorner.x = getPosition().x + ((_characterController.getCapsuleRadius() == 0.0f) ? 0.3f : _characterController.getCapsuleRadius());
-    //_globalBoundingBoxCorner.y = getPosition().y - ((_characterController.getCapsuleHalfHeight() == 0.0f) ? (1.3f / 2) : _characterController.getCapsuleHalfHeight());
-    //_globalBoundingBoxCorner.z = getPosition().z + ((_characterController.getCapsuleRadius() == 0.0f) ? 0.3f : _characterController.getCapsuleRadius());
-    _globalBoundingBoxCorner.x = getPosition().x + 0.3f;
-    _globalBoundingBoxCorner.y = getPosition().y - (1.3f / 2);
-    _globalBoundingBoxCorner.z = getPosition().z + 0.3f;
+    _globalBoundingBoxCorner.x = _globalPosition.x - (_characterController.getCapsuleRadius());
+    _globalBoundingBoxCorner.y = _globalPosition.y - (_characterController.getCapsuleHalfHeight());
+    _globalBoundingBoxCorner.z = _globalPosition.z - (_characterController.getCapsuleRadius());
     if (mode == CAMERA_MODE_THIRD_PERSON || mode == CAMERA_MODE_INDEPENDENT) {
         // fake the avatar position that is sent up to the AvatarMixer
         glm::vec3 oldPosition = getPosition();
