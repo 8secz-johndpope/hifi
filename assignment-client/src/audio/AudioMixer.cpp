@@ -401,7 +401,17 @@ bool AudioMixer::prepareMixForListeningNode(Node* node) {
                 AudioMixerClientData* otherData = reinterpret_cast<AudioMixerClientData*>(otherNode->getLinkedData());
                 AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
                 AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
+                if (glm::any(glm::lessThan(nodeData->getAvatarBoundingBoxScale(), glm::vec3(0.2f, 1.2f, 0.2f)))) {
+                    nodeBox.setScaleStayCentered(glm::vec3(0.2f, 1.2f, 0.2f));
+                }
                 AABox otherNodeBox(otherData->getAvatarBoundingBoxCorner(), otherData->getAvatarBoundingBoxScale());
+                if (glm::any(glm::lessThan(otherData->getAvatarBoundingBoxScale(), glm::vec3(0.2f, 1.2f, 0.2f)))) {
+                    otherNodeBox.setScaleStayCentered(glm::vec3(0.2f, 1.2f, 0.2f));
+                }
+
+                qDebug() << "Audio Node Corner:" << nodeBox.getCorner().x << nodeBox.getCorner().y << nodeBox.getCorner().z;
+                qDebug() << "Audio Node Scale:" << nodeBox.getScale().x << nodeBox.getScale().y << nodeBox.getScale().z;
+
                 AABox* nodeBoxToUse = &nodeBox;
                 float ignoreRadiusToUse = node->getIgnoreRadius();
 

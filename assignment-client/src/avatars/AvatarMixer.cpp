@@ -243,8 +243,21 @@ void AvatarMixer::broadcastAvatarData() {
                         AvatarMixerClientData* nodeData = reinterpret_cast<AvatarMixerClientData*>(node->getLinkedData());
                         // check to see if we're ignoring in radius
                         if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
-                            AABox nodeBox(nodeData->getGlobalBoundingBoxCorner(), (nodeData->getPosition() - nodeData->getGlobalBoundingBoxCorner()) * 2.0f);
-                            AABox otherNodeBox(otherData->getGlobalBoundingBoxCorner(), (otherData->getPosition() - otherData->getGlobalBoundingBoxCorner()) * 2.0f);
+                            glm::vec3 nodeBoxScale = (nodeData->getPosition() - nodeData->getGlobalBoundingBoxCorner()) * 2.0f;
+                            glm::vec3 otherNodeBoxScale = (otherData->getPosition() - otherData->getGlobalBoundingBoxCorner()) * 2.0f;
+
+                            AABox nodeBox(nodeData->getGlobalBoundingBoxCorner(), nodeBoxScale);
+                            if (glm::any(glm::lessThan(nodeBoxScale, glm::vec3(0.2f, 1.2f, 0.2f)))) {
+                                nodeBox.setScaleStayCentered(glm::vec3(0.2f, 1.2f, 0.2f));
+                            }
+                            AABox otherNodeBox(otherData->getGlobalBoundingBoxCorner(), otherNodeBoxScale);
+                            if (glm::any(glm::lessThan(otherNodeBoxScale, glm::vec3(0.2f, 1.2f, 0.2f)))) {
+                                otherNodeBox.setScaleStayCentered(glm::vec3(0.2f, 1.2f, 0.2f));
+                            }
+
+                            qDebug() << "Avatar Node Corner:" << nodeBox.getCorner().x << nodeBox.getCorner().y << nodeBox.getCorner().z;
+                            qDebug() << "Avatar Node Scale:" << nodeBox.getScale().x << nodeBox.getScale().y << nodeBox.getScale().z;
+
                             AABox* nodeBoxToUse = &nodeBox;
                             float ignoreRadiusToUse = node->getIgnoreRadius();
 
