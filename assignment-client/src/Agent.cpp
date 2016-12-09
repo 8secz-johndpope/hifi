@@ -584,6 +584,8 @@ void Agent::processAgentAvatarAudio() {
             audioPacket->writePrimitive(scriptedAvatar->getPosition());
             glm::quat headOrientation = scriptedAvatar->getHeadOrientation();
             audioPacket->writePrimitive(headOrientation);
+            audioPacket->writePrimitive(scriptedAvatar->getPosition() - glm::vec3(0.15f, 0.65f, 0.15f));
+            audioPacket->writePrimitive(glm::vec3(0.3f, 1.3f, 0.3f));
         } else if (nextSoundOutput) {
             
             // write the codec
@@ -596,6 +598,8 @@ void Agent::processAgentAvatarAudio() {
             audioPacket->writePrimitive(scriptedAvatar->getPosition());
             glm::quat headOrientation = scriptedAvatar->getHeadOrientation();
             audioPacket->writePrimitive(headOrientation);
+            audioPacket->writePrimitive(scriptedAvatar->getPosition() - glm::vec3(0.15f, 0.65f, 0.15f));
+            audioPacket->writePrimitive(glm::vec3(0.3f, 1.3f, 0.3f));
 
             QByteArray encodedBuffer;
             if (_flushEncoder) {

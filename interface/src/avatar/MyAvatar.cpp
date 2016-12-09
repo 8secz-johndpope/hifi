@@ -369,13 +369,16 @@ void MyAvatar::update(float deltaTime) {
     updateFromTrackers(deltaTime);
 
     //  Get audio loudness data from audio input device
-    // Also get the AudioClient so we can update the bounding box data
+    // Also get the AudioClient so we can update the avatar bounding box data
     // on the AudioClient side.
     auto audio = DependencyManager::get<AudioClient>();
     head->setAudioLoudness(audio->getLastInputLoudness());
     head->setAudioAverageLoudness(audio->getAudioAverageInputLoudness());
 
-    QMetaObject::invokeMethod(&audio, "setAvatarBoundingBoxParameters", Q_ARG(glm::vec3, glm::vec3(0)), Q_ARG(glm::vec3, glm::vec3(0)));
+    glm::vec3 halfBoundingBox(_characterController.getCapsuleRadius(), _characterController.getCapsuleHalfHeight(), _characterController.getCapsuleRadius());
+    QMetaObject::invokeMethod(audio.data(), "setAvatarBoundingBoxParameters",
+                              Q_ARG(glm::vec3, (getPosition() + halfBoundingBox)),
+                              Q_ARG(glm::vec3, (halfBoundingBox*2.0f)));
 
     if (_avatarEntityDataLocallyEdited) {
         sendIdentityPacket();
