@@ -398,9 +398,22 @@ bool AudioMixer::prepareMixForListeningNode(Node* node) {
             if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
                 AudioMixerClientData* otherData = reinterpret_cast<AudioMixerClientData*>(otherNode->getLinkedData());
                 AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
-                float ignoreRadius = glm::max(node->getIgnoreRadius(), otherNode->getIgnoreRadius());
-                if (glm::distance(nodeData->getPosition(), otherData->getPosition()) < ignoreRadius) {
-                    insideIgnoreRadius = true;
+                if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
+                    AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
+                    AABox otherNodeBox(otherData->getAvatarBoundingBoxCorner(), otherData->getAvatarBoundingBoxScale());
+                    AABox* nodeBoxToUse = &nodeBox;
+                    float ignoreRadiusToUse = node->getIgnoreRadius();
+
+                    if (otherNode->getIgnoreRadius() > ignoreRadiusToUse) {
+                        ignoreRadiusToUse = otherNode->getIgnoreRadius();
+                        nodeBoxToUse = &otherNodeBox;
+                    }
+                    ignoreRadiusToUse = ignoreRadiusToUse / nodeBoxToUse->getScale().x * 2.0f;
+                    nodeBoxToUse->embiggen(glm::vec3(ignoreRadiusToUse, 2.0f, ignoreRadiusToUse));
+
+                    if (nodeBox.touches(otherNodeBox)) {
+                        insideIgnoreRadius = true;
+                    }
                 }
             }
 

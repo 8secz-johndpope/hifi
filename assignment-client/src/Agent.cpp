@@ -351,7 +351,9 @@ void Agent::executeScript() {
         Transform audioTransform;
         audioTransform.setTranslation(scriptedAvatar->getPosition());
         audioTransform.setRotation(scriptedAvatar->getOrientation());
-        AbstractAudioInterface::emitAudioPacket(audio.data(), audio.size(), audioSequenceNumber, audioTransform, PacketType::MicrophoneAudioNoEcho);
+        AbstractAudioInterface::emitAudioPacket(audio.data(), audio.size(), audioSequenceNumber,
+            audioTransform, scriptedAvatar->getPosition() - glm::vec3(0.15f, 0.65f, 0.15f), glm::vec3(0.3f, 1.3f, 0.3f),
+            PacketType::MicrophoneAudioNoEcho);
     });
 
     auto avatarHashMap = DependencyManager::set<AvatarHashMap>();
