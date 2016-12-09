@@ -206,9 +206,9 @@ QByteArray AvatarData::toByteArray(bool cullSmallChanges, bool sendAll) {
     header->globalPosition[0] = _globalPosition.x;
     header->globalPosition[1] = _globalPosition.y;
     header->globalPosition[2] = _globalPosition.z;
-    header->globalBoundingBoxCorner[0] = getPosition().x - max(0.15f, _globalBoundingBoxCorner.x);
-    header->globalBoundingBoxCorner[1] = getPosition().y - max(0.65f, _globalBoundingBoxCorner.y);
-    header->globalBoundingBoxCorner[2] = getPosition().z - max(0.15f, _globalBoundingBoxCorner.z);
+    header->globalBoundingBoxCorner[0] = getPosition().x - max(0.1f, _globalBoundingBoxCorner.x);
+    header->globalBoundingBoxCorner[1] = getPosition().y - max(0.6f, _globalBoundingBoxCorner.y);
+    header->globalBoundingBoxCorner[2] = getPosition().z - max(0.1f, _globalBoundingBoxCorner.z);
 
     glm::vec3 bodyEulerAngles = glm::degrees(safeEulerAngles(getLocalOrientation()));
     packFloatAngleToTwoByte((uint8_t*)(header->localOrientation + 0), bodyEulerAngles.y);

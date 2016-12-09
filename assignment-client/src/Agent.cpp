@@ -352,7 +352,7 @@ void Agent::executeScript() {
         audioTransform.setTranslation(scriptedAvatar->getPosition());
         audioTransform.setRotation(scriptedAvatar->getOrientation());
         AbstractAudioInterface::emitAudioPacket(audio.data(), audio.size(), audioSequenceNumber,
-            audioTransform, scriptedAvatar->getPosition() - glm::vec3(0.15f, 0.65f, 0.15f), glm::vec3(0.3f, 1.3f, 0.3f),
+            audioTransform, scriptedAvatar->getPosition() - glm::vec3(0.10f, 0.60f, 0.10f), glm::vec3(0.2f, 1.2f, 0.2f),
             PacketType::MicrophoneAudioNoEcho);
     });
 
@@ -584,8 +584,8 @@ void Agent::processAgentAvatarAudio() {
             audioPacket->writePrimitive(scriptedAvatar->getPosition());
             glm::quat headOrientation = scriptedAvatar->getHeadOrientation();
             audioPacket->writePrimitive(headOrientation);
-            audioPacket->writePrimitive(scriptedAvatar->getPosition() - glm::vec3(0.15f, 0.65f, 0.15f));
-            audioPacket->writePrimitive(glm::vec3(0.3f, 1.3f, 0.3f));
+            audioPacket->writePrimitive(scriptedAvatar->getPosition() - glm::vec3(0.1f, 0.6f, 0.1f));
+            audioPacket->writePrimitive(glm::vec3(0.2f, 1.2f, 0.2f));
         } else if (nextSoundOutput) {
             
             // write the codec
@@ -598,8 +598,8 @@ void Agent::processAgentAvatarAudio() {
             audioPacket->writePrimitive(scriptedAvatar->getPosition());
             glm::quat headOrientation = scriptedAvatar->getHeadOrientation();
             audioPacket->writePrimitive(headOrientation);
-            audioPacket->writePrimitive(scriptedAvatar->getPosition() - glm::vec3(0.15f, 0.65f, 0.15f));
-            audioPacket->writePrimitive(glm::vec3(0.3f, 1.3f, 0.3f));
+            audioPacket->writePrimitive(scriptedAvatar->getPosition() - glm::vec3(0.1f, 0.6f, 0.1f));
+            audioPacket->writePrimitive(glm::vec3(0.2f, 1.2f, 0.2f));
 
             QByteArray encodedBuffer;
             if (_flushEncoder) {

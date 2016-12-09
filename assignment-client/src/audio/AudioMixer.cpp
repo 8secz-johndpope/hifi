@@ -395,7 +395,9 @@ bool AudioMixer::prepareMixForListeningNode(Node* node) {
 
             // check to see if we're ignoring in radius
             bool insideIgnoreRadius = false;
-            if ((node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) && (*otherNode != *node)) {
+            if (*otherNode == *node) {
+                insideIgnoreRadius = true;
+            } else if ((node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) && (*otherNode != *node)) {
                 AudioMixerClientData* otherData = reinterpret_cast<AudioMixerClientData*>(otherNode->getLinkedData());
                 AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
                 AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
@@ -409,9 +411,6 @@ bool AudioMixer::prepareMixForListeningNode(Node* node) {
                 }
                 ignoreRadiusToUse = ignoreRadiusToUse / nodeBoxToUse->getScale().x * 2.0f;
                 nodeBoxToUse->embiggen(glm::vec3(ignoreRadiusToUse, 2.0f, ignoreRadiusToUse));
-
-                qDebug() << "Node BoxCorner:" << nodeData->getAvatarBoundingBoxCorner().x << nodeData->getAvatarBoundingBoxCorner().y << nodeData->getAvatarBoundingBoxCorner().z;
-                qDebug() << "Node BoxScale:" << nodeData->getAvatarBoundingBoxScale().x << nodeData->getAvatarBoundingBoxScale().y << nodeData->getAvatarBoundingBoxScale().z;
 
                 if (nodeBox.touches(otherNodeBox)) {
                     insideIgnoreRadius = true;
