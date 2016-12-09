@@ -252,7 +252,7 @@ void AvatarMixer::broadcastAvatarData() {
                                 ignoreRadiusToUse = otherNode->getIgnoreRadius();
                                 nodeBoxToUse = &otherNodeBox;
                             }
-                            ignoreRadiusToUse = ignoreRadiusToUse / nodeBoxToUse.getScale().x * 2.0f;
+                            ignoreRadiusToUse = ignoreRadiusToUse / nodeBoxToUse->getScale().x * 2.0f;
                             nodeBoxToUse->embiggen(glm::vec3(ignoreRadiusToUse, 2.0f, ignoreRadiusToUse));
 
                             if (nodeBox.touches(otherNodeBox)) {

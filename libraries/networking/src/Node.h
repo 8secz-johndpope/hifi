@@ -80,7 +80,7 @@ public:
     friend QDataStream& operator>>(QDataStream& in, Node& node);
 
     bool isIgnoreRadiusEnabled() const { return _ignoreRadiusEnabled; }
-    float getIgnoreRadius() { return _ignoreRadiusEnabled ? _ignoreRadius.load() : 1.0f; }
+    float getIgnoreRadius() { return _ignoreRadiusEnabled ? _ignoreRadius.load() : 0.0f; }
 
 private:
     // privatize copy and assignment operator to disallow Node copying
