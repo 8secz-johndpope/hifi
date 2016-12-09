@@ -236,9 +236,10 @@ void MyAvatar::simulateAttachments(float deltaTime) {
 QByteArray MyAvatar::toByteArray(bool cullSmallChanges, bool sendAll) {
     CameraMode mode = qApp->getCamera()->getMode();
     _globalPosition = getPosition();
-    _globalBoundingBoxCorner.x = max(0.15f, _characterController.getCapsuleRadius());
-    _globalBoundingBoxCorner.y = max(0.65f, _characterController.getCapsuleHalfHeight());
-    _globalBoundingBoxCorner.z = max(0.15f, _characterController.getCapsuleRadius());
+    _globalBoundingBoxCorner.x = _characterController.getCapsuleRadius();
+    _globalBoundingBoxCorner.y = _characterController.getCapsuleHalfHeight();
+    _globalBoundingBoxCorner.z = _characterController.getCapsuleRadius();
+    _globalBoundingBoxCorner += _characterController.getCapsuleLocalOffset();
     if (mode == CAMERA_MODE_THIRD_PERSON || mode == CAMERA_MODE_INDEPENDENT) {
         // fake the avatar position that is sent up to the AvatarMixer
         glm::vec3 oldPosition = getPosition();
@@ -375,10 +376,11 @@ void MyAvatar::update(float deltaTime) {
     head->setAudioLoudness(audio->getLastInputLoudness());
     head->setAudioAverageLoudness(audio->getAudioAverageInputLoudness());
 
-    glm::vec3 halfBoundingBox(_characterController.getCapsuleRadius(), _characterController.getCapsuleHalfHeight(), _characterController.getCapsuleRadius());
+    glm::vec3 halfBoundingBoxDimensions(_characterController.getCapsuleRadius(), _characterController.getCapsuleHalfHeight(), _characterController.getCapsuleRadius());
+    halfBoundingBoxDimensions += _characterController.getCapsuleLocalOffset();
     QMetaObject::invokeMethod(audio.data(), "setAvatarBoundingBoxParameters",
-                              Q_ARG(glm::vec3, (getPosition() + halfBoundingBox)),
-                              Q_ARG(glm::vec3, (halfBoundingBox*2.0f)));
+        Q_ARG(glm::vec3, (getPosition() - halfBoundingBoxDimensions)),
+        Q_ARG(glm::vec3, (halfBoundingBoxDimensions*2.0f)));
 
     if (_avatarEntityDataLocallyEdited) {
         sendIdentityPacket();

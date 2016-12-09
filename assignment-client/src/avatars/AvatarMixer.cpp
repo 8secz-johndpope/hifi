@@ -255,6 +255,9 @@ void AvatarMixer::broadcastAvatarData() {
                             ignoreRadiusToUse = ignoreRadiusToUse / nodeBoxToUse->getScale().x * 2.0f;
                             nodeBoxToUse->embiggen(glm::vec3(ignoreRadiusToUse, 2.0f, ignoreRadiusToUse));
 
+                            qDebug() << "Node BoxCorner:" << nodeData->getGlobalBoundingBoxCorner().x << nodeData->getGlobalBoundingBoxCorner().y << nodeData->getGlobalBoundingBoxCorner().z;
+                            qDebug() << "Node BoxScale:" << ((nodeData->getPosition() - nodeData->getGlobalBoundingBoxCorner())*2.0f).x << ((nodeData->getPosition() - nodeData->getGlobalBoundingBoxCorner())*2.0f).y << ((nodeData->getPosition() - nodeData->getGlobalBoundingBoxCorner())*2.0f).z;
+
                             if (nodeBox.touches(otherNodeBox)) {
                                 nodeData->ignoreOther(node, otherNode);
                                 otherData->ignoreOther(otherNode, node);
