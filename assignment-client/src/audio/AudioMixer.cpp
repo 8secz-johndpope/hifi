@@ -398,30 +398,29 @@ bool AudioMixer::prepareMixForListeningNode(Node* node) {
             if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
                 AudioMixerClientData* otherData = reinterpret_cast<AudioMixerClientData*>(otherNode->getLinkedData());
                 AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
-                if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
-                    AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
-                    AABox otherNodeBox(otherData->getAvatarBoundingBoxCorner(), otherData->getAvatarBoundingBoxScale());
-                    AABox* nodeBoxToUse = &nodeBox;
-                    float ignoreRadiusToUse = node->getIgnoreRadius();
+                AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
+                AABox otherNodeBox(otherData->getAvatarBoundingBoxCorner(), otherData->getAvatarBoundingBoxScale());
+                AABox* nodeBoxToUse = &nodeBox;
+                float ignoreRadiusToUse = node->getIgnoreRadius();
 
-                    if (otherNode->getIgnoreRadius() > ignoreRadiusToUse) {
-                        ignoreRadiusToUse = otherNode->getIgnoreRadius();
-                        nodeBoxToUse = &otherNodeBox;
-                    }
-                    ignoreRadiusToUse = ignoreRadiusToUse / nodeBoxToUse->getScale().x * 2.0f;
-                    nodeBoxToUse->embiggen(glm::vec3(ignoreRadiusToUse, 2.0f, ignoreRadiusToUse));
+                if (otherNode->getIgnoreRadius() > ignoreRadiusToUse) {
+                    ignoreRadiusToUse = otherNode->getIgnoreRadius();
+                    nodeBoxToUse = &otherNodeBox;
+                }
+                ignoreRadiusToUse = ignoreRadiusToUse / nodeBoxToUse->getScale().x * 2.0f;
+                nodeBoxToUse->embiggen(glm::vec3(ignoreRadiusToUse, 2.0f, ignoreRadiusToUse));
 
-                    if (nodeBox.touches(otherNodeBox)) {
-                        insideIgnoreRadius = true;
-                    }
+                if (nodeBox.touches(otherNodeBox)) {
+                    insideIgnoreRadius = true;
                 }
             }
+
 
             // enumerate the ARBs attached to the otherNode
             auto streamsCopy = otherNodeClientData->getAudioStreams();
             for (auto& streamPair : streamsCopy) {
                 auto otherNodeStream = streamPair.second;
-                bool isSelfWithEcho = (*otherNode == *node) && (otherNodeStream->shouldLoopbackForNode());
+                bool isSelfWithEcho = ((*otherNode == *node) && (otherNodeStream->shouldLoopbackForNode()));
                 // add all audio streams that should be added to the mix
                 if (isSelfWithEcho || (!isSelfWithEcho && !insideIgnoreRadius)) {
                     addStreamToMixForListeningNodeWithStream(*listenerNodeData, *otherNodeStream, otherNode->getUUID(),
