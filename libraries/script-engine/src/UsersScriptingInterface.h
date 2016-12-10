@@ -77,21 +77,6 @@ public slots:
     void disableIgnoreRadius();
 
     /**jsdoc
-    * sets the parameters for the ignore radius feature.
-    * @function Users.setIgnoreRadius
-    * @param {number} radius The radius for the auto ignore in radius feature
-    * @param {bool} [enabled=true] Whether the ignore in radius feature should be enabled
-    */
-    void setIgnoreRadius(float radius, bool enabled = true);
-
-    /**jsdoc
-    * Returns the effective radius of the ingore radius feature if it is enabled.
-    * @function Users.getIgnoreRadius
-    * @return {number} radius of the ignore feature
-    */
-    float getIgnoreRadius();
-
-    /**jsdoc
     * Returns `true` if the ignore in radius feature is enabled
     * @function Users.getIgnoreRadiusEnabled
     * @return {bool} `true` if the ignore in radius feature is enabled, `false` if not.

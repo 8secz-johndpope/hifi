@@ -351,7 +351,9 @@ void Agent::executeScript() {
         Transform audioTransform;
         audioTransform.setTranslation(scriptedAvatar->getPosition());
         audioTransform.setRotation(scriptedAvatar->getOrientation());
-        AbstractAudioInterface::emitAudioPacket(audio.data(), audio.size(), audioSequenceNumber, audioTransform, PacketType::MicrophoneAudioNoEcho);
+        AbstractAudioInterface::emitAudioPacket(audio.data(), audio.size(), audioSequenceNumber,
+            audioTransform, scriptedAvatar->getPosition(), glm::vec3(0),
+            PacketType::MicrophoneAudioNoEcho);
     });
 
     auto avatarHashMap = DependencyManager::set<AvatarHashMap>();
@@ -582,6 +584,8 @@ void Agent::processAgentAvatarAudio() {
             audioPacket->writePrimitive(scriptedAvatar->getPosition());
             glm::quat headOrientation = scriptedAvatar->getHeadOrientation();
             audioPacket->writePrimitive(headOrientation);
+            audioPacket->writePrimitive(scriptedAvatar->getPosition());
+            audioPacket->writePrimitive(glm::vec3(0));
         } else if (nextSoundOutput) {
             
             // write the codec
@@ -594,6 +598,8 @@ void Agent::processAgentAvatarAudio() {
             audioPacket->writePrimitive(scriptedAvatar->getPosition());
             glm::quat headOrientation = scriptedAvatar->getHeadOrientation();
             audioPacket->writePrimitive(headOrientation);
+            audioPacket->writePrimitive(scriptedAvatar->getPosition());
+            audioPacket->writePrimitive(glm::vec3(0));
 
             QByteArray encodedBuffer;
             if (_flushEncoder) {

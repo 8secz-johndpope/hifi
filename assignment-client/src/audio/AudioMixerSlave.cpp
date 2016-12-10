@@ -213,11 +213,23 @@ bool AudioMixerSlave::prepareMix(const SharedNodePointer& node) {
 
             // check to see if we're ignoring in radius
             bool insideIgnoreRadius = false;
-            if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
+            if (*otherNode == *node) {
+                insideIgnoreRadius = true;
+            } else if ((node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) && (*otherNode != *node)) {
                 AudioMixerClientData* otherData = reinterpret_cast<AudioMixerClientData*>(otherNode->getLinkedData());
                 AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
-                float ignoreRadius = glm::max(node->getIgnoreRadius(), otherNode->getIgnoreRadius());
-                if (glm::distance(nodeData->getPosition(), otherData->getPosition()) < ignoreRadius) {
+                AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
+                if (glm::any(glm::lessThan(nodeData->getAvatarBoundingBoxScale(), glm::vec3(0.3f, 1.3f, 0.3f)))) {
+                    nodeBox.setScaleStayCentered(glm::vec3(0.3f, 1.3f, 0.3f));
+                }
+                AABox otherNodeBox(otherData->getAvatarBoundingBoxCorner(), otherData->getAvatarBoundingBoxScale());
+                if (glm::any(glm::lessThan(otherData->getAvatarBoundingBoxScale(), glm::vec3(0.3f, 1.3f, 0.3f)))) {
+                    otherNodeBox.setScaleStayCentered(glm::vec3(0.3f, 1.3f, 0.3f));
+                }
+                nodeBox.embiggen(4.0f);
+                otherNodeBox.embiggen(4.0f);
+
+                if (nodeBox.touches(otherNodeBox)) {
                     insideIgnoreRadius = true;
                 }
             }
@@ -226,8 +238,9 @@ bool AudioMixerSlave::prepareMix(const SharedNodePointer& node) {
             auto streamsCopy = otherNodeClientData->getAudioStreams();
             for (auto& streamPair : streamsCopy) {
                 auto otherNodeStream = streamPair.second;
+                bool isSelfWithEcho = ((*otherNode == *node) && (otherNodeStream->shouldLoopbackForNode()));
                 // add all audio streams that should be added to the mix
-                if (*otherNode != *node || otherNodeStream->shouldLoopbackForNode() || !insideIgnoreRadius) {
+                if (isSelfWithEcho || (!isSelfWithEcho && !insideIgnoreRadius)) {
                     addStreamToMixForListeningNodeWithStream(*listenerNodeData, *otherNodeStream, otherNode->getUUID(),
                                                                 *nodeAudioStream);
                 }
