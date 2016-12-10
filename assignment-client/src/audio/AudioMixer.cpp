@@ -401,26 +401,15 @@ bool AudioMixer::prepareMixForListeningNode(Node* node) {
                 AudioMixerClientData* otherData = reinterpret_cast<AudioMixerClientData*>(otherNode->getLinkedData());
                 AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
                 AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
-                if (glm::any(glm::lessThan(nodeData->getAvatarBoundingBoxScale(), glm::vec3(0.2f, 1.2f, 0.2f)))) {
-                    nodeBox.setScaleStayCentered(glm::vec3(0.2f, 1.2f, 0.2f));
+                if (glm::any(glm::lessThan(nodeData->getAvatarBoundingBoxScale(), glm::vec3(0.3f, 1.3f, 0.3f)))) {
+                    nodeBox.setScaleStayCentered(glm::vec3(0.3f, 1.3f, 0.3f));
                 }
                 AABox otherNodeBox(otherData->getAvatarBoundingBoxCorner(), otherData->getAvatarBoundingBoxScale());
-                if (glm::any(glm::lessThan(otherData->getAvatarBoundingBoxScale(), glm::vec3(0.2f, 1.2f, 0.2f)))) {
-                    otherNodeBox.setScaleStayCentered(glm::vec3(0.2f, 1.2f, 0.2f));
+                if (glm::any(glm::lessThan(otherData->getAvatarBoundingBoxScale(), glm::vec3(0.3f, 1.3f, 0.3f)))) {
+                    otherNodeBox.setScaleStayCentered(glm::vec3(0.3f, 1.3f, 0.3f));
                 }
-
-                qDebug() << "Audio Node Corner:" << nodeBox.getCorner().x << nodeBox.getCorner().y << nodeBox.getCorner().z;
-                qDebug() << "Audio Node Scale:" << nodeBox.getScale().x << nodeBox.getScale().y << nodeBox.getScale().z;
-
-                AABox* nodeBoxToUse = &nodeBox;
-                float ignoreRadiusToUse = node->getIgnoreRadius();
-
-                if (otherNode->getIgnoreRadius() > ignoreRadiusToUse) {
-                    ignoreRadiusToUse = otherNode->getIgnoreRadius();
-                    nodeBoxToUse = &otherNodeBox;
-                }
-                ignoreRadiusToUse = ignoreRadiusToUse / nodeBoxToUse->getScale().x * 2.0f;
-                nodeBoxToUse->embiggen(glm::vec3(ignoreRadiusToUse, 2.0f, ignoreRadiusToUse));
+                nodeBox.embiggen(4.0f);
+                otherNodeBox.embiggen(4.0f);
 
                 if (nodeBox.touches(otherNodeBox)) {
                     insideIgnoreRadius = true;

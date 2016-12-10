@@ -68,18 +68,6 @@ void setupPreferences() {
         auto setter = [=](bool value) { myAvatar->setClearOverlayWhenMoving(value); };
         preferences->addPreference(new CheckPreference(AVATAR_BASICS, "Clear overlays when moving", getter, setter));
     }
-    {
-        auto getter = [=]()->float { return nodeList->getIgnoreRadius(); };
-        auto setter = [=](float value) {
-            nodeList->ignoreNodesInRadius(value, nodeList->getIgnoreRadiusEnabled());
-        };
-        auto preference = new SpinnerPreference(AVATAR_BASICS, "Personal space bubble radius", getter, setter);
-        preference->setMin(0.5f);
-        preference->setMax(10.0f);
-        preference->setDecimals(1);
-        preference->setStep(0.50f);
-        preferences->addPreference(preference);
-    }
 
     // UI
     {

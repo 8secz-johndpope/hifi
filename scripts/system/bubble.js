@@ -20,13 +20,12 @@
     var bubbleOverlayTimestamp;
     var bubbleButtonFlashState = false;
     var bubbleButtonTimestamp;
-    var ignoreRadius = Settings.getValue("IgnoreRadius");
     var bubbleOverlay = Overlays.addOverlay("model", {
         url: Script.resolvePath("assets/models/bubble-v12.fbx"),
         dimensions: { x: 1.0, y: 0.75, z: 1.0 },
-        position: { x: MyAvatar.position.x, y: -MyAvatar.scale * 2 + MyAvatar.position.y + MyAvatar.scale * 0.28 - ignoreRadius * 0.05, z: MyAvatar.position.z },
+        position: { x: MyAvatar.position.x, y: -MyAvatar.scale * 2 + MyAvatar.position.y + MyAvatar.scale * 0.28, z: MyAvatar.position.z },
         rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-        scale: { x: ignoreRadius * 2, y: MyAvatar.scale * ignoreRadius * 0.5 + 0.5, z: ignoreRadius * 2 },
+        scale: { x: 2, y: MyAvatar.scale * 0.5 + 0.5, z: 2 },
         visible: false,
         ignoreRayIntersection: true
     });
@@ -48,7 +47,6 @@
     }
 
     function createOverlays() {
-        ignoreRadius = Settings.getValue("IgnoreRadius");
         Audio.playSound(bubbleActivateSound, {
             position: { x: MyAvatar.position.x, y: MyAvatar.position.y, z: MyAvatar.position.z },
             localOnly: true,
@@ -61,9 +59,9 @@
         }
 
         Overlays.editOverlay(bubbleOverlay, {
-            position: { x: MyAvatar.position.x, y: -MyAvatar.scale * 2 + MyAvatar.position.y + MyAvatar.scale * 0.28 - ignoreRadius * 0.05, z: MyAvatar.position.z },
+            position: { x: MyAvatar.position.x, y: -MyAvatar.scale * 2 + MyAvatar.position.y + MyAvatar.scale * 0.28, z: MyAvatar.position.z },
             rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-            scale: { x: ignoreRadius * 2, y: MyAvatar.scale * ignoreRadius * 0.5 + 0.5, z: ignoreRadius * 2 },
+            scale: { x: 2, y: MyAvatar.scale * 0.5 + 0.5, z: 2 },
             visible: true
         });
         bubbleOverlayTimestamp = Date.now();
@@ -96,15 +94,15 @@
 
             if (delay < 750) {
                 Overlays.editOverlay(bubbleOverlay, {
-                    position: { x: MyAvatar.position.x, y: (-((750 - delay) / 750)) * MyAvatar.scale * 2 + MyAvatar.position.y + MyAvatar.scale * 0.28 - ignoreRadius * 0.05, z: MyAvatar.position.z },
+                    position: { x: MyAvatar.position.x, y: (-((750 - delay) / 750)) * MyAvatar.scale * 2 + MyAvatar.position.y + MyAvatar.scale * 0.28, z: MyAvatar.position.z },
                     rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-                    scale: { x: ignoreRadius * 2, y: ((1 - ((750 - delay) / 750)) * MyAvatar.scale * ignoreRadius * 0.5 + 0.5), z: ignoreRadius * 2 }
+                    scale: { x: 2, y: ((1 - ((750 - delay) / 750)) * MyAvatar.scale * 0.5 + 0.5), z: 2 }
                 });
             } else {
                 Overlays.editOverlay(bubbleOverlay, {
-                    position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.28 - ignoreRadius * 0.05, z: MyAvatar.position.z },
+                    position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.28, z: MyAvatar.position.z },
                     rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-                    scale: { x: ignoreRadius * 2, y: MyAvatar.scale * ignoreRadius * 0.5 + 0.5, z: ignoreRadius * 2 }
+                    scale: { x: 2, y: MyAvatar.scale * 0.5 + 0.5, z: 2 }
                 });
             }
         } else {
