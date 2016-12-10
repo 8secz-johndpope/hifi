@@ -216,7 +216,6 @@ bool AudioMixerSlave::prepareMix(const SharedNodePointer& node) {
             if (*otherNode == *node) {
                 insideIgnoreRadius = true;
             } else if ((node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) && (*otherNode != *node)) {
-                AudioMixerClientData* otherData = reinterpret_cast<AudioMixerClientData*>(otherNode->getLinkedData());
                 AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
                 AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
                 if (glm::any(glm::lessThan(nodeData->getAvatarBoundingBoxScale(), glm::vec3(0.3f, 1.3f, 0.3f)))) {
@@ -235,14 +234,13 @@ bool AudioMixerSlave::prepareMix(const SharedNodePointer& node) {
             }
 
             // enumerate the ARBs attached to the otherNode
-            auto streamsCopy = otherNodeClientData->getAudioStreams();
+            auto streamsCopy = otherData->getAudioStreams();
             for (auto& streamPair : streamsCopy) {
                 auto otherNodeStream = streamPair.second;
                 bool isSelfWithEcho = ((*otherNode == *node) && (otherNodeStream->shouldLoopbackForNode()));
                 // add all audio streams that should be added to the mix
                 if (isSelfWithEcho || (!isSelfWithEcho && !insideIgnoreRadius)) {
-                    addStreamToMixForListeningNodeWithStream(*listenerNodeData, *otherNodeStream, otherNode->getUUID(),
-                                                                *nodeAudioStream);
+                    addStreamToMix(*nodeData, otherNode->getUUID(), *nodeAudioStream, *otherNodeStream);
                 }
             }
         }
