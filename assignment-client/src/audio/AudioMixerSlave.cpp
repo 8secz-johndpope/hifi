@@ -213,32 +213,43 @@ bool AudioMixerSlave::prepareMix(const SharedNodePointer& node) {
 
             // check to see if we're ignoring in radius
             bool insideIgnoreRadius = false;
+            // If the otherNode equals the node, we're doing a comparison on ourselves
             if (*otherNode == *node) {
+                // We'll always be inside the radius in that case.
                 insideIgnoreRadius = true;
+            // Check to see if the space bubble is enabled
             } else if ((node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) && (*otherNode != *node)) {
+                // Define the minimum bubble size
+                static const glm::vec3 minBubbleSize = glm::vec3(0.3f, 1.3f, 0.3f);
                 AudioMixerClientData* nodeData = reinterpret_cast<AudioMixerClientData*>(node->getLinkedData());
+                // Set up the bounding box for the current node
                 AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
-                if (glm::any(glm::lessThan(nodeData->getAvatarBoundingBoxScale(), glm::vec3(0.3f, 1.3f, 0.3f)))) {
-                    nodeBox.setScaleStayCentered(glm::vec3(0.3f, 1.3f, 0.3f));
+                // Clamp the size of the bounding box to a minimum scale
+                if (glm::any(glm::lessThan(nodeData->getAvatarBoundingBoxScale(), minBubbleSize))) {
+                    nodeBox.setScaleStayCentered(minBubbleSize);
                 }
+                // Set up the bounding box for the current other node
                 AABox otherNodeBox(otherData->getAvatarBoundingBoxCorner(), otherData->getAvatarBoundingBoxScale());
-                if (glm::any(glm::lessThan(otherData->getAvatarBoundingBoxScale(), glm::vec3(0.3f, 1.3f, 0.3f)))) {
-                    otherNodeBox.setScaleStayCentered(glm::vec3(0.3f, 1.3f, 0.3f));
+                // Clamp the size of the bounding box to a minimum scale
+                if (glm::any(glm::lessThan(otherData->getAvatarBoundingBoxScale(), minBubbleSize))) {
+                    otherNodeBox.setScaleStayCentered(minBubbleSize);
                 }
+                // Quadruple the scale of both bounding boxes
                 nodeBox.embiggen(4.0f);
                 otherNodeBox.embiggen(4.0f);
 
+                // Perform the collision check between the two bounding boxes
                 if (nodeBox.touches(otherNodeBox)) {
                     insideIgnoreRadius = true;
                 }
             }
 
-            // enumerate the ARBs attached to the otherNode
+            // Enumerate the audio streams attached to the otherNode
             auto streamsCopy = otherData->getAudioStreams();
             for (auto& streamPair : streamsCopy) {
                 auto otherNodeStream = streamPair.second;
                 bool isSelfWithEcho = ((*otherNode == *node) && (otherNodeStream->shouldLoopbackForNode()));
-                // add all audio streams that should be added to the mix
+                // Add all audio streams that should be added to the mix
                 if (isSelfWithEcho || (!isSelfWithEcho && !insideIgnoreRadius)) {
                     addStreamToMix(*nodeData, otherNode->getUUID(), *nodeAudioStream, *otherNodeStream);
                 }

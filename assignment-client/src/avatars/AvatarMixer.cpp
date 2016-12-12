@@ -241,31 +241,39 @@ void AvatarMixer::broadcastAvatarData() {
                     } else {
                         AvatarMixerClientData* otherData = reinterpret_cast<AvatarMixerClientData*>(otherNode->getLinkedData());
                         AvatarMixerClientData* nodeData = reinterpret_cast<AvatarMixerClientData*>(node->getLinkedData());
-                        // check to see if we're ignoring in radius
+                        // Check to see if the space bubble is enabled
                         if (node->isIgnoreRadiusEnabled() || otherNode->isIgnoreRadiusEnabled()) {
+                            // Define the minimum bubble size
+                            static const glm::vec3 minBubbleSize = glm::vec3(0.3f, 1.3f, 0.3f);
+                            // Define the scale of the box for the current node
                             glm::vec3 nodeBoxScale = (nodeData->getPosition() - nodeData->getGlobalBoundingBoxCorner()) * 2.0f;
+                            // Define the scale of the box for the current other node
                             glm::vec3 otherNodeBoxScale = (otherData->getPosition() - otherData->getGlobalBoundingBoxCorner()) * 2.0f;
 
+                            // Set up the bounding box for the current node
                             AABox nodeBox(nodeData->getGlobalBoundingBoxCorner(), nodeBoxScale);
-                            if (glm::any(glm::lessThan(nodeBoxScale, glm::vec3(0.3f, 1.3f, 0.3f)))) {
-                                nodeBox.setScaleStayCentered(glm::vec3(0.3f, 1.3f, 0.3f));
+                            // Clamp the size of the bounding box to a minimum scale
+                            if (glm::any(glm::lessThan(nodeBoxScale, minBubbleSize))) {
+                                nodeBox.setScaleStayCentered(minBubbleSize);
                             }
+                            // Set up the bounding box for the current other node
                             AABox otherNodeBox(otherData->getGlobalBoundingBoxCorner(), otherNodeBoxScale);
-                            if (glm::any(glm::lessThan(otherNodeBoxScale, glm::vec3(0.3f, 1.3f, 0.3f)))) {
-                                otherNodeBox.setScaleStayCentered(glm::vec3(0.3f, 1.3f, 0.3f));
+                            // Clamp the size of the bounding box to a minimum scale
+                            if (glm::any(glm::lessThan(otherNodeBoxScale, minBubbleSize))) {
+                                otherNodeBox.setScaleStayCentered(minBubbleSize);
                             }
+                            // Quadruple the scale of both bounding boxes
                             nodeBox.embiggen(4.0f);
                             otherNodeBox.embiggen(4.0f);
 
+                            // Perform the collision check between the two bounding boxes
                             if (nodeBox.touches(otherNodeBox)) {
-                                //nodeData->ignoreOther(node, otherNode);
-                                otherData->ignoreOther(otherNode, node);
+                                nodeData->ignoreOther(node, otherNode);
                                 return false;
                             }
                         }
-                        // not close enough to ignore
-                        //nodeData->removeFromRadiusIgnoringSet(otherNode->getUUID());
-                        otherData->removeFromRadiusIgnoringSet(node->getUUID());
+                        // Not close enough to ignore
+                        nodeData->removeFromRadiusIgnoringSet(otherNode->getUUID());
                         return true;
                     }
                 },

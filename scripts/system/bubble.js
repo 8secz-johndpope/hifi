@@ -17,11 +17,15 @@
 
     // grab the toolbar
     var toolbar = Toolbars.getToolbar("com.highfidelity.interface.toolbar.system");
+    // Used for animating and disappearing the bubble
     var bubbleOverlayTimestamp;
+    // Used for flashing the HUD button upon activation
     var bubbleButtonFlashState = false;
+    // Used for flashing the HUD button upon activation
     var bubbleButtonTimestamp;
+    // The bubble model itself
     var bubbleOverlay = Overlays.addOverlay("model", {
-        url: Script.resolvePath("assets/models/bubble-v12.fbx"),
+        url: Script.resolvePath("assets/models/bubble-v12.fbx"), // If you'd like to change the model, modify this line (and the dimensions below)
         dimensions: { x: 1.0, y: 0.75, z: 1.0 },
         position: { x: MyAvatar.position.x, y: -MyAvatar.scale * 2 + MyAvatar.position.y + MyAvatar.scale * 0.28, z: MyAvatar.position.z },
         rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
@@ -29,8 +33,14 @@
         visible: false,
         ignoreRayIntersection: true
     });
+    // The bubble activation sound
     var bubbleActivateSound = SoundCache.getSound(Script.resolvePath("assets/sounds/bubble.wav"));
+    // Is the update() function connected?
     var updateConnected = false;
+
+    const BUBBLE_VISIBLE_DURATION_MS = 3000;
+    const BUBBLE_RAISE_ANIMATION_DURATION_MS = 750;
+    const BUBBLE_HUD_ICON_FLASH_INTERVAL_MS = 500;
 
     var ASSETS_PATH = Script.resolvePath("assets");
     var TOOLS_PATH = Script.resolvePath("assets/images/tools/");
@@ -39,6 +49,7 @@
         return TOOLS_PATH + 'bubble.svg';
     }
 
+    // Hides the bubble model overlay and resets the button flash state
     function hideOverlays() {
         Overlays.editOverlay(bubbleOverlay, {
             visible: false
@@ -46,6 +57,7 @@
         bubbleButtonFlashState = false;
     }
 
+    // Make the bubble overlay visible, set its position, and play the sound
     function createOverlays() {
         Audio.playSound(bubbleActivateSound, {
             position: { x: MyAvatar.position.x, y: MyAvatar.position.y, z: MyAvatar.position.z },
@@ -70,39 +82,60 @@
         updateConnected = true;
     }
 
+    // Called from the C++ scripting interface to show the bubble overlay
     function enteredIgnoreRadius() {
         createOverlays();
     }
 
+    // Used to set the state of the bubble HUD button
     function writeButtonProperties(parameter) {
         button.writeProperty('buttonState', parameter ? 0 : 1);
         button.writeProperty('defaultState', parameter ? 0 : 1);
         button.writeProperty('hoverState', parameter ? 2 : 3);
     }
 
+    // The bubble script's update function
     update = function () {
         var timestamp = Date.now();
         var delay = (timestamp - bubbleOverlayTimestamp);
-        var overlayAlpha = 1.0 - (delay / 3000);
+        var overlayAlpha = 1.0 - (delay / BUBBLE_VISIBLE_DURATION_MS);
         if (overlayAlpha > 0) {
             // Flash button
-            if ((timestamp - bubbleButtonTimestamp) >= 500) {
+            if ((timestamp - bubbleButtonTimestamp) >= BUBBLE_VISIBLE_DURATION_MS) {
                 writeButtonProperties(bubbleButtonFlashState);
                 bubbleButtonTimestamp = timestamp;
                 bubbleButtonFlashState = !bubbleButtonFlashState;
             }
 
-            if (delay < 750) {
+            if (delay < BUBBLE_RAISE_ANIMATION_DURATION_MS) {
                 Overlays.editOverlay(bubbleOverlay, {
-                    position: { x: MyAvatar.position.x, y: (-((750 - delay) / 750)) * MyAvatar.scale * 2 + MyAvatar.position.y + MyAvatar.scale * 0.28, z: MyAvatar.position.z },
+                    // Quickly raise the bubble from the ground up
+                    position: {
+                        x: MyAvatar.position.x,
+                        y: (-((BUBBLE_RAISE_ANIMATION_DURATION_MS - delay) / BUBBLE_RAISE_ANIMATION_DURATION_MS)) * MyAvatar.scale * 2 + MyAvatar.position.y + MyAvatar.scale * 0.28,
+                        z: MyAvatar.position.z
+                    },
                     rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-                    scale: { x: 2, y: ((1 - ((750 - delay) / 750)) * MyAvatar.scale * 0.5 + 0.5), z: 2 }
+                    scale: {
+                        x: 2,
+                        y: ((1 - ((BUBBLE_RAISE_ANIMATION_DURATION_MS - delay) / BUBBLE_RAISE_ANIMATION_DURATION_MS)) * MyAvatar.scale * 0.5 + 0.5),
+                        z: 2
+                    }
                 });
             } else {
+                // Keep the bubble in place for a couple seconds
                 Overlays.editOverlay(bubbleOverlay, {
-                    position: { x: MyAvatar.position.x, y: MyAvatar.position.y + MyAvatar.scale * 0.28, z: MyAvatar.position.z },
+                    position: {
+                        x: MyAvatar.position.x,
+                        y: MyAvatar.position.y + MyAvatar.scale * 0.28,
+                        z: MyAvatar.position.z
+                    },
                     rotation: Quat.fromPitchYawRollDegrees(MyAvatar.bodyPitch, 0, MyAvatar.bodyRoll),
-                    scale: { x: 2, y: MyAvatar.scale * 0.5 + 0.5, z: 2 }
+                    scale: {
+                        x: 2,
+                        y: MyAvatar.scale * 0.5 + 0.5,
+                        z: 2
+                    }
                 });
             }
         } else {
@@ -116,6 +149,7 @@
         }
     };
 
+    // When the space bubble is toggled...
     function onBubbleToggled() {
         var bubbleActive = Users.getIgnoreRadiusEnabled();
         writeButtonProperties(bubbleActive);
@@ -130,7 +164,7 @@
         }
     }
 
-    // setup the mod button and add it to the toolbar
+    // Setup the bubble button and add it to the toolbar
     var button = toolbar.addButton({
         objectName: 'bubble',
         imageURL: buttonImageURL(),
@@ -143,7 +177,7 @@
     Users.ignoreRadiusEnabledChanged.connect(onBubbleToggled);
     Users.enteredIgnoreRadius.connect(enteredIgnoreRadius);
 
-    // cleanup the toolbar button and overlays when script is stopped
+    // Cleanup the toolbar button and overlays when script is stopped
     Script.scriptEnding.connect(function () {
         toolbar.removeButton('bubble');
         button.clicked.disconnect(Users.toggleIgnoreRadius);
