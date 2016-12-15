@@ -29,6 +29,10 @@ function shouldOpenFeedAfterShare() {
     var persisted = Settings.getValue('openFeedAfterShare', true); // might answer true, false, "true", or "false"
     return persisted && (persisted !== 'false');
 }
+function shouldAlsoTakeGifs() {
+    var persisted = Settings.getValue('alsoTakeAnimatedSnapshot', true); // might answer true, false, "true", or "false"
+    return persisted && (persisted !== 'false');
+}
 function showFeedWindow() {
     DialogsManager.showFeed();
 }
@@ -59,6 +63,12 @@ function confirmShare(data) {
                 break;
             case 'setOpenFeedTrue':
                 Settings.setValue('openFeedAfterShare', true)
+                break;
+            case 'setAlsoTakeGifsFalse':
+                Settings.setValue('alsoTakeAnimatedSnapshot', false)
+                break;
+            case 'setAlsoTakeGifsTrue':
+                Settings.setValue('alsoTakeAnimatedSnapshot', true)
                 break;
             default:
                 dialog.webEventReceived.disconnect(onMessage);
@@ -184,7 +194,8 @@ function resetButtons(pathStillSnapshot, pathAnimatedSnapshot, notify) {
         { localPath: pathStillSnapshot, href: href },
         {
             canShare: !!isDomainOpen(domainId),
-            openFeedAfterShare: shouldOpenFeedAfterShare()
+            openFeedAfterShare: shouldOpenFeedAfterShare(),
+            alsoTakeGifs: shouldAlsoTakeGifs()
         }];
     if (pathAnimatedSnapshot !== "") {
         confirmShareContents.unshift({ localPath: pathAnimatedSnapshot, href: href });

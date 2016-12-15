@@ -49,6 +49,9 @@ function handleShareButtons(shareMsg) {
         // because you are not in a public place.
         document.getElementById("sharing").innerHTML = "<p class='prompt'>Snapshots can be shared when they're taken in shareable places.";
     }
+    var alsoTakeGifs = document.getElementById('alsoTakeGifs');
+    alsoTakeGifs.checked = shareMsg.alsoTakeGifs;
+    alsoTakeGifs.onchange = function () { EventBridge.emitWebEvent(alsoTakeGifs.checked ? 'setAlsoTakeGifsTrue' : 'setAlsoTakeGifsFalse'); };
 }
 window.onload = function () {
     // Something like the following will allow testing in a browser.
