@@ -558,6 +558,10 @@ void AvatarMixer::handleKillAvatarPacket(QSharedPointer<ReceivedMessage> message
 }
 
 void AvatarMixer::handleNodeIgnoreRequestPacket(QSharedPointer<ReceivedMessage> message, SharedNodePointer senderNode) {
+    auto killPacket = NLPacket::create(PacketType::KillAvatar, NUM_BYTES_RFC4122_UUID + sizeof(KillAvatarReason));
+    killPacket->write(message->peek(NUM_BYTES_RFC4122_UUID));
+    killPacket->writePrimitive(KillAvatarReason::AvatarIgnored);
+    DependencyManager::get<NodeList>()->sendUnreliablePacket(*killPacket, *senderNode);
     senderNode->parseIgnoreRequestMessage(message);
 }
 
