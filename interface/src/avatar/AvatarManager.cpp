@@ -255,13 +255,22 @@ void AvatarManager::handleRemovedAvatar(const AvatarSharedPointer& removedAvatar
         _motionStatesToRemoveFromPhysics.push_back(motionState);
     }
 
-    if (removalReason == KillAvatarReason::TheirAvatarEnteredYourBubble) {
-        emit DependencyManager::get<UsersScriptingInterface>()->enteredIgnoreRadius();
-    }
     if (removalReason == KillAvatarReason::TheirAvatarEnteredYourBubble || removalReason == YourAvatarEnteredTheirBubble) {
         DependencyManager::get<NodeList>()->radiusIgnoreNodeBySessionID(avatar->getSessionUUID(), true);
     }
-    _avatarFades.push_back(removedAvatar);
+    if (removalReason == KillAvatarReason::TheirAvatarEnteredYourBubble) {
+        // Show the bubble on the client whose bubble was entered
+        emit DependencyManager::get<UsersScriptingInterface>()->enteredIgnoreRadius();
+        // Freeze the avatar that entered the bubble for a moment, then make them fade
+        QTimer* freezeTimer = new QTimer(this);
+        QObject::connect(freezeTimer, &QTimer::timeout, [=] {
+            _avatarFades.push_back(removedAvatar);
+            delete freezeTimer;
+        });
+        freezeTimer->start(3000);
+    } else {
+        _avatarFades.push_back(removedAvatar);
+    }
 }
 
 void AvatarManager::clearOtherAvatars() {

@@ -41,7 +41,7 @@
     var updateConnected = false;
 
     const BUBBLE_VISIBLE_DURATION_MS = 3000;
-    const BUBBLE_RAISE_ANIMATION_DURATION_MS = 750;
+    const BUBBLE_RAISE_ANIMATION_DURATION_MS = 500;
     const BUBBLE_HUD_ICON_FLASH_INTERVAL_MS = 500;
 
     var ASSETS_PATH = Script.resolvePath("assets");
