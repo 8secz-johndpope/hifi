@@ -469,6 +469,7 @@ void UserInputMapper::runMappings() {
         qCDebug(controllers) << "Processing standard routes";
     }
     applyRoutes(_standardRoutes);
+    qDebug() << "AFTER UserInputMapper Update() _driveKeys[TRANSLATE_X] = " << _actionStates[toInt(Action::TRANSLATE_X)];
 
     if (debugRoutes) {
         qCDebug(controllers) << "Done with mappings";
@@ -587,6 +588,7 @@ bool UserInputMapper::applyRoute(const Route::Pointer& route, bool force) {
         if (debugRoutes && route->debug) {
             qCDebug(controllers) << "Filtered value was " << value;
         }
+        qCDebug(controllers) << "Dest:" << "" << "Value:" << value;
 
         destination->apply(value, source);
     }

@@ -4214,6 +4214,7 @@ void Application::update(float deltaTime) {
         }
         myAvatar->setDriveKeys(ZOOM, userInputMapper->getActionState(controller::Action::TRANSLATE_CAMERA_Z));
     }
+    //qDebug() << "Application Update() _driveKeys[TRANSLATE_X] = " << userInputMapper->getActionState(controller::Action::TRANSLATE_X);
 
     controller::Pose leftHandPose = userInputMapper->getPoseState(controller::Action::LEFT_HAND);
     controller::Pose rightHandPose = userInputMapper->getPoseState(controller::Action::RIGHT_HAND);

@@ -11,159 +11,147 @@
 //  Distributed under the Apache License, Version 2.0.
 //  See the accompanying file LICENSE or http://www.apache.org/licenses/LICENSE-2.0.html
 
-(function() { // BEGIN LOCAL_SCOPE
+(function () { // BEGIN LOCAL_SCOPE
 
-var mappingName, basicMapping, isChecked;
+    var mappingName, basicMapping, isChecked;
 
-var TURN_RATE = 1000;
-var MENU_ITEM_NAME = "Advanced Movement For Hand Controllers";
-var SETTINGS_KEY = 'advancedMovementForHandControllersIsChecked';
-var isDisabled = false;
-var previousSetting = Settings.getValue(SETTINGS_KEY);
-if (previousSetting === '' || previousSetting === false || previousSetting === 'false') {
-    previousSetting = false;
-    isChecked = false;
-}
+    var TURN_RATE = 1000;
+    var MENU_ITEM_NAME = "Advanced Movement For Hand Controllers";
+    var SETTINGS_KEY = 'advancedMovementForHandControllersIsChecked';
+    var isDisabled = false;
+    var previousSetting = Settings.getValue(SETTINGS_KEY);
+    if (previousSetting === '' || previousSetting === false || previousSetting === 'false') {
+        previousSetting = false;
+        isChecked = false;
+    }
 
-if (previousSetting === true || previousSetting === 'true') {
-    previousSetting = true;
-    isChecked = true;
-}
+    if (previousSetting === true || previousSetting === 'true') {
+        previousSetting = true;
+        isChecked = true;
+    }
 
-function addAdvancedMovementItemToSettingsMenu() {
-    Menu.addMenuItem({
-        menuName: "Settings",
-        menuItemName: MENU_ITEM_NAME,
-        isCheckable: true,
-        isChecked: previousSetting
-    });
+    function addAdvancedMovementItemToSettingsMenu() {
+        Menu.addMenuItem({
+            menuName: "Settings",
+            menuItemName: MENU_ITEM_NAME,
+            isCheckable: true,
+            isChecked: previousSetting
+        });
 
-}
+    }
 
-function rotate180() {
-    var newOrientation = Quat.multiply(MyAvatar.orientation, Quat.angleAxis(180, {
-        x: 0,
-        y: 1,
-        z: 0
-    }))
-    MyAvatar.orientation = newOrientation
-}
+    function rotate180() {
+        inFlipTurn = true;
+        var newOrientation = Quat.multiply(MyAvatar.orientation, Quat.angleAxis(180, {
+            x: 0,
+            y: 1,
+            z: 0
+        }))
+        MyAvatar.orientation = newOrientation
+        Script.setTimeout(function () {
+            inFlipTurn = false;
+        }, TURN_RATE)
+    }
 
-var inFlipTurn = false;
+    var inFlipTurn = false;
 
-function registerBasicMapping() {
-    mappingName = 'Hifi-AdvancedMovement-Dev-' + Math.random();
-    basicMapping = Controller.newMapping(mappingName);
-    basicMapping.from(Controller.Standard.LY).to(function(value) {
-        if (isDisabled) {
-            return;
-        }
-        var stick = Controller.getValue(Controller.Standard.LS);
-        if (value === 1 && Controller.Hardware.OculusTouch !== undefined) {
-            rotate180();
-        } else if (Controller.Hardware.Vive !== undefined) {
-            if (value > 0.75 && inFlipTurn === false) {
-                inFlipTurn = true;
-                rotate180();
-                Script.setTimeout(function() {
-                    inFlipTurn = false;
-                }, TURN_RATE)
-            }
-        }
-        return;
-    });
-    basicMapping.from(Controller.Standard.LX).to(Controller.Standard.RX);
-    basicMapping.from(Controller.Standard.RY).to(function(value) {
+    function maybeFlipTurn(value, stickMapping) {
         if (isDisabled) {
             return;
         }
         var stick = Controller.getValue(Controller.Standard.RS);
-        if (value === 1 && Controller.Hardware.OculusTouch !== undefined) {
-            rotate180();
-        } else if (Controller.Hardware.Vive !== undefined) {
-            if (value > 0.75 && inFlipTurn === false) {
-                inFlipTurn = true;
+        if (inFlipTurn === false) {
+            if ((Controller.Hardware.OculusTouch !== undefined && value > 0.8)
+                || (Controller.Hardware.Vive !== undefined && value > 0.75)) {
                 rotate180();
-                Script.setTimeout(function() {
-                    inFlipTurn = false;
-                }, TURN_RATE)
             }
         }
         return;
-    })
-}
-
-
-function enableMappings() {
-    Controller.enableMapping(mappingName);
-}
-
-function disableMappings() {
-    Controller.disableMapping(mappingName);
-}
-
-function scriptEnding() {
-    Menu.removeMenuItem("Settings", MENU_ITEM_NAME);
-    disableMappings();
-}
-
-
-function menuItemEvent(menuItem) {
-    if (menuItem == MENU_ITEM_NAME) {
-        isChecked = Menu.isOptionChecked(MENU_ITEM_NAME);
-        if (isChecked === true) {
-            Settings.setValue(SETTINGS_KEY, true);
-            disableMappings();
-        } else if (isChecked === false) {
-            Settings.setValue(SETTINGS_KEY, false);
-            enableMappings();
-        }
     }
-}
 
-addAdvancedMovementItemToSettingsMenu();
+    function registerBasicMapping() {
+        mappingName = 'Hifi-AdvancedMovement-Dev-' + Math.random();
+        basicMapping = Controller.newMapping(mappingName);
+        basicMapping.from(Controller.Standard.LY).to(function (value) {
+            maybeFlipTurn(value, Controller.Standard.LS);
+        });
+        basicMapping.from(Controller.Standard.LX).to(function (value) { return; });
+        basicMapping.from(Controller.Standard.RY).to(function (value) {
+            maybeFlipTurn(value, Controller.Standard.RS);
+        });
+    }
 
-Script.scriptEnding.connect(scriptEnding);
 
-Menu.menuItemEvent.connect(menuItemEvent);
+    function enableMappings() {
+        Controller.enableMapping(mappingName);
+    }
 
-registerBasicMapping();
+    function disableMappings() {
+        Controller.disableMapping(mappingName);
+    }
 
-Script.setTimeout(function() {
-    if (previousSetting === true) {
+    function scriptEnding() {
+        Menu.removeMenuItem("Settings", MENU_ITEM_NAME);
         disableMappings();
-    } else {
-        enableMappings();
     }
-}, 100)
 
 
-HMD.displayModeChanged.connect(function(isHMDMode) {
-    if (isHMDMode) {
-        if (Controller.Hardware.Vive !== undefined || Controller.Hardware.OculusTouch !== undefined) {
+    function menuItemEvent(menuItem) {
+        if (menuItem == MENU_ITEM_NAME) {
+            isChecked = Menu.isOptionChecked(MENU_ITEM_NAME);
             if (isChecked === true) {
+                Settings.setValue(SETTINGS_KEY, true);
                 disableMappings();
             } else if (isChecked === false) {
+                Settings.setValue(SETTINGS_KEY, false);
                 enableMappings();
             }
-
         }
     }
-});
+
+    addAdvancedMovementItemToSettingsMenu();
+
+    Script.scriptEnding.connect(scriptEnding);
+
+    Menu.menuItemEvent.connect(menuItemEvent);
+
+    registerBasicMapping();
+
+    Script.setTimeout(function () {
+        if (previousSetting === true) {
+            disableMappings();
+        } else {
+            enableMappings();
+        }
+    }, 100)
 
 
-var HIFI_ADVANCED_MOVEMENT_DISABLER_CHANNEL = 'Hifi-Advanced-Movement-Disabler';
-function handleMessage(channel, message, sender) {
-    if (channel == HIFI_ADVANCED_MOVEMENT_DISABLER_CHANNEL) {
-        if (message == 'disable') {
-            isDisabled = true;
-        } else if (message == 'enable') {
-            isDisabled = false;
+    HMD.displayModeChanged.connect(function (isHMDMode) {
+        if (isHMDMode) {
+            if (Controller.Hardware.Vive !== undefined || Controller.Hardware.OculusTouch !== undefined) {
+                if (isChecked === true) {
+                    disableMappings();
+                } else if (isChecked === false) {
+                    enableMappings();
+                }
+
+            }
+        }
+    });
+
+
+    var HIFI_ADVANCED_MOVEMENT_DISABLER_CHANNEL = 'Hifi-Advanced-Movement-Disabler';
+    function handleMessage(channel, message, sender) {
+        if (channel == HIFI_ADVANCED_MOVEMENT_DISABLER_CHANNEL) {
+            if (message == 'disable') {
+                isDisabled = true;
+            } else if (message == 'enable') {
+                isDisabled = false;
+            }
         }
     }
-}
 
-Messages.subscribe(HIFI_ADVANCED_MOVEMENT_DISABLER_CHANNEL);
-Messages.messageReceived.connect(handleMessage);
+    Messages.subscribe(HIFI_ADVANCED_MOVEMENT_DISABLER_CHANNEL);
+    Messages.messageReceived.connect(handleMessage);
 
 }()); // END LOCAL_SCOPE
