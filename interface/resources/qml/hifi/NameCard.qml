@@ -34,6 +34,7 @@ Item {
     property bool isMyCard: false
     property bool selected: false
     property bool isAdmin: false
+    property bool isAgent: false
 
     /* User image commented out for now - will probably be re-introduced later.
     Column {

@@ -817,8 +817,10 @@ void DomainServerSettingsManager::processUsernameFromIDRequestPacket(QSharedPoin
             // Write whether or not the user is an admin
             bool isAdmin = matchingNode->getCanKick();
             usernameFromIDReplyPacket->writePrimitive(isAdmin);
+            bool isAgent = (matchingNode->getType() == NodeType::Agent);
+            usernameFromIDReplyPacket->writePrimitive(isAgent);
 
-            qDebug() << "Sending username" << verifiedUsername << "and machine fingerprint" << machineFingerprint << "associated with node" << nodeUUID << ". Node admin status: " << isAdmin;
+            qDebug() << "Node:" << nodeUUID << "Username:" << verifiedUsername << "Machine Fingerprint:" << machineFingerprint << "isAdmin:" << isAdmin << "isAgent:" << isAgent;
             // Ship it!
             limitedNodeList->sendPacket(std::move(usernameFromIDReplyPacket), *sendingNode);
         } else {

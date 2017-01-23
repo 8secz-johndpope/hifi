@@ -28,7 +28,7 @@ Rectangle {
     property int rowHeight: 70
     property int actionButtonWidth: 75
     property int nameCardWidth: palContainer.width - actionButtonWidth*(iAmAdmin ? 4 : 2) - 4 - hifi.dimensions.scrollbarBackgroundWidth
-    property var myData: ({displayName: "", userName: "", audioLevel: 0.0, admin: true}) // valid dummy until set
+    property var myData: ({displayName: "", userName: "", audioLevel: 0.0, admin: false, agent: false}) // valid dummy until set
     property var ignored: ({}); // Keep a local list of ignored avatars & their data. Necessary because HashMap is slow to respond after ignoring.
     property var userModelData: [] // This simple list is essentially a mirror of the userModel listModel without all the extra complexities.
     property bool iAmAdmin: false
@@ -223,7 +223,8 @@ Rectangle {
                 visible: !isCheckBox && !isButton
                 uuid: model ? model.sessionId : ""
                 selected: styleData.selected
-                isAdmin: model && model.admin
+                isAdmin: model ? model.admin : false
+                isAgent: model ? model.agent : false
                 // Size
                 width: nameCardWidth
                 height: parent.height
@@ -271,7 +272,7 @@ Rectangle {
             HifiControls.Button {
                 id: actionButton
                 color: 2 // Red
-                visible: isButton
+                visible: isButton && (model ? !model.agent : true)
                 anchors.centerIn: parent
                 width: 32
                 height: 24
@@ -502,6 +503,7 @@ Rectangle {
             // The text that goes in the userName field is the second parameter in the message.
             var userName = message.params[1];
             var admin = message.params[2];
+            var agent = message.params[3];
             // If the userId is empty, we're updating "myData".
             if (!userId) {
                 myData.userName = userName;
@@ -516,6 +518,9 @@ Rectangle {
                     // Set the admin status appropriately
                     userModel.setProperty(userIndex, "admin", admin);
                     userModelData[userIndex].admin = admin; // Defensive programming
+                    // Set the agent status appropriately
+                    userModel.setProperty(userIndex, "agent", agent);
+                    userModelData[userIndex].agent = agent; // Defensive programming
                 }
             }
             break;

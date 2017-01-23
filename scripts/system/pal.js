@@ -280,9 +280,10 @@ function populateUserList(selectData) {
             userName: '',
             sessionId: id || '',
             audioLevel: 0.0,
-            admin: false
+            admin: false,
+            agent: false
         };
-        // Request the username, fingerprint, and admin status from the given UUID
+        // Request the username, fingerprint, admin, and agent status from the given UUID
         // Username and fingerprint returns default constructor output if the requesting user isn't an admin
         Users.requestUsernameFromID(id);
         // Request personal mute status and ignore status
@@ -303,20 +304,22 @@ function populateUserList(selectData) {
 }
 
 // The function that handles the reply from the server
-function usernameFromIDReply(id, username, machineFingerprint, isAdmin) {
+function usernameFromIDReply(id, username, machineFingerprint, isAdmin, isAgent) {
     var data;
     // If the ID we've received is our ID...
     if (MyAvatar.sessionUUID === id) {
         // Set the data to contain specific strings.
-        data = ['', username, isAdmin];
+        data = ['', username];
     } else if (Users.canKick) {
         // Set the data to contain the ID and the username (if we have one)
         // or fingerprint (if we don't have a username) string.
-        data = [id, username || machineFingerprint, isAdmin];
+        data = [id, username || machineFingerprint];
     } else {
         // Set the data to contain specific strings.
-        data = [id, '', isAdmin];
+        data = [id, ''];
     }
+    data.push(isAdmin);
+    data.push(isAgent);
     print('Username Data:', JSON.stringify(data));
     // Ship the data off to QML
     pal.sendToQml({ method: 'updateUsername', params: data });
