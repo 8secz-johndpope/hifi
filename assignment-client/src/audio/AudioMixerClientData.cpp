@@ -427,3 +427,11 @@ void AudioMixerClientData::cleanupCodec() {
         }
     }
 }
+
+void AudioMixerClientData::getSpaceBubbleData(glm::vec3 boundingBoxCorner, glm::vec3 boundingBoxScale) {
+    AvatarAudioStream* audioStream = getAvatarAudioStream();
+    if (audioStream != NULL) {
+        boundingBoxCorner = audioStream->getAvatarBoundingBoxCorner();
+        boundingBoxScale = audioStream->getAvatarBoundingBoxScale();
+    }
+}

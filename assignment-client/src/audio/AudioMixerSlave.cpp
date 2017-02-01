@@ -439,25 +439,28 @@ bool shouldIgnoreNode(const SharedNodePointer& listener, const SharedNodePointer
 
     if (nodeData &&
             // make sure that it isn't being ignored by our listening node
-            (!listener->isIgnoringNodeWithID(node->getUUID()) || (nodeData->getRequestsDomainListData() && node->getCanKick())) &&
+            ((nodeData->getRequestsDomainListData() && node->getCanKick()) || !listener->isIgnoringNodeWithID(node->getUUID())) &&
             // and that it isn't ignoring our listening node
-            (!node->isIgnoringNodeWithID(listener->getUUID()) || getsAnyIgnored))  {
+            (getsAnyIgnored || !node->isIgnoringNodeWithID(listener->getUUID())))  {
 
         // is either node enabling the space bubble / ignore radius?
         if ((listener->isIgnoreRadiusEnabled() || node->isIgnoreRadiusEnabled())) {
             // define the minimum bubble size
             static const glm::vec3 minBubbleSize = glm::vec3(0.3f, 1.3f, 0.3f);
+            glm::vec3 boundingBoxCorner, boundingBoxScale;
 
+            listenerData->getSpaceBubbleData(&boundingBoxCorner, &boundingBoxScale);
             // set up the bounding box for the listener
-            AABox listenerBox(listenerData->getAvatarBoundingBoxCorner(), listenerData->getAvatarBoundingBoxScale());
-            if (glm::any(glm::lessThan(listenerData->getAvatarBoundingBoxScale(), minBubbleSize))) {
+            AABox listenerBox(boundingBoxCorner, boundingBoxScale);
+            if (glm::any(glm::lessThan(boundingBoxScale, minBubbleSize))) {
                 listenerBox.setScaleStayCentered(minBubbleSize);
             }
 
+            nodeData->getSpaceBubbleData(&boundingBoxCorner, &boundingBoxScale);
             // set up the bounding box for the node
-            AABox nodeBox(nodeData->getAvatarBoundingBoxCorner(), nodeData->getAvatarBoundingBoxScale());
+            AABox nodeBox(boundingBoxCorner, boundingBoxScale);
             // Clamp the size of the bounding box to a minimum scale
-            if (glm::any(glm::lessThan(nodeData->getAvatarBoundingBoxScale(), minBubbleSize))) {
+            if (glm::any(glm::lessThan(boundingBoxScale, minBubbleSize))) {
                 nodeBox.setScaleStayCentered(minBubbleSize);
             }
 
