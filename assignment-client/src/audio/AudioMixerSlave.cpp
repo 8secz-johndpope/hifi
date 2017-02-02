@@ -449,14 +449,14 @@ bool shouldIgnoreNode(const SharedNodePointer& listener, const SharedNodePointer
             static const glm::vec3 minBubbleSize = glm::vec3(0.3f, 1.3f, 0.3f);
             glm::vec3 boundingBoxCorner, boundingBoxScale;
 
-            listenerData->getSpaceBubbleData(&boundingBoxCorner, &boundingBoxScale);
+            listenerData->getSpaceBubbleData(boundingBoxCorner, boundingBoxScale);
             // set up the bounding box for the listener
             AABox listenerBox(boundingBoxCorner, boundingBoxScale);
             if (glm::any(glm::lessThan(boundingBoxScale, minBubbleSize))) {
                 listenerBox.setScaleStayCentered(minBubbleSize);
             }
 
-            nodeData->getSpaceBubbleData(&boundingBoxCorner, &boundingBoxScale);
+            nodeData->getSpaceBubbleData(boundingBoxCorner, boundingBoxScale);
             // set up the bounding box for the node
             AABox nodeBox(boundingBoxCorner, boundingBoxScale);
             // Clamp the size of the bounding box to a minimum scale
