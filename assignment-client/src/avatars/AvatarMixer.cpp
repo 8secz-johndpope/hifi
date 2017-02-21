@@ -213,9 +213,6 @@ void AvatarMixer::broadcastAvatarData() {
             // use the data rate specifically for avatar data for FRD adjustment checks
             float avatarDataRateLastSecond = nodeData->getOutboundAvatarDataKbps();
 
-            // When this is true, the AvatarMixer will send Avatar data to a client about avatars that are not in the view frustrum
-            bool getsOutOfView = false;
-
             // When this is true, the AvatarMixer will send Avatar data to a client about avatars that they've ignored
             bool getsIgnoredByMe = nodeData->getRequestsDomainListData();
             
@@ -372,7 +369,6 @@ void AvatarMixer::broadcastAvatarData() {
                     maxAvatarDistanceThisFrame = std::max(maxAvatarDistanceThisFrame, distanceToAvatar);
 
                     if (distanceToAvatar != 0.0f
-                        && !getsOutOfView
                         && distribution(generator) > (nodeData->getFullRateDistance() / distanceToAvatar)) {
                         return;
                     }
@@ -410,7 +406,7 @@ void AvatarMixer::broadcastAvatarData() {
                     bool isInView = nodeData->otherAvatarInView(otherNodeBox);
 
                     // this throttles the extra data to only be sent every Nth message
-                    if (!isInView && !getsOutOfView && (lastSeqToReceiver % EXTRA_AVATAR_DATA_FRAME_RATIO > 0)) {
+                    if (!isInView && (lastSeqToReceiver % EXTRA_AVATAR_DATA_FRAME_RATIO > 0)) {
                         return;
                     }
 
@@ -418,7 +414,7 @@ void AvatarMixer::broadcastAvatarData() {
                     avatarPacketList->startSegment();
 
                     AvatarData::AvatarDataDetail detail;
-                    if (!isInView && !getsOutOfView) {
+                    if (!isInView) {
                         detail = AvatarData::MinimumData;
                         nodeData->incrementAvatarOutOfView();
                     } else {
