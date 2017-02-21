@@ -334,6 +334,7 @@ void AvatarManager::removeAvatar(const QUuid& sessionUUID, KillAvatarReason remo
 
     auto removedAvatar = _avatarHash.take(sessionUUID);
     if (removedAvatar) {
+        qDebug() << "Removing avatar from AvatarHashMap. sessionUUID:" << sessionUUID << "Reason" << removalReason;
         handleRemovedAvatar(removedAvatar, removalReason);
     }
 }
