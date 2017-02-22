@@ -294,6 +294,7 @@ function populateUserList(selectData) {
         data.push(avatarPalDatum);
         print('PAL data:', JSON.stringify(avatarPalDatum));
     });
+    Users.requestsDomainListData = false;
     sendToQml({ method: 'users', params: data });
     if (selectData) {
         selectData[2] = true;
