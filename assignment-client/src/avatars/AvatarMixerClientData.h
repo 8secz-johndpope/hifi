@@ -109,8 +109,6 @@ public:
     void setBaseDisplayName(const QString& baseDisplayName) { _baseDisplayName = baseDisplayName; }
     bool getRequestsDomainListData() { return _requestsDomainListData; }
     void setRequestsDomainListData(bool requesting) { _requestsDomainListData = requesting; }
-    bool getGetsIgnoredByMe() { return _getsIgnoredByMe; }
-    void setGetsIgnoredByMe(bool requesting) { _getsIgnoredByMe = requesting; }
 
     ViewFrustum getViewFrustom() const { return _currentViewFrustum; }
 
@@ -166,8 +164,7 @@ private:
     int _recentOtherAvatarsInView { 0 };
     int _recentOtherAvatarsOutOfView { 0 };
     QString _baseDisplayName{}; // The santized key used in determinging unique sessionDisplayName, so that we can remove from dictionary.
-    bool _requestsDomainListData{ false };
-    bool _getsIgnoredByMe{ false };
+    bool _requestsDomainListData { false };
 };
 
 #endif // hifi_AvatarMixerClientData_h
