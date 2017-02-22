@@ -213,8 +213,11 @@ void AvatarMixer::broadcastAvatarData() {
             // use the data rate specifically for avatar data for FRD adjustment checks
             float avatarDataRateLastSecond = nodeData->getOutboundAvatarDataKbps();
 
+            // When this is true, the AvatarMixer will send Avatar data to a client about avatars that are not in the view frustrum
+            bool getsOutOfView = nodeData->getRequestsDomainListData();
+
             // When this is true, the AvatarMixer will send Avatar data to a client about avatars that they've ignored
-            bool getsIgnoredByMe = nodeData->getRequestsDomainListData();
+            bool getsIgnoredByMe = getsOutOfView;
             
             // When this is true, the AvatarMixer will send Avatar data to a client about avatars that have ignored them
             bool getsAnyIgnored = getsIgnoredByMe && node->getCanKick();
@@ -369,6 +372,7 @@ void AvatarMixer::broadcastAvatarData() {
                     maxAvatarDistanceThisFrame = std::max(maxAvatarDistanceThisFrame, distanceToAvatar);
 
                     if (distanceToAvatar != 0.0f
+                        && !getsOutOfView
                         && distribution(generator) > (nodeData->getFullRateDistance() / distanceToAvatar)) {
                         return;
                     }
@@ -406,7 +410,7 @@ void AvatarMixer::broadcastAvatarData() {
                     bool isInView = nodeData->otherAvatarInView(otherNodeBox);
 
                     // this throttles the extra data to only be sent every Nth message
-                    if (!isInView && (lastSeqToReceiver % EXTRA_AVATAR_DATA_FRAME_RATIO > 0)) {
+                    if (!isInView && !getsOutOfView && (lastSeqToReceiver % EXTRA_AVATAR_DATA_FRAME_RATIO > 0)) {
                         return;
                     }
 
@@ -414,13 +418,14 @@ void AvatarMixer::broadcastAvatarData() {
                     avatarPacketList->startSegment();
 
                     AvatarData::AvatarDataDetail detail;
-                    if (!isInView) {
+                    if (!isInView && !getsOutOfView) {
                         detail = AvatarData::MinimumData;
                         nodeData->incrementAvatarOutOfView();
                     } else {
                         detail = distribution(generator) < AVATAR_SEND_FULL_UPDATE_RATIO
                                         ? AvatarData::SendAllData : AvatarData::CullSmallData;
                         nodeData->incrementAvatarInView();
+                        nodeData->setRequestsDomainListData(false);
                     }
 
                     numAvatarDataBytes += avatarPacketList->write(otherNode->getUUID().toRfc4122());
