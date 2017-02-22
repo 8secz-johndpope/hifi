@@ -138,10 +138,10 @@ void AvatarMixerSlave::broadcastAvatarData(const SharedNodePointer& node) {
         int numAvatarsWithSkippedFrames = 0;
 
         // When this is true, the AvatarMixer will send Avatar data to a client about avatars that are not in the view frustrum
-        bool getsOutOfView = false;
+        bool getsOutOfView = nodeData->getRequestsDomainListData();
 
         // When this is true, the AvatarMixer will send Avatar data to a client about avatars that they've ignored
-        bool getsIgnoredByMe = nodeData->getRequestsDomainListData();
+        bool getsIgnoredByMe = getsOutOfView;
 
         // When this is true, the AvatarMixer will send Avatar data to a client about avatars that have ignored them
         bool getsAnyIgnored = getsIgnoredByMe && node->getCanKick();
