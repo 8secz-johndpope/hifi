@@ -180,7 +180,7 @@ private:
     bool _shouldFlushEncoder { false };
 
     bool _shouldMuteClient { false };
-    bool _requestsDomainListData { false };
+    bool _requestsDomainListData{ false };
 };
 
 #endif // hifi_AudioMixerClientData_h

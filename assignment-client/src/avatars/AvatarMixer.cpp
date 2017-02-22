@@ -364,6 +364,7 @@ void AvatarMixer::handleRequestsDomainListDataPacket(QSharedPointer<ReceivedMess
             bool isRequesting;
             message->readPrimitive(&isRequesting);
             nodeData->setRequestsDomainListData(isRequesting);
+            nodeData->setGetsIgnoredByMe(isRequesting);
             qCDebug(avatars) << "node" << nodeData->getNodeID() << "requestsDomainListData" << isRequesting;
         }
     }

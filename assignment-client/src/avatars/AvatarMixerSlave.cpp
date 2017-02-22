@@ -141,7 +141,7 @@ void AvatarMixerSlave::broadcastAvatarData(const SharedNodePointer& node) {
         bool getsOutOfView = nodeData->getRequestsDomainListData();
 
         // When this is true, the AvatarMixer will send Avatar data to a client about avatars that they've ignored
-        bool getsIgnoredByMe = getsOutOfView;
+        bool getsIgnoredByMe = nodeData->getGetsIgnoredByMe();
 
         // When this is true, the AvatarMixer will send Avatar data to a client about avatars that have ignored them
         bool getsAnyIgnored = getsIgnoredByMe && node->getCanKick();
