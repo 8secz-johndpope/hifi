@@ -13,6 +13,7 @@
 
 import QtQuick 2.5
 import QtQuick.Controls 1.4
+import Qt.labs.settings 1.0
 import "../styles-uit"
 import "../controls-uit" as HifiControls
 
@@ -54,8 +55,15 @@ Rectangle {
         letterboxMessage.visible = true
         letterboxMessage.popupRadius = 0
     }
+    Settings {
+        id: settings
+        category: "pal"
+        property bool filtered: false
+        property int nearDistance: 30
+    }
     function refreshWithFilter() {
-        pal.sendToScript({method: 'refresh', params: {filter: filter.checked && {distance: 30}}})
+        // We should just be able to set settings.filtered to filter.checked, but see #3249, so send to .js for saving.
+        pal.sendToScript({method: 'refresh', params: {filter: filter.checked && {distance: settings.nearDistance}}});
     }
 
     // This is the container for the PAL
@@ -101,8 +109,9 @@ Rectangle {
         Row {
             HifiControls.CheckBox {
                 id: filter
+                checked: settings.filtered
                 text: "in view"
-                boxSize: reload.height
+                boxSize: reload.height * 0.70
                 onCheckedChanged: refreshWithFilter()
             }
             HifiControls.GlyphButton {
@@ -111,7 +120,7 @@ Rectangle {
                 width: reload.height
                 onClicked: refreshWithFilter()
             }
-            spacing: 40
+            spacing: 50
             anchors {
                 right: parent.right
                 top: parent.top
