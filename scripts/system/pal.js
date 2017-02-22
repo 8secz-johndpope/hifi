@@ -228,6 +228,7 @@ function fromQml(message) { // messages are {method, params}, like json-rpc. See
         }
         break;
     case 'refresh':
+        Users.requestsDomainListData = true;
         removeOverlays();
         populateUserList(message.params);
         UserActivityLogger.palAction("refresh", "");
