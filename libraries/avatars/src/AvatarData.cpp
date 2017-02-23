@@ -186,6 +186,7 @@ QByteArray AvatarData::toByteArray(AvatarDataDetail dataDetail, quint64 lastSent
     bool cullSmallChanges = (dataDetail == CullSmallData);
     bool sendAll = (dataDetail == SendAllData);
     bool sendMinimum = (dataDetail == MinimumData);
+    bool sendPALMinimum = (dataDetail == PALMinimum);
 
     lazyInitHeadData();
 
@@ -222,24 +223,45 @@ QByteArray AvatarData::toByteArray(AvatarDataDetail dataDetail, quint64 lastSent
     auto parentID = getParentID();
 
     bool hasAvatarGlobalPosition = true; // always include global position
-    bool hasAvatarOrientation = sendAll || rotationChangedSince(lastSentTime);
-    bool hasAvatarBoundingBox = sendAll || avatarBoundingBoxChangedSince(lastSentTime);
-    bool hasAvatarScale = sendAll || avatarScaleChangedSince(lastSentTime);
-    bool hasLookAtPosition = sendAll || lookAtPositionChangedSince(lastSentTime);
-    bool hasAudioLoudness = sendAll || audioLoudnessChangedSince(lastSentTime);
-    bool hasSensorToWorldMatrix = sendAll || sensorToWorldMatrixChangedSince(lastSentTime);
-    bool hasAdditionalFlags = sendAll || additionalFlagsChangedSince(lastSentTime);
+    bool hasAvatarOrientation;
+    bool hasAvatarBoundingBox;
+    bool hasAvatarScale;
+    bool hasLookAtPosition;
+    bool hasAudioLoudness;
+    bool hasSensorToWorldMatrix;
+    bool hasAdditionalFlags;
 
     // local position, and parent info only apply to avatars that are parented. The local position
     // and the parent info can change independently though, so we track their "changed since"
     // separately
-    bool hasParentInfo = sendAll || parentInfoChangedSince(lastSentTime);
-    bool hasAvatarLocalPosition = hasParent() && (sendAll ||
-        tranlationChangedSince(lastSentTime) ||
-        parentInfoChangedSince(lastSentTime));
+    bool hasParentInfo;
+    bool hasAvatarLocalPosition;
 
-    bool hasFaceTrackerInfo = !dropFaceTracking && hasFaceTracker() && (sendAll || faceTrackerInfoChangedSince(lastSentTime));
-    bool hasJointData = sendAll || !sendMinimum;
+    bool hasFaceTrackerInfo;
+    bool hasJointData;
+
+    if (sendPALMinimum) {
+        hasAudioLoudness = true;
+    } else {
+        hasAvatarOrientation = sendAll || rotationChangedSince(lastSentTime);
+        hasAvatarBoundingBox = sendAll || avatarBoundingBoxChangedSince(lastSentTime);
+        hasAvatarScale = sendAll || avatarScaleChangedSince(lastSentTime);
+        hasLookAtPosition = sendAll || lookAtPositionChangedSince(lastSentTime);
+        hasAudioLoudness = sendAll || audioLoudnessChangedSince(lastSentTime);
+        hasSensorToWorldMatrix = sendAll || sensorToWorldMatrixChangedSince(lastSentTime);
+        hasAdditionalFlags = sendAll || additionalFlagsChangedSince(lastSentTime);
+
+        // local position, and parent info only apply to avatars that are parented. The local position
+        // and the parent info can change independently though, so we track their "changed since"
+        // separately
+        hasParentInfo = sendAll || parentInfoChangedSince(lastSentTime);
+        hasAvatarLocalPosition = hasParent() && (sendAll ||
+            tranlationChangedSince(lastSentTime) ||
+            parentInfoChangedSince(lastSentTime));
+
+        hasFaceTrackerInfo = !dropFaceTracking && hasFaceTracker() && (sendAll || faceTrackerInfoChangedSince(lastSentTime));
+        hasJointData = sendAll || !sendMinimum;
+    }
 
     // Leading flags, to indicate how much data is actually included in the packet...
     AvatarDataPacket::HasFlags packetStateFlags =
