@@ -237,7 +237,6 @@ function fromQml(message) { // messages are {method, params}, like json-rpc. See
         }
         break;
     case 'refresh':
-        Users.requestsDomainListData = true;
         removeOverlays();
         // If filter is specified from .qml instead of through settings, update the settings.
         if (message.params.filter !== undefined) {
@@ -338,9 +337,6 @@ function populateUserList(selectData) {
         print('PAL data:', JSON.stringify(avatarPalDatum));
     });
     conserveResources = Object.keys(avatarsOfInterest).length > 20;
-    Users.requestsDomainListData = false;
-    Script.clearInterval(avatarInfoTimer);
-    avatarInfoTimer = createAvatarInfoInterval(AVATAR_INFO_UPDATE_INTERVAL_MS);
     sendToQml({ method: 'users', params: data });
     if (selectData) {
         selectData[2] = true;
@@ -553,10 +549,9 @@ function startup() {
 startup();
 
 var isWired = false;
-var audioTimer, avatarInfoTimer;
+var audioTimer;
 var AUDIO_LEVEL_UPDATE_INTERVAL_MS = 100; // 10hz for now (change this and change the AVERAGING_RATIO too)
 var AUDIO_LEVEL_CONSERVED_UPDATE_INTERVAL_MS = 300;
-var AVATAR_INFO_UPDATE_INTERVAL_MS = 1000;
 function off() {
     if (isWired) { // It is not ok to disconnect these twice, hence guard.
         Script.update.disconnect(updateOverlays);
@@ -567,14 +562,12 @@ function off() {
     if (audioTimer) {
         Script.clearInterval(audioTimer);
     }
-    if (avatarInfoTimer) {
-        Script.clearInterval(avatarInfoTimer);
-    }
     triggerMapping.disable(); // It's ok if we disable twice.
     triggerPressMapping.disable(); // see above
     removeOverlays();
     Users.requestsDomainListData = false;
 }
+
 function onTabletButtonClicked() {
     tablet.loadQMLSource("../Pal.qml");
     Users.requestsDomainListData = true;
@@ -656,12 +649,6 @@ function createAudioInterval(interval) {
             param[userId] = level;
         });
         sendToQml({method: 'updateAudioLevel', params: param});
-    }, interval);
-}
-
-function createAvatarInfoInterval(interval) {
-    return Script.setInterval(function () {
-        Users.requestsDomainListData = !requestsDomainListData;
     }, interval);
 }
 
