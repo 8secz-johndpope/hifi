@@ -146,7 +146,8 @@ void AvatarMixerSlave::broadcastAvatarData(const SharedNodePointer& node) {
 
         // Increase minimumBytesPerAvatar if the PAL is open or we're gettingAnyIgnored
         if (PALIsOpen || getsAnyIgnored) {
-            minimumBytesPerAvatar += sizeof(AvatarDataPacket::AvatarGlobalPosition) + sizeof(AvatarDataPacket::AudioLoudness);
+            minimumBytesPerAvatar += sizeof(AvatarDataPacket::AvatarGlobalPosition) +
+                sizeof(AvatarDataPacket::AudioLoudness);
         }
 
         // setup a PacketList for the avatarPackets

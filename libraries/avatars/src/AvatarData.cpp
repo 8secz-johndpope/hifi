@@ -223,22 +223,22 @@ QByteArray AvatarData::toByteArray(AvatarDataDetail dataDetail, quint64 lastSent
     auto parentID = getParentID();
 
     bool hasAvatarGlobalPosition = true; // always include global position
-    bool hasAvatarOrientation;
-    bool hasAvatarBoundingBox;
-    bool hasAvatarScale;
-    bool hasLookAtPosition;
-    bool hasAudioLoudness;
-    bool hasSensorToWorldMatrix;
-    bool hasAdditionalFlags;
+    bool hasAvatarOrientation = false;
+    bool hasAvatarBoundingBox = false;
+    bool hasAvatarScale = false;
+    bool hasLookAtPosition = false;
+    bool hasAudioLoudness = false;
+    bool hasSensorToWorldMatrix = false;
+    bool hasAdditionalFlags = false;
 
     // local position, and parent info only apply to avatars that are parented. The local position
     // and the parent info can change independently though, so we track their "changed since"
     // separately
-    bool hasParentInfo;
-    bool hasAvatarLocalPosition;
+    bool hasParentInfo = false;
+    bool hasAvatarLocalPosition = false;
 
-    bool hasFaceTrackerInfo;
-    bool hasJointData;
+    bool hasFaceTrackerInfo = false;
+    bool hasJointData = false;
 
     if (sendPALMinimum) {
         hasAudioLoudness = true;
