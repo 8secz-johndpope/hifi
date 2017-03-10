@@ -126,6 +126,7 @@ Rectangle {
                 id: myCard;
                 // Properties
                 profileUrl: myData.profileUrl;
+                imageMaskColor: pal.color;
                 displayName: myData.displayName;
                 userName: myData.userName;
                 audioLevel: myData.audioLevel;
@@ -355,7 +356,7 @@ Rectangle {
                                                  "Connections and Friends",
                                                  "<font color='purple'>Purple borders around profile pictures are <b>Connections</b>.</font><br>" +
                                                  "When your availability is set to Everyone, Connections can see your username and location.<br><br>" +
-                                                 "<font color='green'>Green borders around profile pictures are <b>Friends</b>.</font>" +
+                                                 "<font color='green'>Green borders around profile pictures are <b>Friends</b>.</font><br>" +
                                                  "When your availability is set to Friends, only Friends can see your username and location.");
                             onEntered: connectionsHelpText.color = hifi.colors.redAccent;
                             onExited: connectionsHelpText.color = hifi.colors.redHighlight;
@@ -553,9 +554,7 @@ Rectangle {
             rowDelegate: Rectangle { // The only way I know to specify a row height.
                 // Size
                 height: styleData.selected ? rowHeight + 15 : rowHeight;
-                color: styleData.selected
-                    ? hifi.colors.orangeHighlight
-                    : styleData.alternate ? hifi.colors.tableRowLightEven : hifi.colors.tableRowLightOdd;
+                color: rowColor(styleData.selected, styleData.alternate);
             }
 
             // This Item refers to the contents of each Cell
@@ -571,6 +570,7 @@ Rectangle {
                     id: nameCard;
                     // Properties
                     profileUrl: (model && model.profileUrl) || "";
+                    imageMaskColor: rowColor(styleData.selected, styleData.row % 2);
                     displayName: styleData.value;
                     userName: model ? model.userName : "";
                     connectionStatus: model ? model.connection : "";
@@ -845,9 +845,7 @@ Rectangle {
             rowDelegate: Rectangle {
                 // Size
                 height: rowHeight;
-                color: styleData.selected
-                    ? hifi.colors.orangeHighlight
-                    : styleData.alternate ? hifi.colors.tableRowLightEven : hifi.colors.tableRowLightOdd;
+                color: rowColor(styleData.selected, styleData.alternate);
             }
 
             // This Item refers to the contents of each Cell
@@ -860,6 +858,7 @@ Rectangle {
                     // Properties
                     visible: styleData.role === "userName";
                     profileUrl: (model && model.profileUrl) || "";
+                    imageMaskColor: rowColor(styleData.selected, styleData.row % 2);
                     displayName: model ? model.userName : "";
                     userName: "";
                     connectionStatus : model ? model.connection : "";
@@ -957,6 +956,9 @@ Rectangle {
         }
     }
 
+    function rowColor(selected, alternate) {
+        return selected ? hifi.colors.orangeHighlight : alternate ? hifi.colors.tableRowLightEven : hifi.colors.tableRowLightOdd;
+    }
     function findNearbySessionIndex(sessionId, optionalData) { // no findIndex in .qml
         var data = optionalData || nearbyUserModelData, length = data.length;
         for (var i = 0; i < length; i++) {

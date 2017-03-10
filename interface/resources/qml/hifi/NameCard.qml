@@ -38,7 +38,8 @@ Item {
     property bool isMyCard: false
     property bool selected: false
     property bool isAdmin: false
-    property string profilePicMaskColor: (connectionStatus == "connection" ? hifi.colors.indigoAccent : (connectionStatus == "friend" ? hifi.colors.greenHighlight : hifi.colors.darkGray))
+    property string imageMaskColor: pal.color;
+    property string profilePicBorderColor: (connectionStatus == "connection" ? hifi.colors.indigoAccent : (connectionStatus == "friend" ? hifi.colors.greenHighlight : imageMaskColor))
 
     Item {
         id: avatarImage
@@ -49,6 +50,7 @@ Item {
         anchors.top: parent.top;
         anchors.topMargin: isMyCard ? 0 : 8;
         anchors.left: parent.left
+        clip: true
         Image {
             id: userImage
             source: profileUrl !== "" ? ((0 === profileUrl.indexOf("http")) ? profileUrl : (defaultBaseUrl + profileUrl)) : "";
@@ -60,6 +62,32 @@ Item {
             source: "../../icons/profilePicLoading.gif"
             anchors.fill: parent;
             visible: userImage.status != Image.Ready;
+        }
+        // Circular mask
+        Rectangle {
+            id: avatarImageMask;
+            visible: avatarImage.visible;
+            anchors.verticalCenter: avatarImage.verticalCenter;
+            anchors.horizontalCenter: avatarImage.horizontalCenter;
+            width: avatarImage.width * 2;
+            height: avatarImage.height * 2;
+            color: "transparent"
+            radius: avatarImage.height;
+            border.color: imageMaskColor;
+            border.width: avatarImage.height/2;
+        }
+        // Colored border around image
+        Rectangle {
+            id: avatarImageBorder;
+            visible: avatarImage.visible;
+            anchors.verticalCenter: avatarImage.verticalCenter;
+            anchors.horizontalCenter: avatarImage.horizontalCenter;
+            width: avatarImage.width + border.width;
+            height: avatarImage.height + border.width;
+            color: "transparent"
+            radius: avatarImage.height;
+            border.color: profilePicBorderColor;
+            border.width: 4;
         }
     }
 
@@ -192,7 +220,7 @@ Item {
                 }
                 onExited: {
                     displayNameText.color = hifi.colors.darkGray;
-                    userNameText.color = hifi.colors.darkGray;
+                    userNameText.color = hifi.colors.greenShadow;
                 }
             }
         }
@@ -282,7 +310,7 @@ Item {
                 }
                 onExited: {
                     displayNameText.color = hifi.colors.darkGray;
-                    userNameText.color = hifi.colors.darkGray;
+                    userNameText.color = hifi.colors.greenShadow;
                 }
         }
     }
