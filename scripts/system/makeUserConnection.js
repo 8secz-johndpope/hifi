@@ -11,7 +11,7 @@
 //
 const version = 0.1;
 const label = "Friends";
-const MAX_AVATAR_DISTANCE = 1.25;
+const MAX_AVATAR_DISTANCE = 1.0;
 const GRIP_MIN = 0.05;
 const MESSAGE_CHANNEL = "io.highfidelity.friends";
 const STATES = {
@@ -24,7 +24,6 @@ const WAITING_INTERVAL = 100; // ms
 const FRIENDING_INTERVAL = 100; // ms
 const FRIENDING_TIME = 3000; // ms
 const OVERLAY_COLORS = [{red: 0x00, green: 0xFF, blue: 0x00}, {red: 0x00, green: 0x00, blue: 0xFF}];
-const ANIM_VAR_NAME = 'rightHandPosition';
 const FRIENDING_HAPTIC_STRENGTH = 0.5;
 const FRIENDING_SUCCESS_HAPTIC_STRENGTH = 1.0;
 const HAPTIC_DURATION = 20;
@@ -35,9 +34,10 @@ var nearbyAvatars = [];
 var state = STATES.inactive;
 var waitingInterval;
 var friendingInterval;
-var overlay;
+var entity;
 var makingFriends = false; // really just for visualizations for now
 var animHandlerId;
+var entityDimensionMultiplier = 1.0;
 
 function debug() {
     var stateString = "<" + STATE_STRINGS[state] + ">";
@@ -69,7 +69,7 @@ function getHandPosition(avatar, hand) {
         debug("calling getHandPosition with no hand!");
         return;
     }
-    var jointName = handToString(hand);
+    var jointName = handToString(hand) + "Middle1";
     return avatar.getJointPosition(avatar.getJointIndex(jointName));
 }
 
@@ -84,16 +84,17 @@ function shakeHandsAnimation(animationProperties) {
     if (headIndex) {
         offset = 0.8 * MyAvatar.getAbsoluteJointTranslationInObjectFrame(headIndex).y;
     }
-    var handPos = Vec3.multiply(offset, {x: -0.25, y: 1.2, z: 1.3});
-    result[ANIM_VAR_NAME] = handPos;
+    var handPos = Vec3.multiply(offset, {x: -0.25, y: 0.8, z: 1.3});
+    result.rightHandPosition = handPos;
+    result.rightHandRotation = Quat.fromPitchYawRollDegrees(90, 0, 90);
     return result;
 }
 
 // this is called frequently, but usually does nothing
-function updateOverlays() {
+function updateVisualization() {
     if (state == STATES.inactive) {
-        if (overlay) {
-            overlay = Overlays.deleteOverlay(overlay);
+        if (entity) {
+            entity = Entities.deleteEntity(entity);
         }
         return;
     }
@@ -108,17 +109,21 @@ function updateOverlays() {
 
     // TODO: make the size scale with avatar, up to
     // the actual size of MAX_AVATAR_DISTANCE
-    if (!overlay) {
+    var wrist = MyAvatar.getJointPosition(MyAvatar.getJointIndex(handToString(currentHand)));
+    var d = entityDimensionMultiplier * Vec3.distance(wrist, position);
+    var dimension = {x: d, y: d, z: d};
+    if (!entity) {
         var props =  {
+            type: "Sphere",
             solid: true,
             alpha: 0.5,
             color: color,
             position: position,
-            dimensions: MAX_AVATAR_DISTANCE / 3
+            dimensions: dimension
         }
-        overlay = Overlays.addOverlay("sphere", props);
+        entity = Entities.addEntity(props, true);
     } else {
-        Overlays.editOverlay(overlay, { position: position, color: color});
+        Entities.editEntity(entity, {dimensions: dimension, position: position, color: color});
     }
 
 }
@@ -148,7 +153,7 @@ function findNearbyAvatars() {
 function startHandshake(fromKeyboard) {
     if (fromKeyboard) {
         debug("adding animation");
-        animHandlerId = MyAvatar.addAnimationStateHandler(shakeHandsAnimation, [ANIM_VAR_NAME]);
+        animHandlerId = MyAvatar.addAnimationStateHandler(shakeHandsAnimation, []);
     }
     debug("starting handshake for", currentHand);
     state = STATES.waiting;
@@ -217,12 +222,12 @@ function isNearby(id, hand) {
 }
 
 // this should be where we make the appropriate friend call.  For now just make the
-// overlay change.
+// visualization change.
 function makeFriends(id) {
-    // temp code to just flash the overlay really
+    // temp code to just flash the visualization really (for now!)
     makingFriends = true;
     Controller.triggerHapticPulse(FRIENDING_SUCCESS_HAPTIC_STRENGTH, HAPTIC_DURATION, handToHaptic(currentHand));
-    Script.setTimeout(function () { makingFriends = false; }, 1000);
+    Script.setTimeout(function () { makingFriends = false; entityDimensionMultiplier = 1.0; }, 1000);
 }
 // we change states, start the friendingInterval where we check
 // to be sure the hand is still close enough.  If not, we terminate
@@ -238,6 +243,7 @@ function startFriending(id, hand) {
     }
     friendingInterval = Script.setInterval(function () {
         nearbyAvatars = findNearbyAvatars();
+        entityDimensionMultiplier = 1.0 + 2.0 * ++count * FRIENDING_INTERVAL / FRIENDING_TIME;
         // insure senderID is still nearby
         if (state != STATES.friending) {
             debug("stopping friending interval, state changed");
@@ -248,7 +254,7 @@ function startFriending(id, hand) {
             debug(id, "moved, back to waiting");
             friendingInterval = Script.clearInterval(friendingInterval);
             startHandshake();
-        } else if (count++ > FRIENDING_TIME/FRIENDING_INTERVAL) {
+        } else if (count > FRIENDING_TIME/FRIENDING_INTERVAL) {
             debug("made friends with " + id);
             makeFriends(id);
             friendingInterval = Script.clearInterval(friendingInterval);
@@ -330,28 +336,39 @@ function makeGripHandler(hand) {
     };
 }
 
+function keyPressEvent(event) {
+    if ((event.text === "x") && !event.isAutoRepeat) {
+        updateTriggers(1.0, true, Controller.Standard.RightHand);
+    }
+}
+function keyReleaseEvent(event) {
+    if ((event.text === "x") && !event.isAutoRepeat) {
+        updateTriggers(0.0, true, Controller.Standard.RightHand);
+    }
+}
 // map controller actions
 var friendsMapping = Controller.newMapping(Script.resolvePath('') + '-grip');
 friendsMapping.from(Controller.Standard.LeftGrip).peek().to(makeGripHandler(Controller.Standard.LeftHand));
 friendsMapping.from(Controller.Standard.RightGrip).peek().to(makeGripHandler(Controller.Standard.RightHand));
 
 // setup keyboard initiation
-Controller.keyPressEvent.connect(function (event) { if ((event.text === "x") && !event.isAutoRepeat) { updateTriggers(1.0, true, Controller.Standard.RightHand); } });
-Controller.keyReleaseEvent.connect(function (event) { if ((event.text === "x") && !event.isAutoRepeat) { updateTriggers(0.0, true, Controller.Standard.RightHand); } });
+
+Controller.keyPressEvent.connect(keyPressEvent);
+Controller.keyReleaseEvent.connect(keyReleaseEvent);
 
 // it is easy to forget this and waste a lot of time for nothing
 friendsMapping.enable();
 
-// connect updateOverlays to update frequently
-Script.update.connect(updateOverlays);
+// connect updateVisualization to update frequently
+Script.update.connect(updateVisualization);
 
 Script.scriptEnding.connect(function () {
     debug("removing controller mappings");
     friendsMapping.disable();
     debug("removing key mappings");
-    Controller.keyPressEvent.disconnect();
-    Controller.keyReleaseEvent.disconnect();
-    debug("disconnecting updateOverlays");
-    Script.update.disconnect(updateOverlays);
+    Controller.keyPressEvent.disconnect(keyPressEvent);
+    Controller.keyReleaseEvent.disconnect(keyReleaseEvent);
+    debug("disconnecting updateVisualization");
+    Script.update.disconnect(updateVisualization);
 });
 
