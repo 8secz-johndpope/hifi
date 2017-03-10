@@ -324,6 +324,43 @@ Rectangle {
                         horizontalAlignment: Text.AlignHLeft;
                         verticalAlignment: Text.AlignVCenter;
                     }
+                    TextMetrics {
+                        id: connectionsTabSelectorTextMetrics;
+                        text: connectionsTabSelectorText.text;
+                    }
+
+                    // This Rectangle refers to the [?] popup button next to "CONNECTIONS"
+                    Rectangle {
+                        color: connectionsTabSelector.color;
+                        width: 20;
+                        height: connectionsTabSelectorText.height - 2;
+                        anchors.left: connectionsTabSelectorTextContainer.left;
+                        anchors.top: connectionsTabSelectorTextContainer.top;
+                        anchors.topMargin: 1;
+                        anchors.leftMargin: connectionsTabSelectorTextMetrics.width + 42;
+                        RalewayRegular {
+                            id: connectionsHelpText;
+                            text: "[?]";
+                            size: connectionsTabSelectorText.size + 6;
+                            font.capitalization: Font.AllUppercase;
+                            color: hifi.colors.redHighlight;
+                            horizontalAlignment: Text.AlignHCenter;
+                            verticalAlignment: Text.AlignVCenter;
+                            anchors.fill: parent;
+                        }
+                        MouseArea {
+                            anchors.fill: parent;
+                            hoverEnabled: true;
+                            onClicked: letterbox(hifi.glyphs.question,
+                                                 "Connections and Friends",
+                                                 "<font color='purple'>Purple borders around profile pictures are <b>Connections</b>.</font><br>" +
+                                                 "When your availability is set to Everyone, Connections can see your username and location.<br><br>" +
+                                                 "<font color='green'>Green borders around profile pictures are <b>Friends</b>.</font>" +
+                                                 "When your availability is set to Friends, only Friends can see your username and location.");
+                            onEntered: connectionsHelpText.color = hifi.colors.redAccent;
+                            onExited: connectionsHelpText.color = hifi.colors.redHighlight;
+                        }
+                    }
                 }
             }
         }
@@ -688,8 +725,8 @@ Rectangle {
                 onClicked: letterbox(hifi.glyphs.question,
                                      "Display Names",
                                      "Bold names in the list are <b>avatar display names</b>.<br>" +
-                                     "<font color='purple'>Purple names are <b>connections</b></font>.<br>" +
-                                     "<font color='green'>Green names are <b>friends</b>.</font><br>" +
+                                     "<font color='purple'>Purple borders around profile pictures are <b>connections</b></font>.<br>" +
+                                     "<font color='green'>Green borders around profile pictures are <b>friends</b>.</font><br>" +
                                      "<br>If someone's display name isn't set, a unique <b>session display name</b> is assigned to them.<br>" +
                                      "<br>Administrators of this domain can also see the <b>username</b> or <b>machine ID</b> associated with each avatar present.");
                 onEntered: helpText.color = hifi.colors.baseGrayHighlight;
@@ -846,7 +883,7 @@ Rectangle {
                     // Anchors
                     anchors.fill: parent;
                     // Text Size
-                    size: 14;
+                    size: 16;
                     // Text Positioning
                     verticalAlignment: Text.AlignVCenter
                     // Style
@@ -886,42 +923,6 @@ Rectangle {
                         checked = Qt.binding(function() { return (model["connection"] === "friend" ? true : false)});
                     }
                 }
-            }
-        }
-        TextMetrics {
-            id: connectionsUserNameHeaderMetrics;
-            text: connectionsUserNameHeader.title;
-        }
-
-        // This Rectangle refers to the [?] popup button next to "NAMES"
-        Rectangle {
-            visible: !connectionsLoading.visible;
-            color: hifi.colors.tableBackgroundLight;
-            width: 20;
-            height: hifi.dimensions.tableHeaderHeight - 2;
-            anchors.left: connectionsTable.left;
-            anchors.top: connectionsTable.top;
-            anchors.topMargin: 1;
-            anchors.leftMargin: connectionsNameCardWidth/2 + connectionsUserNameHeaderMetrics.width/2 + 6;
-            RalewayRegular {
-                id: connectionsNamesHelpText;
-                text: "[?]";
-                size: hifi.fontSizes.tableHeading + 2;
-                font.capitalization: Font.AllUppercase;
-                color: hifi.colors.darkGray;
-                horizontalAlignment: Text.AlignHCenter;
-                verticalAlignment: Text.AlignVCenter;
-                anchors.fill: parent;
-            }
-            MouseArea {
-                anchors.fill: parent;
-                hoverEnabled: true;
-                onClicked: letterbox(hifi.glyphs.question,
-                                     "Connections",
-                                     "<font color='purple'>Purple names are <b>connections</b>.</font> When your availability is set to Everyone, Connections can see your username and location.<br><br>"+
-                                     "<font color='green'>Green names are <b>friends</b>.</font> When your availability is set to Friends, only Friends can see your username and location.");
-                onEntered: connectionsNamesHelpText.color = hifi.colors.baseGrayHighlight;
-                onExited: connectionsNamesHelpText.color = hifi.colors.darkGray;
             }
         }
     } // "Connections" Tab

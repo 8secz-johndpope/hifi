@@ -38,7 +38,7 @@ Item {
     property bool isMyCard: false
     property bool selected: false
     property bool isAdmin: false
-    property string userTextColor: (connectionStatus == "connection" ? hifi.colors.indigoAccent : (connectionStatus == "friend" ? hifi.colors.greenHighlight : hifi.colors.darkGray))
+    property string profilePicMaskColor: (connectionStatus == "connection" ? hifi.colors.indigoAccent : (connectionStatus == "friend" ? hifi.colors.greenHighlight : hifi.colors.darkGray))
 
     Item {
         id: avatarImage
@@ -180,7 +180,7 @@ Item {
             // Text Positioning
             verticalAlignment: Text.AlignTop
             // Style
-            color: userTextColor;
+            color: pal.activeTab == "nearbyTab" ? hifi.colors.darkGray : hifi.colors.greenShadow;
             MouseArea {
                 anchors.fill: parent
                 enabled: selected && pal.activeTab == "nearbyTab"
@@ -191,8 +191,8 @@ Item {
                     userNameText.color = hifi.colors.blueHighlight;
                 }
                 onExited: {
-                    displayNameText.color = userTextColor;
-                    userNameText.color = userTextColor;
+                    displayNameText.color = hifi.colors.darkGray;
+                    userNameText.color = hifi.colors.darkGray;
                 }
             }
         }
@@ -270,7 +270,7 @@ Item {
         // Text Positioning
         verticalAlignment: Text.AlignBottom
         // Style
-        color: userTextColor
+        color: hifi.colors.greenShadow;
         MouseArea {
             anchors.fill: parent
             enabled: selected && pal.activeTab == "nearbyTab"
@@ -281,8 +281,8 @@ Item {
                     userNameText.color = hifi.colors.blueHighlight;
                 }
                 onExited: {
-                    displayNameText.color = userTextColor;
-                    userNameText.color = userTextColor;
+                    displayNameText.color = hifi.colors.darkGray;
+                    userNameText.color = hifi.colors.darkGray;
                 }
         }
     }
