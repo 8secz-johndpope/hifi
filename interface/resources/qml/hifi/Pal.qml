@@ -146,7 +146,7 @@ Rectangle {
                 anchors.top: parent.top;
                 anchors.right: parent.right;
                 
-                RalewaySemiBold {
+                RalewayRegular {
                     id: availabilityText;
                     text: "set availability";
                     // Text size
@@ -210,7 +210,6 @@ Rectangle {
                 color: activeTab == "nearbyTab" ? pal.color : "#CCCCCC";
                 MouseArea {
                     anchors.fill: parent;
-                    hoverEnabled: true;
                     onClicked: {
                         if (activeTab != "nearbyTab") {
                             refreshNearbyWithFilter();
@@ -281,10 +280,13 @@ Rectangle {
                 color: activeTab == "connectionsTab" ? pal.color : "#CCCCCC";
                 MouseArea {
                     anchors.fill: parent;
-                    hoverEnabled: true;
-                    onClicked: { activeTab = "connectionsTab";
+                    onClicked: { 
+                        if (activeTab != "connectionsTab") {
+                            pal.sendToScript({method: 'refreshConnections'});
+                        }
+                        activeTab = "connectionsTab";
                         connectionsLoading.visible = true;
-                        pal.sendToScript({method: 'refreshConnections'}); }
+                    }
                 }
 
                 // "CONNECTIONS" Text Container
@@ -344,12 +346,13 @@ Rectangle {
                             text: "[?]";
                             size: connectionsTabSelectorText.size + 6;
                             font.capitalization: Font.AllUppercase;
-                            color: hifi.colors.redHighlight;
+                            color: connectionsTabSelectorMouseArea.containsMouse ? hifi.colors.redAccent : hifi.colors.redHighlight;
                             horizontalAlignment: Text.AlignHCenter;
                             verticalAlignment: Text.AlignVCenter;
                             anchors.fill: parent;
                         }
                         MouseArea {
+                            id: connectionsTabSelectorMouseArea;
                             anchors.fill: parent;
                             hoverEnabled: true;
                             onClicked: letterbox(hifi.glyphs.question,
@@ -358,8 +361,6 @@ Rectangle {
                                                  "When your availability is set to Everyone, Connections can see your username and location.<br><br>" +
                                                  "<font color='green'>Green borders around profile pictures are <b>Friends</b>.</font><br>" +
                                                  "When your availability is set to Friends, only Friends can see your username and location.");
-                            onEntered: connectionsHelpText.color = hifi.colors.redAccent;
-                            onExited: connectionsHelpText.color = hifi.colors.redHighlight;
                         }
                     }
                 }
@@ -702,6 +703,7 @@ Rectangle {
         }
         // This Rectangle refers to the [?] popup button next to "NAMES"
         Rectangle {
+            id: helpText;
             color: hifi.colors.tableBackgroundLight;
             width: 20;
             height: hifi.dimensions.tableHeaderHeight - 2;
@@ -710,16 +712,16 @@ Rectangle {
             anchors.topMargin: 1;
             anchors.leftMargin: actionButtonWidth + nearbyNameCardWidth/2 + displayNameHeaderMetrics.width/2 + 6;
             RalewayRegular {
-                id: helpText;
                 text: "[?]";
                 size: hifi.fontSizes.tableHeading + 2;
                 font.capitalization: Font.AllUppercase;
-                color: hifi.colors.darkGray;
+                color: helpTextMouseArea.containsMouse ? hifi.colors.baseGrayHighlight : hifi.colors.darkGray;
                 horizontalAlignment: Text.AlignHCenter;
                 verticalAlignment: Text.AlignVCenter;
                 anchors.fill: parent;
             }
             MouseArea {
+                id: helpTextMouseArea;
                 anchors.fill: parent;
                 hoverEnabled: true;
                 onClicked: letterbox(hifi.glyphs.question,
@@ -727,10 +729,10 @@ Rectangle {
                                      "Bold names in the list are <b>avatar display names</b>.<br>" +
                                      "<font color='purple'>Purple borders around profile pictures are <b>connections</b></font>.<br>" +
                                      "<font color='green'>Green borders around profile pictures are <b>friends</b>.</font><br>" +
+                                     "(TEMPORARY LANGUAGE) In some situations, you can also see others' usernames.<br>" +
+                                     "If you can see someone's username, you can GoTo them by selecting them in the PAL, then clicking their name.<br>" +
                                      "<br>If someone's display name isn't set, a unique <b>session display name</b> is assigned to them.<br>" +
                                      "<br>Administrators of this domain can also see the <b>username</b> or <b>machine ID</b> associated with each avatar present.");
-                onEntered: helpText.color = hifi.colors.baseGrayHighlight;
-                onExited: helpText.color = hifi.colors.darkGray;
             }
         }
         // This Rectangle refers to the [?] popup button next to "ADMIN"
@@ -748,20 +750,19 @@ Rectangle {
                 text: "[?]";
                 size: hifi.fontSizes.tableHeading + 2;
                 font.capitalization: Font.AllUppercase;
-                color: hifi.colors.redHighlight;
+                color: adminHelpTextMouseArea.containsMouse ? "#94132e" : hifi.colors.redHighlight;
                 horizontalAlignment: Text.AlignHCenter;
                 verticalAlignment: Text.AlignVCenter;
                 anchors.fill: parent;
             }
             MouseArea {
+                id: adminHelpTextMouseArea;
                 anchors.fill: parent;
                 hoverEnabled: true;
                 onClicked: letterbox(hifi.glyphs.question,
                                      "Admin Actions",
                                      "<b>Silence</b> mutes a user's microphone. Silenced users can unmute themselves by clicking &quot;UNMUTE&quot; on their toolbar.<br><br>" +
                                      "<b>Ban</b> removes a user from this domain and prevents them from returning. Admins can un-ban users from the Sandbox Domain Settings page.");
-                onEntered: adminHelpText.color = "#94132e";
-                onExited: adminHelpText.color = hifi.colors.redHighlight;
             }
         }
     } // "Nearby" Tab
@@ -886,18 +887,13 @@ Rectangle {
                     // Text Positioning
                     verticalAlignment: Text.AlignVCenter
                     // Style
-                    color: hifi.colors.darkGray;
+                    color: connectionsLocationDataMouseArea.containsMouse ? hifi.colors.blueHighlight : hifi.colors.darkGray;
                     MouseArea {
+                        id: connectionsLocationDataMouseArea;
                         anchors.fill: parent
                         hoverEnabled: true
                         enabled: connectionsNameCard.selected && pal.activeTab == "connectionsTab"
                         onClicked: pal.sendToScript({method: 'goToUser', params: model.userName});
-                        onEntered: {
-                            connectionsLocationData.color = hifi.colors.blueHighlight;
-                        }
-                        onExited: {
-                            connectionsLocationData.color = hifi.colors.darkGray;
-                        }
                     }
                 }
 
@@ -937,6 +933,18 @@ Rectangle {
                 right: parent.right;
             }
         } // Keyboard
+
+        /*
+        THIS WILL BE THE BROWSER THAT OPENS THE USER'S INFO PAGE!
+        I've no idea how to do this yet..
+
+        HifiTablet.TabletAddressDialog {
+            id: userInfoViewer;
+            visible: false;
+        }
+        */
+
+
     } // PAL container
 
     // Timer used when selecting nearbyTable rows that aren't yet present in the model

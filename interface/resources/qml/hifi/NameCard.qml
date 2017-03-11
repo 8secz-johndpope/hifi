@@ -14,6 +14,7 @@ import QtQuick.Controls 1.4
 import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
 import "../styles-uit"
+import "toolbars"
 
 Item {
     id: thisNameCard
@@ -45,7 +46,7 @@ Item {
         id: avatarImage
         visible: profileUrl !== "";
         // Size
-        height: isMyCard ? 70 : 42
+        height: isMyCard ? 70 : 42;
         width: visible ? height : 0;
         anchors.top: parent.top;
         anchors.topMargin: isMyCard ? 0 : 8;
@@ -76,19 +77,40 @@ Item {
             border.color: imageMaskColor;
             border.width: avatarImage.height/2;
         }
-        // Colored border around image
-        Rectangle {
-            id: avatarImageBorder;
-            visible: avatarImage.visible;
-            anchors.verticalCenter: avatarImage.verticalCenter;
-            anchors.horizontalCenter: avatarImage.horizontalCenter;
-            width: avatarImage.width + border.width;
-            height: avatarImage.height + border.width;
-            color: "transparent"
-            radius: avatarImage.height;
-            border.color: profilePicBorderColor;
-            border.width: 4;
+        StateImage {
+            id: infoHoverImage;
+            visible: avatarImageMouseArea.containsMouse ? true : false;
+            imageURL: "../../images/info-icon-2-state.svg";
+            size: 32;
+            buttonState: 1;
+            anchors.centerIn: parent;
         }
+        MouseArea {
+            id: avatarImageMouseArea;
+            anchors.fill: parent
+            enabled: selected || isMyCard;
+            hoverEnabled: true
+            onClicked: {
+            /*
+            THIS WILL OPEN THE BROWSER TO THE USER'S INFO PAGE!
+            I've no idea how to do this yet..
+            */
+            }
+        }
+    }
+
+    // Colored border around avatarImage
+    Rectangle {
+        id: avatarImageBorder;
+        visible: avatarImage.visible;
+        anchors.verticalCenter: avatarImage.verticalCenter;
+        anchors.horizontalCenter: avatarImage.horizontalCenter;
+        width: avatarImage.width + border.width;
+        height: avatarImage.height + border.width;
+        color: "transparent"
+        radius: avatarImage.height;
+        border.color: profilePicBorderColor;
+        border.width: 4;
     }
 
     // DisplayName field for my card
@@ -104,7 +126,7 @@ Item {
         anchors.leftMargin: 5;
         anchors.rightMargin: 5;
         // Style
-        color: hifi.colors.textFieldLightBackground
+        color: myDisplayNameMouseArea.containsMouse ? hifi.colors.lightGrayText : hifi.colors.textFieldLightBackground
         border.color: hifi.colors.blueHighlight
         border.width: 0
         TextInput {
@@ -145,6 +167,7 @@ Item {
             }
         }
         MouseArea {
+            id: myDisplayNameMouseArea;
             anchors.fill: parent
             hoverEnabled: true
             onClicked: {
@@ -161,8 +184,6 @@ Item {
                 pal.currentlyEditingDisplayName = true
                 myDisplayNameText.autoScroll = true;
             }
-            onEntered: myDisplayName.color = hifi.colors.lightGrayText
-            onExited: myDisplayName.color = hifi.colors.textFieldLightBackground
         }
         // Edit pencil glyph
         HiFiGlyphs {
@@ -191,7 +212,7 @@ Item {
         anchors.top: pal.activeTab == "connectionsTab" ? undefined : avatarImage.top;
         anchors.bottom: pal.activeTab == "connectionsTab" ? avatarImage.bottom : undefined;
         anchors.left: avatarImage.right
-        anchors.leftMargin: 5;
+        anchors.leftMargin: avatarImage.visible ? 5 : 0;
         // DisplayName Text for others' cards
         FiraSansSemiBold {
             id: displayNameText
@@ -208,20 +229,13 @@ Item {
             // Text Positioning
             verticalAlignment: Text.AlignTop
             // Style
-            color: pal.activeTab == "nearbyTab" ? hifi.colors.darkGray : hifi.colors.greenShadow;
+            color: (pal.activeTab == "nearbyTab" && (displayNameTextMouseArea.containsMouse || userNameTextMouseArea.containsMouse)) ? hifi.colors.blueHighlight : hifi.colors.darkGray;
             MouseArea {
+                id: displayNameTextMouseArea;
                 anchors.fill: parent
-                enabled: selected && pal.activeTab == "nearbyTab"
+                enabled: selected && pal.activeTab == "nearbyTab" && thisNameCard.userName !== "";
                 hoverEnabled: true
                 onClicked: pal.sendToScript({method: 'goToUser', params: thisNameCard.userName});
-                onEntered: {
-                    displayNameText.color = hifi.colors.blueHighlight;
-                    userNameText.color = hifi.colors.blueHighlight;
-                }
-                onExited: {
-                    displayNameText.color = hifi.colors.darkGray;
-                    userNameText.color = hifi.colors.greenShadow;
-                }
             }
         }
         TextMetrics {
@@ -292,26 +306,19 @@ Item {
         anchors.top: isMyCard ? myDisplayName.bottom : undefined;
         anchors.bottom: isMyCard ? undefined : avatarImage.bottom
         anchors.left: avatarImage.right;
-        anchors.leftMargin: 5;
+        anchors.leftMargin: avatarImage.visible ? 5 : 0;
         // Text Size
         size: usernameTextPixelSize;
         // Text Positioning
         verticalAlignment: Text.AlignBottom
         // Style
-        color: hifi.colors.greenShadow;
+        color: (pal.activeTab == "nearbyTab" && (displayNameTextMouseArea.containsMouse || userNameTextMouseArea.containsMouse)) ? hifi.colors.blueHighlight : hifi.colors.greenShadow;
         MouseArea {
+            id: userNameTextMouseArea;
             anchors.fill: parent
-            enabled: selected && pal.activeTab == "nearbyTab"
+            enabled: selected && pal.activeTab == "nearbyTab" && thisNameCard.userName !== "";
             hoverEnabled: true
             onClicked: pal.sendToScript({method: 'goToUser', params: thisNameCard.userName});
-                onEntered: {
-                    displayNameText.color = hifi.colors.blueHighlight;
-                    userNameText.color = hifi.colors.blueHighlight;
-                }
-                onExited: {
-                    displayNameText.color = hifi.colors.darkGray;
-                    userNameText.color = hifi.colors.greenShadow;
-                }
         }
     }
     // VU Meter
@@ -408,7 +415,11 @@ Item {
         maximumValue: 20.0
         stepSize: 5
         updateValueWhileDragging: true
-        onValueChanged: updateGainFromQML(uuid, value, false)
+        onValueChanged: {
+            if (uuid !== "") {
+                updateGainFromQML(uuid, value, false);
+            }
+        }
         onPressedChanged: {
             if (!pressed) {
                 updateGainFromQML(uuid, value, true)
