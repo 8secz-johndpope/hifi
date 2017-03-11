@@ -89,7 +89,7 @@ Item {
             id: avatarImageMouseArea;
             anchors.fill: parent
             enabled: selected || isMyCard;
-            hoverEnabled: true
+            hoverEnabled: enabled
             onClicked: {
             /*
             THIS WILL OPEN THE BROWSER TO THE USER'S INFO PAGE!
@@ -229,12 +229,13 @@ Item {
             // Text Positioning
             verticalAlignment: Text.AlignTop
             // Style
-            color: (pal.activeTab == "nearbyTab" && (displayNameTextMouseArea.containsMouse || userNameTextMouseArea.containsMouse)) ? hifi.colors.blueHighlight : hifi.colors.darkGray;
+            color: (pal.activeTab == "nearbyTab" && (displayNameTextMouseArea.containsMouse || userNameTextMouseArea.containsMouse))
+                ? hifi.colors.blueHighlight : (pal.activeTab == "nearbyTab" ? hifi.colors.darkGray : hifi.colors.greenShadow);
             MouseArea {
                 id: displayNameTextMouseArea;
                 anchors.fill: parent
                 enabled: selected && pal.activeTab == "nearbyTab" && thisNameCard.userName !== "";
-                hoverEnabled: true
+                hoverEnabled: enabled
                 onClicked: pal.sendToScript({method: 'goToUser', params: thisNameCard.userName});
             }
         }
@@ -317,7 +318,7 @@ Item {
             id: userNameTextMouseArea;
             anchors.fill: parent
             enabled: selected && pal.activeTab == "nearbyTab" && thisNameCard.userName !== "";
-            hoverEnabled: true
+            hoverEnabled: enabled
             onClicked: pal.sendToScript({method: 'goToUser', params: thisNameCard.userName});
         }
     }

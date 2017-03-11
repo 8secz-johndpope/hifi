@@ -891,7 +891,7 @@ Rectangle {
                     MouseArea {
                         id: connectionsLocationDataMouseArea;
                         anchors.fill: parent
-                        hoverEnabled: true
+                        hoverEnabled: enabled
                         enabled: connectionsNameCard.selected && pal.activeTab == "connectionsTab"
                         onClicked: pal.sendToScript({method: 'goToUser', params: model.userName});
                     }
