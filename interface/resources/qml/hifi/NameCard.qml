@@ -91,7 +91,7 @@ Item {
             enabled: selected || isMyCard;
             hoverEnabled: enabled
             onClicked: {
-                userInfoViewer.url = "http://highfidelity.com/users/" + userName;
+                userInfoViewer.url = "http://highfidelity.com/users/" + (pal.activeTab == "nearbyTab" ? userName : displayName); // Connections tab puts username in "displayname" field
                 userInfoViewer.visible = true;
             }
         }
