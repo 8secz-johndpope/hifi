@@ -65,11 +65,6 @@ Window {
         toggleOrGo(true);
         clearAddressLineTimer.start();
     }
-    function goUrl(targetString) {
-        storyCardHTML.url = targetString;
-        storyCardFrame.shown = true;
-        return;
-    }
     property var allStories: [];
     property int cardWidth: 212;
     property int cardHeight: 152;
