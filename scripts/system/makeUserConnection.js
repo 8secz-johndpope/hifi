@@ -115,13 +115,11 @@ function updateVisualization() {
     if (!entity) {
         var props =  {
             type: "Sphere",
-            solid: true,
-            alpha: 0.5,
             color: color,
             position: position,
             dimensions: dimension
         }
-        entity = Entities.addEntity(props, true);
+        entity = Entities.addEntity(props);
     } else {
         Entities.editEntity(entity, {dimensions: dimension, position: position, color: color});
     }
@@ -159,9 +157,10 @@ function startHandshake(fromKeyboard) {
     state = STATES.waiting;
     waitingInterval = Script.setInterval(
         function () {
+            debug("currentHand", handToString(currentHand));
             messageSend({
                 key: "waiting",
-                hand: handToString(currentHand),
+                hand: handToString(currentHand)
             });
         }, WAITING_INTERVAL);
 }
@@ -189,7 +188,6 @@ function updateTriggers(value, fromKeyboard, hand) {
     }
     if (!currentHand) {
         currentHand = hand;
-
     }
     // ok now, we are either initiating or quitting...
     var isGripping = value > GRIP_MIN;
