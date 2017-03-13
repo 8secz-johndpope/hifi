@@ -301,7 +301,7 @@ Item {
         height: pal.activeTab == "nearbyTab" || isMyCard ? usernameTextPixelSize + 4 : displayNameTextPixelSize + 4
         // Anchors
         anchors.top: isMyCard ? myDisplayName.bottom : undefined;
-        anchors.bottom: !isMyCard && pal.activeTab == "connectionsTab" ? avatarImage.bottom : undefined;
+        anchors.bottom: !isMyCard ? avatarImage.bottom : undefined;
         anchors.left: avatarImage.right;
         anchors.leftMargin: avatarImage.visible ? 5 : 0;
         // Text Size
