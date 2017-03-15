@@ -16,8 +16,8 @@ import QtQuick.Controls 1.4
 import QtGraphicalEffects 1.0
 import Qt.labs.settings 1.0
 import "../styles-uit"
-import "../controls-uit" as HifiControls
-import HFWebEngineProfile 1.0
+import "../controls-uit" as HifiControlsUit
+import "../controls" as HifiControls
 
 // references HMD, Users, UserActivityLogger from root context
 
@@ -44,6 +44,7 @@ Rectangle {
     property var activeTab: "nearbyTab";
     property int usernameAvailability;
     property bool currentlyEditingDisplayName: false
+    property var eventBridge;
 
     HifiConstants { id: hifi; }
 
@@ -161,7 +162,7 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter;
                     verticalAlignment: Text.AlignTop;
                 }
-                HifiControls.TabletComboBox {
+                HifiControlsUit.TabletComboBox {
                     id: availabilityComboBox;
                     // Anchors
                     anchors.top: parent.top;
@@ -240,7 +241,7 @@ Rectangle {
                         verticalAlignment: Text.AlignVCenter;
                     }
                     // "In View" Checkbox
-                    HifiControls.CheckBox {
+                    HifiControlsUit.CheckBox {
                         id: inViewCheckbox;
                         visible: activeTab == "nearbyTab";
                         anchors.right: reloadNearbyContainer.left;
@@ -260,7 +261,7 @@ Rectangle {
                         anchors.rightMargin: 6;
                         height: reloadNearby.height;
                         width: height;
-                        HifiControls.GlyphButton {
+                        HifiControlsUit.GlyphButton {
                             id: reloadNearby;
                             width: reloadNearby.height;
                             glyph: hifi.glyphs.reload;
@@ -305,7 +306,7 @@ Rectangle {
                         anchors.rightMargin: 6;
                         height: reloadConnections.height;
                         width: height;
-                        HifiControls.GlyphButton {
+                        HifiControlsUit.GlyphButton {
                             id: reloadConnections;
                             width: reloadConnections.height;
                             glyph: hifi.glyphs.reload;
@@ -494,7 +495,7 @@ Rectangle {
             }
         }
         // This TableView refers to the Nearby Table (on the "Nearby" tab below the current user's NameCard)
-        HifiControls.Table {
+        HifiControlsUit.Table {
             id: nearbyTable;
             // Anchors
             anchors.fill: parent;
@@ -592,7 +593,7 @@ Rectangle {
                     // Anchors
                     anchors.left: parent.left;
                 }
-                HifiControls.GlyphButton {
+                HifiControlsUit.GlyphButton {
                     function getGlyph() {
                         var fileName = "vol_";
                         if (model && model.personalMute) {
@@ -626,7 +627,7 @@ Rectangle {
                 // Clicking on the sides of the sorting header doesn't cause this problem.
                 // I'm guessing this is a QT bug and not anything I can fix. I spent too long trying to work around it...
                 // I'm just going to leave the minor visual bug in.
-                HifiControls.CheckBox {
+                HifiControlsUit.CheckBox {
                     id: actionCheckBox;
                     visible: isCheckBox;
                     anchors.centerIn: parent;
@@ -658,7 +659,7 @@ Rectangle {
                 }
 
                 // This Button belongs in the columns that contain the stateless action buttons ("Silence" & "Ban" for now)
-                HifiControls.Button {
+                HifiControlsUit.Button {
                     id: actionButton;
                     color: 2; // Red
                     visible: isButton;
@@ -831,7 +832,7 @@ Rectangle {
         }
 
         // This TableView refers to the Connections Table (on the "Connections" tab below the current user's NameCard)
-        HifiControls.Table {
+        HifiControlsUit.Table {
             id: connectionsTable;
             visible: !connectionsLoading.visible;
             // Anchors
@@ -935,7 +936,7 @@ Rectangle {
                 }
 
                 // "Friends" checkbox
-                HifiControls.CheckBox {
+                HifiControlsUit.CheckBox {
                     id: friendsCheckBox;
                     visible: styleData.role === "friends";
                     anchors.centerIn: parent;
@@ -960,7 +961,7 @@ Rectangle {
     } // "Connections" Tab
     } // palTabContainer
 
-        HifiControls.Keyboard {
+        HifiControlsUit.Keyboard {
             id: keyboard;
             raised: currentlyEditingDisplayName && HMD.mounted;
             numeric: parent.punctuationMode;
@@ -1096,9 +1097,8 @@ Rectangle {
 
             HifiControls.WebView {
                 id: userInfoViewer;
-                profile: HFWebEngineProfile {
-                    storageName: "qmlWebEngine"
-                }
+                shouldSendPopupEvents: true;
+                eventBridge: pal.eventBridge;
                 anchors {
                     top: navigationContainer.bottom;
                     bottom: parent.bottom;
