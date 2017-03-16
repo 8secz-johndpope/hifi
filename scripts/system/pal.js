@@ -763,8 +763,6 @@ function onTabletScreenChanged(type, url) {
     shouldActivateButton = false;
     onPalScreen = false;
 
-    tablet.webEventReceived.connect(receivedPalWebEvent);
-
     // disable sphere overlays when not on pal screen.
     if (type !== "QML" || url !== "../Pal.qml") {
         off();
@@ -876,10 +874,6 @@ function clearLocalQMLDataAndClosePAL() {
     sendToQml({ method: 'clearLocalQMLData' });
 }
 
-function receivedPalWebEvent(msg) {
-    print("RECEIVED WEB EVENT: " + JSON.stringify(msg));
-}
-
 function shutdown() {
     if (onPalScreen) {
         tablet.gotoHomeScreen();
@@ -894,7 +888,6 @@ function shutdown() {
     Messages.messageReceived.disconnect(receiveMessage);
     Users.avatarDisconnected.disconnect(avatarDisconnected);
     GlobalServices.findableByChanged.disconnect(findableByChanged);
-    tablet.webEventReceived.disconnect(receivedPalWebEvent);
     off();
 }
 

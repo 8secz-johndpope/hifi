@@ -11,7 +11,6 @@ Item {
     property bool keyboardEnabled: true  // FIXME - Keyboard HMD only: Default to false
     property bool keyboardRaised: false
     property bool punctuationMode: false
-    property bool shouldSendPopupEvents: false
 
     // FIXME - Keyboard HMD only: Make Interface either set keyboardRaised property directly in OffscreenQmlSurface
     // or provide HMDinfo object to QML in RenderableWebEntityItem and do the following.
@@ -102,19 +101,11 @@ Item {
         }
 
         onNewViewRequested:{
-            console.log("ONNEWVIEWREQUESTED!");
             // desktop is not defined for web-entities or tablet
             if (typeof desktop !== "undefined") {
-                var component = Qt.createComponent("../Browser.qml");
-                var newWindow = component.createObject(desktop);
-                request.openIn(newWindow.webView);
-            } else if (eventBridge && eventBridge.emitWebEvent && shouldSendPopupEvents) {
-                // Send a message through the event bridge
-                // that opens a new 2D window
-                console.log("EMITTING WEB EVENT!");
-                eventBridge.emitWebEvent("popup:" + request);
+                desktop.openBrowserWindow(request, profile);
             } else {
-                console.log("onNewViewRequested: Unhandled case!");
+                console.log("onNewViewRequested: desktop not defined");
             }
         }
     }

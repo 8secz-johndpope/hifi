@@ -44,7 +44,6 @@ Rectangle {
     property var activeTab: "nearbyTab";
     property int usernameAvailability;
     property bool currentlyEditingDisplayName: false
-    property var eventBridge;
 
     HifiConstants { id: hifi; }
 
@@ -1097,8 +1096,6 @@ Rectangle {
 
             HifiControls.WebView {
                 id: userInfoViewer;
-                shouldSendPopupEvents: true;
-                eventBridge: pal.eventBridge;
                 anchors {
                     top: navigationContainer.bottom;
                     bottom: parent.bottom;
