@@ -35,11 +35,11 @@ Rectangle {
     property int actionButtonWidth: 55;
     property int locationColumnWidth: 170;
     property int nearbyNameCardWidth: nearbyTable.width - (iAmAdmin ? (actionButtonWidth * 4) : (actionButtonWidth * 2)) - 4 - hifi.dimensions.scrollbarBackgroundWidth;
-    property int connectionsNameCardWidth: connectionsTable.width - locationColumnWidth - actionButtonWidth - 4 - hifi.dimensions.scrollbarBackgroundWidth;
+    property int peopleNameCardWidth: peopleTable.width - locationColumnWidth - actionButtonWidth - 4 - hifi.dimensions.scrollbarBackgroundWidth;
     property var myData: ({profileUrl: "", displayName: "", userName: "", audioLevel: 0.0, avgAudioLevel: 0.0, admin: true, placeName: "", connection: "", isPresent: true}); // valid dummy until set
     property var ignored: ({}); // Keep a local list of ignored avatars & their data. Necessary because HashMap is slow to respond after ignoring.
     property var nearbyUserModelData: []; // This simple list is essentially a mirror of the nearbyUserModel listModel without all the extra complexities.
-    property var connectionsUserModelData: []; // This simple list is essentially a mirror of the connectionsUserModel listModel without all the extra complexities.
+    property var peopleUserModelData: []; // This simple list is essentially a mirror of the peopleUserModel listModel without all the extra complexities.
     property bool iAmAdmin: false;
     property var activeTab: "nearbyTab";
     property bool currentlyEditingDisplayName: false
@@ -66,8 +66,8 @@ Rectangle {
         property int nearDistance: 30;
         property int nearbySortIndicatorColumn: 1;
         property int nearbySortIndicatorOrder: Qt.AscendingOrder;
-        property int connectionsSortIndicatorColumn: 0;
-        property int connectionsSortIndicatorOrder: Qt.AscendingOrder;
+        property int peopleSortIndicatorColumn: 0;
+        property int peopleSortIndicatorOrder: Qt.AscendingOrder;
     }
     function getSelectedNearbySessionIDs() {
         var sessionIDs = [];
@@ -79,10 +79,10 @@ Rectangle {
         });
         return sessionIDs;
     }
-    function getSelectedConnectionsUserNames() {
+    function getSelectedPeopleUserNames() {
         var userNames = [];
-        connectionsTable.selection.forEach(function (userIndex) {
-            var datum = connectionsUserModelData[userIndex];
+        peopleTable.selection.forEach(function (userIndex) {
+            var datum = peopleUserModelData[userIndex];
             if (datum) {
                 userNames.push(datum.userName);
             }
@@ -287,7 +287,7 @@ Rectangle {
                 }
             }
             Rectangle {
-                id: connectionsTabSelector;
+                id: peopleTabSelector;
                 // Anchors
                 anchors {
                     top: parent.top;
@@ -295,47 +295,47 @@ Rectangle {
                 }
                 width: parent.width/2;
                 height: parent.height;
-                color: activeTab == "connectionsTab" ? pal.color : "#CCCCCC";
+                color: activeTab == "peopleTab" ? pal.color : "#CCCCCC";
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: { 
-                        if (activeTab != "connectionsTab") {
-                            connectionsLoading.visible = false;
-                            connectionsLoading.visible = true;
-                            pal.sendToScript({method: 'refreshConnections'});
+                        if (activeTab != "peopleTab") {
+                            peopleLoading.visible = false;
+                            peopleLoading.visible = true;
+                            pal.sendToScript({method: 'refreshPeople'});
                         }
-                        activeTab = "connectionsTab";
+                        activeTab = "peopleTab";
                     }
                 }
 
-                // "CONNECTIONS" Text Container
+                // "PEOPLE" Text Container
                 Item {
-                    id: connectionsTabSelectorTextContainer;
+                    id: peopleTabSelectorTextContainer;
                     anchors.fill: parent;
                     anchors.leftMargin: 15;
                     // Refresh button
                     Rectangle {
-                        visible: activeTab == "connectionsTab";
+                        visible: activeTab == "peopleTab";
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.right: parent.right;
                         anchors.rightMargin: 6;
-                        height: reloadConnections.height;
+                        height: reloadPeople.height;
                         width: height;
                         HifiControlsUit.GlyphButton {
-                            id: reloadConnections;
-                            width: reloadConnections.height;
+                            id: reloadPeople;
+                            width: reloadPeople.height;
                             glyph: hifi.glyphs.reload;
                             onClicked: {
-                                connectionsLoading.visible = false;
-                                connectionsLoading.visible = true;
-                                pal.sendToScript({method: 'refreshConnections'});
+                                peopleLoading.visible = false;
+                                peopleLoading.visible = true;
+                                pal.sendToScript({method: 'refreshPeople'});
                             }
                         }
                     }
-                    // "CONNECTIONS" text
+                    // "PEOPLE" text
                     RalewaySemiBold {
-                        id: connectionsTabSelectorText;
-                        text: "CONNECTIONS";
+                        id: peopleTabSelectorText;
+                        text: "PEOPLE";
                         // Text size
                         size: hifi.fontSizes.tabularData;
                         // Anchors
@@ -348,23 +348,23 @@ Rectangle {
                         verticalAlignment: Text.AlignVCenter;
                     }
                     TextMetrics {
-                        id: connectionsTabSelectorTextMetrics;
-                        text: connectionsTabSelectorText.text;
+                        id: peopleTabSelectorTextMetrics;
+                        text: peopleTabSelectorText.text;
                     }
 
-                    // This Rectangle refers to the [?] popup button next to "CONNECTIONS"
+                    // This Rectangle refers to the [?] popup button next to "PEOPLE"
                     Rectangle {
-                        color: connectionsTabSelector.color;
+                        color: peopleTabSelector.color;
                         width: 20;
-                        height: connectionsTabSelectorText.height - 2;
-                        anchors.left: connectionsTabSelectorTextContainer.left;
-                        anchors.top: connectionsTabSelectorTextContainer.top;
+                        height: peopleTabSelectorText.height - 2;
+                        anchors.left: peopleTabSelectorTextContainer.left;
+                        anchors.top: peopleTabSelectorTextContainer.top;
                         anchors.topMargin: 1;
-                        anchors.leftMargin: connectionsTabSelectorTextMetrics.width + 42;
+                        anchors.leftMargin: peopleTabSelectorTextMetrics.width + 42;
                         RalewayRegular {
-                            id: connectionsHelpText;
+                            id: peopleHelpText;
                             text: "[?]";
-                            size: connectionsTabSelectorText.size + 6;
+                            size: peopleTabSelectorText.size + 6;
                             font.capitalization: Font.AllUppercase;
                             color: hifi.colors.redHighlight;
                             horizontalAlignment: Text.AlignHCenter;
@@ -380,8 +380,8 @@ Rectangle {
                                                  "When your availability is set to Everyone, Connections can see your username and location.<br><br>" +
                                                  "<font color='green'>Green borders around profile pictures are <b>Friends</b>.</font><br>" +
                                                  "When your availability is set to Friends, only Friends can see your username and location.");
-                            onEntered: connectionsHelpText.color = hifi.colors.redAccent;
-                            onExited: connectionsHelpText.color = hifi.colors.redHighlight;
+                            onEntered: peopleHelpText.color = hifi.colors.redAccent;
+                            onExited: peopleHelpText.color = hifi.colors.redHighlight;
                         }
                     }
                 }
@@ -794,10 +794,10 @@ Rectangle {
 
 
     /*****************************************
-                CONNECTIONS TAB
+                PEOPLE TAB
     *****************************************/
     Rectangle {
-        id: connectionsTab;
+        id: peopleTab;
         color: "#E3E3E3";
         // Anchors
         anchors {
@@ -808,10 +808,10 @@ Rectangle {
             horizontalCenter: parent.horizontalCenter;
         }
         width: parent.width - 12;
-        visible: activeTab == "connectionsTab";
+        visible: activeTab == "peopleTab";
         
         AnimatedImage {
-            id: connectionsLoading;
+            id: peopleLoading;
             source: "../../icons/profilePicLoading.gif"
             width: 120;
             height: width;
@@ -819,21 +819,21 @@ Rectangle {
             visible: true;
             onVisibleChanged: {
                 if (visible) {
-                    connectionsTimeoutTimer.start();
+                    peopleTimeoutTimer.start();
                 } else {
-                    connectionsTimeoutTimer.stop();     
-                    connectionsRefreshProblemText.visible = false;               
+                    peopleTimeoutTimer.stop();     
+                    peopleRefreshProblemText.visible = false;               
                 }
             }
         }
 
         // "This is taking too long..." text
         FiraSansSemiBold {
-            id: connectionsRefreshProblemText
+            id: peopleRefreshProblemText
             // Properties
-            text: "This is taking longer than normal.\nIf you get stuck, try refreshing the Connections tab.";
+            text: "This is taking longer than normal.\nIf you get stuck, try refreshing the People tab.";
             // Anchors
-            anchors.top: connectionsLoading.bottom;
+            anchors.top: peopleLoading.bottom;
             anchors.topMargin: 10;
             anchors.left: parent.left;
             anchors.bottom: parent.bottom;
@@ -848,32 +848,32 @@ Rectangle {
             color: hifi.colors.darkGray;
         }
 
-        // This TableView refers to the Connections Table (on the "Connections" tab below the current user's NameCard)
+        // This TableView refers to the People Table (on the "People" tab below the current user's NameCard)
         HifiControlsUit.Table {
-            id: connectionsTable;
-            visible: !connectionsLoading.visible;
+            id: peopleTable;
+            visible: !peopleLoading.visible;
             // Anchors
             anchors.fill: parent;
             // Properties
             centerHeaderText: true;
             sortIndicatorVisible: true;
             headerVisible: true;
-            sortIndicatorColumn: settings.connectionsSortIndicatorColumn;
-            sortIndicatorOrder: settings.connectionsSortIndicatorOrder;
+            sortIndicatorColumn: settings.peopleSortIndicatorColumn;
+            sortIndicatorOrder: settings.peopleSortIndicatorOrder;
             onSortIndicatorColumnChanged: {
-                settings.connectionsSortIndicatorColumn = sortIndicatorColumn;
-                sortConnectionsModel();
+                settings.peopleSortIndicatorColumn = sortIndicatorColumn;
+                sortPeopleModel();
             }
             onSortIndicatorOrderChanged: {
-                settings.connectionsSortIndicatorOrder = sortIndicatorOrder;
-                sortConnectionsModel();
+                settings.peopleSortIndicatorOrder = sortIndicatorOrder;
+                sortPeopleModel();
             }
 
             TableViewColumn {
-                id: connectionsUserNameHeader;
+                id: peopleUserNameHeader;
                 role: "userName";
-                title: connectionsTable.rowCount + (connectionsTable.rowCount === 1 ? " NAME" : " NAMES");
-                width: connectionsNameCardWidth;
+                title: peopleTable.rowCount + (peopleTable.rowCount === 1 ? " NAME" : " NAMES");
+                width: peopleNameCardWidth;
                 movable: false;
                 resizable: false;
             }
@@ -893,10 +893,10 @@ Rectangle {
             }
 
             model: ListModel {
-                id: connectionsUserModel;
+                id: peopleUserModel;
             }
 
-            // This Rectangle refers to each Row in the connectionsTable.
+            // This Rectangle refers to each Row in the peopleTable.
             rowDelegate: Rectangle {
                 // Size
                 height: rowHeight;
@@ -905,11 +905,11 @@ Rectangle {
 
             // This Item refers to the contents of each Cell
             itemDelegate: Item {
-                id: connectionsItemCell;
+                id: peopleItemCell;
 
-                // This NameCard refers to the cell that contains a connection's UserName
+                // This NameCard refers to the cell that contains a person's UserName
                 NameCard {
-                    id: connectionsNameCard;
+                    id: peopleNameCard;
                     // Properties
                     visible: styleData.role === "userName";
                     profileUrl: (model && model.profileUrl) || "";
@@ -918,7 +918,7 @@ Rectangle {
                     connectionStatus : model ? model.connection : "";
                     selected: styleData.selected;
                     // Size
-                    width: connectionsNameCardWidth;
+                    width: peopleNameCardWidth;
                     height: parent.height;
                     // Anchors
                     anchors.left: parent.left;
@@ -926,7 +926,7 @@ Rectangle {
 
                 // LOCATION data
                 FiraSansSemiBold {
-                    id: connectionsLocationData
+                    id: peopleLocationData
                     // Properties
                     visible: styleData.role === "placeName";
                     text: (model && model.placeName) || "";
@@ -944,13 +944,13 @@ Rectangle {
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: enabled
-                        enabled: connectionsNameCard.selected && pal.activeTab == "connectionsTab"
+                        enabled: peopleNameCard.selected && pal.activeTab == "peopleTab"
                         onClicked: {
                             AddressManager.goToUser(model.userName);
                             UserActivityLogger.palAction("go_to_user", model.userName);
                         }
-                        onEntered: connectionsLocationData.color = hifi.colors.blueHighlight;
-                        onExited: connectionsLocationData.color = hifi.colors.darkGray;
+                        onEntered: peopleLocationData.color = hifi.colors.blueHighlight;
+                        onExited: peopleLocationData.color = hifi.colors.darkGray;
                     }
                 }
 
@@ -963,8 +963,8 @@ Rectangle {
                     boxSize: 24;
                     onClicked: {
                         var newValue = !model[styleData.role];
-                        connectionsUserModel.setProperty(model.userIndex, styleData.role, newValue);
-                        connectionsUserModelData[model.userIndex][styleData.role] = newValue; // Defensive programming
+                        peopleUserModel.setProperty(model.userIndex, styleData.role, newValue);
+                        peopleUserModelData[model.userIndex][styleData.role] = newValue; // Defensive programming
                         // Insert line here about actually taking the friend/unfriend action
                         // Also insert line here about logging the activity, similar to the commented line below
                         //UserActivityLogger["palAction"](newValue ? styleData.role : "un-" + styleData.role, model.sessionId);
@@ -981,8 +981,8 @@ Rectangle {
         // "Make a Connection" instructions
         Rectangle {
             id: connectionInstructions;
-            visible: connectionsTable.rowCount === 0 && !connectionsLoading.visible;
-            anchors.fill: connectionsTable;
+            visible: peopleTable.rowCount === 0 && !peopleLoading.visible;
+            anchors.fill: peopleTable;
             anchors.topMargin: hifi.dimensions.tableHeaderHeight;
             color: "white";
 
@@ -1049,7 +1049,7 @@ Rectangle {
             }
 
         }
-    } // "Connections" Tab
+    } // "People" Tab
     } // palTabContainer
 
         HifiControlsUit.Keyboard {
@@ -1218,12 +1218,12 @@ Rectangle {
         }
     }
 
-    // Timer used when refreshing the Connections tab
+    // Timer used when refreshing the People tab
     Timer {
-        id: connectionsTimeoutTimer;
+        id: peopleTimeoutTimer;
         interval: 3000; // 3 seconds
         onTriggered: {
-            connectionsRefreshProblemText.visible = true;
+            peopleRefreshProblemText.visible = true;
         }
     }
 
@@ -1264,13 +1264,13 @@ Rectangle {
             sortModel();
             reloadNearby.color = 0;
             break;
-        case 'connections':
+        case 'people':
             var data = message.params;
-            console.log('Got connection data: ', JSON.stringify(data));
-            connectionsUserModelData = data;
-            sortConnectionsModel();
-            connectionsLoading.visible = false;
-            connectionsRefreshProblemText.visible = false;
+            console.log('Got People data: ', JSON.stringify(data));
+            peopleUserModelData = data;
+            sortPeopleModel();
+            peopleLoading.visible = false;
+            peopleRefreshProblemText.visible = false;
             break;
         case 'select':
             var sessionIds = message.params[0];
@@ -1418,14 +1418,14 @@ Rectangle {
             nearbyTable.positionViewAtRow(newSelectedIndexes[0], ListView.Beginning);
         }
     }
-    function sortConnectionsModel() {
-        var column = connectionsTable.getColumn(connectionsTable.sortIndicatorColumn);
+    function sortPeopleModel() {
+        var column = peopleTable.getColumn(peopleTable.sortIndicatorColumn);
         var sortProperty = column ? column.role : "userName";
-        var before = (connectionsTable.sortIndicatorOrder === Qt.AscendingOrder) ? -1 : 1;
+        var before = (peopleTable.sortIndicatorOrder === Qt.AscendingOrder) ? -1 : 1;
         var after = -1 * before;
         // get selection(s) before sorting
-        var selectedIDs = getSelectedConnectionsUserNames();
-        connectionsUserModelData.sort(function (a, b) {
+        var selectedIDs = getSelectedPeopleUserNames();
+        peopleUserModelData.sort(function (a, b) {
             var aValue = a[sortProperty].toString().toLowerCase(), bValue = b[sortProperty].toString().toLowerCase();
             switch (true) {
             case (aValue < bValue): return before;
@@ -1433,21 +1433,21 @@ Rectangle {
             default: return 0;
             }
         });
-        connectionsTable.selection.clear();
+        peopleTable.selection.clear();
 
-        connectionsUserModel.clear();
+        peopleUserModel.clear();
         var userIndex = 0;
         var newSelectedIndexes = [];
-        connectionsUserModelData.forEach(function (datum) {
+        peopleUserModelData.forEach(function (datum) {
             datum.userIndex = userIndex++;
-            connectionsUserModel.append(datum);
+            peopleUserModel.append(datum);
             if (selectedIDs.indexOf(datum.sessionId) != -1) {
                  newSelectedIndexes.push(datum.userIndex);
             }
         });
         if (newSelectedIndexes.length > 0) {
-            connectionsTable.selection.select(newSelectedIndexes);
-            connectionsTable.positionViewAtRow(newSelectedIndexes[0], ListView.Beginning);
+            peopleTable.selection.select(newSelectedIndexes);
+            peopleTable.positionViewAtRow(newSelectedIndexes[0], ListView.Beginning);
         }
     }
     signal sendToScript(var message);

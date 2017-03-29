@@ -209,7 +209,7 @@ Item {
     // DisplayName container for others' cards
     Item {
         id: displayNameContainer
-        visible: !isMyCard && pal.activeTab !== "connectionsTab"
+        visible: !isMyCard && pal.activeTab !== "peopleTab"
         // Size
         width: parent.width - anchors.leftMargin - avatarImage.width - anchors.leftMargin;
         height: displayNameTextPixelSize + 4

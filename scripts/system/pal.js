@@ -264,10 +264,10 @@ function fromQml(message) { // messages are {method, params}, like json-rpc. See
         populateNearbyUserList(message.params.selected, data);
         UserActivityLogger.palAction("refresh_nearby", "");
         break;
-    case 'refreshConnections':
-        print('Refreshing Connections...');
-        getConnectionData();
-        UserActivityLogger.palAction("refresh_connections", "");
+    case 'refreshPeople':
+        print('Refreshing People...');
+        getPeopleData();
+        UserActivityLogger.palAction("refresh_people", "");
         break;
     default:
         print('Unrecognized message from Pal.qml:', JSON.stringify(message));
