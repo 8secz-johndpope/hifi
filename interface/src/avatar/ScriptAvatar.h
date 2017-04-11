@@ -1,6 +1,6 @@
 //
 //  ScriptAvatar.h
-//  interface/src/avatars
+//  interface/src/avatar
 //
 //  Created by Stephen Birarda on 4/10/17.
 //  Copyright 2017 High Fidelity, Inc.

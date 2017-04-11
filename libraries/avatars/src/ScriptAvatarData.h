@@ -1,6 +1,6 @@
 //
 //  ScriptAvatarData.h
-//  libraries/script-engine/src
+//  libraries/avatars/src
 //
 //  Created by Zach Fox on 2017-04-10.
 //  Copyright 2017 High Fidelity, Inc.
