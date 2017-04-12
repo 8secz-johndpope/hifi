@@ -95,7 +95,7 @@ Item {
             hoverEnabled: enabled
             onClicked: {
                 userInfoViewer.url = defaultBaseUrl + "/users/" + userName;
-                userInfoViewer.visible = true;
+                webViewContainer.visible = true;
             }
             onEntered: infoHoverImage.visible = true;
             onExited: infoHoverImage.visible = false;
@@ -364,7 +364,7 @@ Item {
         hoverEnabled: true
         onClicked: {
             userInfoViewer.url = defaultBaseUrl + "/users/" + userName;
-            userInfoViewer.visible = true;
+            webViewContainer.visible = true;
         }
         onEntered: {
             nameCardConnectionInfoImage.buttonState = 1;

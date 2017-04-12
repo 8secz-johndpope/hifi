@@ -1036,138 +1036,16 @@ Rectangle {
             }
         } // Keyboard
 
-        Item {
+        Rectangle {
             id: webViewContainer;
             anchors.fill: parent;
+            color: "white";
+            visible: false;
 
-            Rectangle {
-                id: navigationContainer;
-                visible: userInfoViewer.visible;
-                height: 60;
-                anchors {
-                    top: parent.top;
-                    left: parent.left;
-                    right: parent.right;
-                }
-                color: hifi.colors.faintGray;
-
-                Item {
-                    id: backButton
-                    anchors {
-                        top: parent.top;
-                        left: parent.left;
-                    }
-                    height: parent.height - addressBar.height;
-                    width: parent.width/2;
-
-                    FiraSansSemiBold {
-                        // Properties
-                        text: "BACK";
-                        elide: Text.ElideRight;
-                        // Anchors
-                        anchors.fill: parent;
-                        // Text Size
-                        size: 16;
-                        // Text Positioning
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter;
-                        // Style
-                        color: backButtonMouseArea.containsMouse || !userInfoViewer.canGoBack ? hifi.colors.lightGray : hifi.colors.darkGray;
-                        MouseArea {
-                            id: backButtonMouseArea;
-                            anchors.fill: parent
-                            hoverEnabled: enabled
-                            onClicked: {
-                                if (userInfoViewer.canGoBack) {
-                                    userInfoViewer.goBack();
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Item {
-                    id: closeButtonContainer
-                    anchors {
-                        top: parent.top;
-                        right: parent.right;
-                    }
-                    height: parent.height - addressBar.height;
-                    width: parent.width/2;
-
-                    FiraSansSemiBold {
-                        id: closeButton;
-                        // Properties
-                        text: "CLOSE";
-                        elide: Text.ElideRight;
-                        // Anchors
-                        anchors.fill: parent;
-                        // Text Size
-                        size: 16;
-                        // Text Positioning
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter;
-                        // Style
-                        color: hifi.colors.redHighlight;
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: enabled
-                            onClicked: userInfoViewer.visible = false;
-                            onEntered: closeButton.color = hifi.colors.redAccent;
-                            onExited: closeButton.color = hifi.colors.redHighlight;
-                        }
-                    }
-                }
-
-                Item {
-                    id: addressBar
-                    anchors {
-                        top: closeButtonContainer.bottom;
-                        left: parent.left;
-                        right: parent.right;
-                    }
-                    height: 30;
-                    width: parent.width;
-
-                    FiraSansRegular {
-                        // Properties
-                        text: userInfoViewer.url;
-                        elide: Text.ElideRight;
-                        // Anchors
-                        anchors.fill: parent;
-                        anchors.leftMargin: 5;
-                        // Text Size
-                        size: 14;
-                        // Text Positioning
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignLeft;
-                        // Style
-                        color: hifi.colors.lightGray;
-                    }
-                }
-            }
-
-            Rectangle {
-                id: webViewBackground;
-                color: "white";
-                visible: userInfoViewer.visible;
-                anchors {
-                    top: navigationContainer.bottom;
-                    bottom: parent.bottom;
-                    left: parent.left;
-                    right: parent.right;
-                }
-            }
-
-            HifiControls.WebView {
+            HifiControls.TabletWebView {
                 id: userInfoViewer;
-                anchors {
-                    top: navigationContainer.bottom;
-                    bottom: parent.bottom;
-                    left: parent.left;
-                    right: parent.right;
-                }
-                visible: false;
+                anchors.fill: parent;
+                visible: webViewContainer.visible;
             }
         }
 
