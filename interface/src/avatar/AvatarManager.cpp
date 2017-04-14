@@ -350,7 +350,7 @@ void AvatarManager::processAvatarDataPacket(QSharedPointer<ReceivedMessage> mess
                         scene->enqueueTransaction(transaction);
                     }
                 }
-            } else if (_shouldRender && ) {
+            } else if (_shouldRender/* && Something else? PAL not open?*/) {
                 // very rare transition so we process the transaction immediately
                 render::ScenePointer scene = qApp->getMain3DScene();
                 if (scene) {
