@@ -334,8 +334,8 @@ void AvatarMixerSlave::broadcastAvatarData(const SharedNodePointer& node) {
                 detail = PALIsOpen ? AvatarData::PALMinimum : AvatarData::NoData;
             } else if (node->isIgnoreRadiusEnabled() && PALIsOpen && !getsAnyIgnored && nodeBox.touches(otherNodeBox)) {
                 detail = AvatarData::PALMinimum;
-                nodeData->removeOtherFromScene(node, otherNodeData->getNodeID());
-                avatar->removeFromScene(avatar, scene, transaction);
+                //nodeData->removeOtherFromScene(node, otherNodeData->getNodeID());
+                //avatar->removeFromScene(avatar, scene, transaction);
             } else if (!isInView) {
                 detail = PALIsOpen ? AvatarData::PALMinimum : AvatarData::MinimumData;
                 nodeData->incrementAvatarOutOfView();

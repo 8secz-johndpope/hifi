@@ -82,7 +82,7 @@ uint16_t AvatarMixerClientData::getLastBroadcastSequenceNumber(const QUuid& node
     }
     return 0;
 }
-
+/*
 void AvatarMixerClientData::removeOtherFromScene(SharedNodePointer self, QUUid otherAvatarUuid) {
     auto removalPacket = NLPacket::create(PacketType::KillAvatar, NUM_BYTES_RFC4122_UUID + sizeof(KillAvatarReason));
     killPacket->write(other->getUUID().toRfc4122());
@@ -94,7 +94,7 @@ void AvatarMixerClientData::removeOtherFromScene(SharedNodePointer self, QUUid o
     setLastBroadcastTime(other->getUUID(), 0);
     DependencyManager::get<NodeList>()->sendUnreliablePacket(*killPacket, *self);
 }
-
+*/
 void AvatarMixerClientData::ignoreOther(SharedNodePointer self, SharedNodePointer other) {
     if (!isRadiusIgnoring(other->getUUID())) {
         addToRadiusIgnoringSet(other->getUUID());
