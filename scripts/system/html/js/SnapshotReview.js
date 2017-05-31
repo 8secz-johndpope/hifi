@@ -175,7 +175,7 @@ function selectImageToShare(selectedID, isSelected) {
         shareBarHelp.style.visibility = "hidden";
     }
 }
-function createShareBar(parentID, isLoggedIn, canShare, isGif, blastButtonDisabled, hifiButtonDisabled, canBlast) {
+function createShareBar(parentID, isLoggedIn, canShare, isGif, blastButtonDisabled, hifiButtonDisabled, canBlast, imageError) {
     var shareBar = document.createElement("div"),
         shareBarHelpID = parentID + "shareBarHelp",
         shareButtonsDivID = parentID + "shareButtonsDiv",
@@ -217,9 +217,13 @@ function createShareBar(parentID, isLoggedIn, canShare, isGif, blastButtonDisabl
                         '&#xe019;' +
                     '</div>' +
                 '</div>' +
-                '<div class="helpTextDiv" id="' + parentID + 'helpTextDiv' + '" style="visibility:hidden;text-align:left;">' +
-                    'This snap was taken in an unshareable domain.' +
-                '</div>';
+                '<div class="helpTextDiv" id="' + parentID + 'helpTextDiv' + '" style="visibility:hidden;text-align:left;">';
+            if (imageError) {
+                shareBarInnerHTML += 'Could not find last snapshot taken.';
+            } else {
+                shareBarInnerHTML += 'This snap was taken in an unshareable domain.';
+            }
+                shareBarInnerHTML += '</div>';
             // Add onclick handler to parent DIV's img to toggle share buttons
             document.getElementById(parentID + 'img').onclick = function () { selectImageWithHelpText(parentID, true); };
         }
@@ -241,11 +245,11 @@ function createShareBar(parentID, isLoggedIn, canShare, isGif, blastButtonDisabl
 
     return shareBar;
 }
-function appendShareBar(divID, isLoggedIn, canShare, isGif, blastButtonDisabled, hifiButtonDisabled, canBlast) {
+function appendShareBar(divID, isLoggedIn, canShare, isGif, blastButtonDisabled, hifiButtonDisabled, canBlast, imageError) {
     if (divID.id) {
         divID = divID.id; // sometimes (?), `containerID` is passed as an HTML object to these functions; we just want the ID
     }
-    document.getElementById(divID).appendChild(createShareBar(divID, isLoggedIn, canShare, isGif, blastButtonDisabled, hifiButtonDisabled, canBlast));
+    document.getElementById(divID).appendChild(createShareBar(divID, isLoggedIn, canShare, isGif, blastButtonDisabled, hifiButtonDisabled, canBlast, imageError));
     if (divID === "p0") {
         if (isLoggedIn) {
             if (canShare) {
@@ -299,7 +303,7 @@ function addImage(image_data, isLoggedIn, canShare, isGifLoading, isShowingPrevi
             imageContainer.innerHTML += '<span class="gifLabel">GIF</span>';
         }
         if (!isGifLoading) {
-            appendShareBar(id, isLoggedIn, canShare, isGif, blastButtonDisabled, hifiButtonDisabled, canBlast);
+            appendShareBar(id, isLoggedIn, canShare, isGif, blastButtonDisabled, hifiButtonDisabled, canBlast, false);
         }
         if (!isGifLoading || (isShowingPreviousImages && !image_data.story_id)) {
             shareForUrl(id);
@@ -311,6 +315,7 @@ function addImage(image_data, isLoggedIn, canShare, isGifLoading, isShowingPrevi
     img.onerror = function () {
         img.onload = null;
         img.src = image_data.errorPath;
+        appendShareBar(id, isLoggedIn, false, isGif, blastButtonDisabled, hifiButtonDisabled, canBlast, true);
     };
 }
 function showConfirmationMessage(selectedID, destination) {
@@ -654,7 +659,7 @@ window.onload = function () {
 
                             paths[1] = gifPath;
                             shareForUrl("p1");
-                            appendShareBar("p1", messageOptions.isLoggedIn, messageOptions.canShare, true, false, false, messageOptions.canBlast);
+                            appendShareBar("p1", messageOptions.isLoggedIn, messageOptions.canShare, true, false, false, messageOptions.canBlast, false);
                             document.getElementById("p1").classList.remove("processingGif");
                             document.getElementById("snap-button").disabled = false;
                         }
