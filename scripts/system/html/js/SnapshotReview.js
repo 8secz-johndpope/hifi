@@ -223,7 +223,7 @@ function createShareBar(parentID, isLoggedIn, canShare, isGif, blastButtonDisabl
             } else {
                 shareBarInnerHTML += 'This snap was taken in an unshareable domain.';
             }
-                shareBarInnerHTML += '</div>';
+            shareBarInnerHTML += '</div>';
             // Add onclick handler to parent DIV's img to toggle share buttons
             document.getElementById(parentID + 'img').onclick = function () { selectImageWithHelpText(parentID, true); };
         }
@@ -604,7 +604,7 @@ function handleCaptureSetting(setting) {
 window.onload = function () {
     // Uncomment the line below to test functionality in a browser.
     // See definition of "testInBrowser()" to modify tests.
-    //testInBrowser(4);
+    //testInBrowser(5);
     openEventBridge(function () {
         // Set up a handler for receiving the data, and tell the .js we are ready to receive it.
         EventBridge.scriptEventReceived.connect(function (message) {
@@ -725,9 +725,14 @@ function testInBrowser(test) {
         addImage({ localPath: 'D:/Dropbox/Screenshots/High Fidelity Snapshots/hifi-snap-by-zfox-on-2017-05-01_13-28-58.gif', story_id: 1337 }, true, true, false, true, false, false, true);
         showUploadingMessage("p0", 'hifi');
     } else if (test === 4) {
-    imageCount = 2;
-    //addImage({ localPath: 'http://lorempixel.com/553/255' });
-    addImage({ localPath: 'D:/Dropbox/Screenshots/High Fidelity Snapshots/hifi-snap-by-zfox-on-2017-05-01_13-28-58.jpg', story_id: 1338 }, false, true, false, true, false, false, true);
-    addImage({ localPath: 'D:/Dropbox/Screenshots/High Fidelity Snapshots/hifi-snap-by-zfox-on-2017-05-01_13-28-58.gif', story_id: 1337 }, false, true, false, true, false, false, true);
-}
+        imageCount = 2;
+        //addImage({ localPath: 'http://lorempixel.com/553/255' });
+        addImage({ localPath: 'D:/Dropbox/Screenshots/High Fidelity Snapshots/hifi-snap-by-zfox-on-2017-05-01_13-28-58.jpg', story_id: 1338 }, false, true, false, true, false, false, true);
+        addImage({ localPath: 'D:/Dropbox/Screenshots/High Fidelity Snapshots/hifi-snap-by-zfox-on-2017-05-01_13-28-58.gif', story_id: 1337 }, false, true, false, true, false, false, true);
+    } else if (test === 5) {
+        imageCount = 2;
+        //addImage({ localPath: 'http://lorempixel.com/553/255' });
+        addImage({ localPath: 'D:/Dropbox/Screenshots/High Fidelity Snapshots/hifi-snap-by-zfox-on-2017-05-01_13-28-58.jpg', story_id: 1338 }, true, true, false, true, false, false, true);
+        addImage({ localPath: '404', story_id: 1337, errorPath: 'C:/Code/hifi/interface/resources/snapshot/img/no-image.jpg' }, true, true, false, true, false, false, true);
+    }
 }
