@@ -54,11 +54,21 @@ public:
 
     void configure(const Config& config) {
         if (config.enabled || config.alwaysEnabled) {
-            _position = config.position;
-            _orientation = config.orientation;
-            _vFoV = config.vFoV;
-            _nearClipPlaneDistance = config.nearClipPlaneDistance;
-            _farClipPlaneDistance = config.farClipPlaneDistance;
+            if (config.position != _position) {
+                _position = config.position;
+            }
+            if (config.orientation != _orientation) {
+                _orientation = config.orientation;
+            }
+            if (config.vFoV != _vFoV) {
+                _vFoV = config.vFoV;
+            }
+            if (config.nearClipPlaneDistance != _nearClipPlaneDistance) {
+                _nearClipPlaneDistance = config.nearClipPlaneDistance;
+            }
+            if (config.farClipPlaneDistance != _farClipPlaneDistance) {
+                _farClipPlaneDistance = config.farClipPlaneDistance;
+            }
         }
     }
 

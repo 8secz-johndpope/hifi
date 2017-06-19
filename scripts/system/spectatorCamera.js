@@ -43,8 +43,6 @@
     // camera: The in-world entity that corresponds to the spectator camera.
     // cameraIsDynamic: "false" for now while we figure out why dynamic, parented overlays
     //     drift with respect to their parent
-    // lastCameraPosition: Holds the last known camera position
-    // lastCameraRotation: Holds the last known camera rotation
     // 
     // Arguments:
     // None
@@ -58,18 +56,10 @@
     var viewFinderOverlay = false;
     var camera = false;
     var cameraIsDynamic = false;
-    var lastCameraPosition = false;
-    var lastCameraRotation = false;
     function updateRenderFromCamera() {
         var cameraData = Entities.getEntityProperties(camera, ['position', 'rotation']);
-        if (JSON.stringify(lastCameraRotation) !== JSON.stringify(cameraData.rotation)) {
-            lastCameraRotation = cameraData.rotation;
-            beginSpectatorFrameRenderConfig.orientation = lastCameraRotation;
-        }
-        if (JSON.stringify(lastCameraPosition) !== JSON.stringify(cameraData.position)) {
-            lastCameraPosition = cameraData.position;
-            beginSpectatorFrameRenderConfig.position = Vec3.sum(inFrontOf(0.17, lastCameraPosition, lastCameraRotation), {x: 0, y: 0.02, z: 0});
-        }
+        beginSpectatorFrameRenderConfig.orientation = cameraData.rotation;
+        beginSpectatorFrameRenderConfig.position = Vec3.sum(inFrontOf(0.17, cameraData.position, cameraData.rotation), {x: 0, y: 0.02, z: 0});
     }
 
     //
