@@ -102,7 +102,6 @@ void Image3DOverlay::render(RenderArgs* args) {
 
     Transform transform = getTransform();
     applyTransformTo(transform, true);
-    setTransform(transform);
     transform.postScale(glm::vec3(getDimensions(), 1.0f));
 
     batch->setModelTransform(transform);
