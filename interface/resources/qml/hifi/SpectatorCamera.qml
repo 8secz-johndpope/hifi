@@ -13,7 +13,7 @@
 
 import Hifi 1.0 as Hifi
 import QtQuick 2.5
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.2
 import "../styles-uit"
 import "../controls-uit" as HifiControlsUit
 import "../controls" as HifiControls
@@ -217,11 +217,31 @@ Rectangle {
             }
         }
 
+        // FOV Slider
+        Slider {
+            id: fovSlider
+            // Size
+            anchors.left: parent.left;
+            anchors.top: cameraToggleCheckBox.bottom;
+            anchors.topMargin: 10;
+            anchors.right: parent.right;
+            height: 15;
+            // Properties
+            value: Render.getConfig("SecondaryCamera").vFoV || 45.0;
+            from: 15.0;
+            to: 110.0;
+            live: true;
+            stepSize: 1;
+            onValueChanged: {
+                Render.getConfig("SecondaryCamera").vFoV = value;
+            }
+        }
+
         // Instructions or Preview
         Rectangle {
             id: spectatorCameraImageContainer;
             anchors.left: parent.left;
-            anchors.top: cameraToggleCheckBox.bottom;
+            anchors.top: fovSlider.bottom;
             anchors.topMargin: 20;
             anchors.right: parent.right;
             height: 250;
