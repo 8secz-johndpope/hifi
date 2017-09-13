@@ -78,4 +78,6 @@ const uint16_t ENTITY_ITEM_DEFAULT_DPI = 30;
 
 const QUuid ENTITY_ITEM_DEFAULT_LAST_EDITED_BY = QUuid();
 
+const QUuid ENTITY_ITEM_DEFAULT_CERTIFICATE_ID = QUuid();
+
 #endif // hifi_EntityItemPropertiesDefaults_h

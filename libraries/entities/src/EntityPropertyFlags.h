@@ -187,6 +187,8 @@ enum EntityPropertyList {
     PROP_SERVER_SCRIPTS,
 
     PROP_FILTER_URL,
+
+    PROP_CERTIFICATE_ID,
     
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // ATTENTION: add new properties to end of list just ABOVE this line
