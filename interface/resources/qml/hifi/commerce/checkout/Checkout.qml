@@ -35,6 +35,7 @@ Rectangle {
     property bool alreadyOwned: false;
     property int itemPriceFull: 0;
     property bool itemIsJson: true;
+    property bool shouldBuyWithControlledFailure: false;
     // Style
     color: hifi.colors.baseGray;
     Hifi.QmlCommerce {
@@ -647,7 +648,11 @@ Rectangle {
                 onClicked: {
                     if (itemIsJson) {
                         buyButton.enabled = false;
-                        commerce.buy(itemId, itemPriceFull);
+                        if (!shouldBuyWithControlledFailure) {
+                            commerce.buy(itemId, itemPriceFull);
+                        } else {
+                            commerce.buy(itemId, itemPriceFull, true);
+                        }
                     } else {
                         if (urlHandler.canHandleUrl(itemHref)) {
                             urlHandler.handleUrl(itemHref);
@@ -893,6 +898,20 @@ Rectangle {
     //
     // CHECKOUT FAILURE END
     //
+
+    Keys.onPressed: {
+        if ((event.key == Qt.Key_F) && (event.modifiers & Qt.ControlModifier)) {
+            if (!shouldBuyWithControlledFailure) {
+                buyButton.text += " DEBUG FAIL ON"
+                buyButton.color = hifi.buttons.red;
+                shouldBuyWithControlledFailure = true;
+            } else {
+                buyButton.text = (itemIsJson ? ((purchasesReceived && balanceReceived) ? (root.alreadyOwned ? "Buy Another" : "Buy"): "--") : "Get Item");
+                buyButton.color = hifi.buttons.blue;
+                shouldBuyWithControlledFailure = false;
+            }
+        }
+    }
 
     //
     // FUNCTION DEFINITIONS START
