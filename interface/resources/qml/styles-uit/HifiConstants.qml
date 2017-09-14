@@ -209,11 +209,12 @@ Item {
         readonly property int blue: 1
         readonly property int red: 2
         readonly property int black: 3
-        readonly property var textColor: [ colors.darkGray, colors.white, colors.white, colors.white ]
-        readonly property var colorStart: [ colors.white, colors.primaryHighlight, "#d42043", "#343434" ]
-        readonly property var colorFinish: [ colors.lightGrayText, colors.blueAccent, "#94132e", colors.black ]
-        readonly property var hoveredColor: [ colorStart[white], colorStart[blue], colorStart[red], colorFinish[black] ]
-        readonly property var pressedColor: [ colorFinish[white], colorFinish[blue], colorFinish[red], colorStart[black] ]
+        readonly property int none: 4
+        readonly property var textColor: [ colors.darkGray, colors.white, colors.white, colors.white, colors.white ]
+        readonly property var colorStart: [ colors.white, colors.primaryHighlight, "#d42043", "#343434", Qt.rgba(0, 0, 0, 0) ]
+        readonly property var colorFinish: [ colors.lightGrayText, colors.blueAccent, "#94132e", colors.black, Qt.rgba(0, 0, 0, 0) ]
+        readonly property var hoveredColor: [ colorStart[white], colorStart[blue], colorStart[red], colorFinish[black], colorStart[none] ]
+        readonly property var pressedColor: [ colorFinish[white], colorFinish[blue], colorFinish[red], colorStart[black], colorStart[none] ]
         readonly property var disabledColorStart: [ colorStart[white], colors.baseGrayHighlight]
         readonly property var disabledColorFinish: [ colorFinish[white], colors.baseGrayShadow]
         readonly property var disabledTextColor: [ colors.lightGrayText, colors.baseGrayShadow]

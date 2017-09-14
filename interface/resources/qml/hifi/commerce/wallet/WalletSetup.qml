@@ -1,8 +1,8 @@
 //
-//  WalletSetupLightbox.qml
+//  modalContainer.qml
 //  qml/hifi/commerce/wallet
 //
-//  WalletSetupLightbox
+//  modalContainer
 //
 //  Created by Zach Fox on 2017-08-17
 //  Copyright 2017 High Fidelity, Inc.
@@ -13,6 +13,7 @@
 
 import Hifi 1.0 as Hifi
 import QtQuick 2.5
+import QtGraphicalEffects 1.0
 import QtQuick.Controls 1.4
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
@@ -20,31 +21,38 @@ import "../../../controls" as HifiControls
 
 // references XXX from root context
 
-Rectangle {
+Item {
     HifiConstants { id: hifi; }
 
     id: root;
-    property string lastPage: "initialize";
-    // Style
-    color: hifi.colors.baseGray;
+    property string activeView: "step_1";
+    property string lastPage;
+
+    LinearGradient {
+        anchors.fill: parent;
+        start: Qt.point(parent.width, 0);
+        end: Qt.point(0, parent.width);
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "#1A7E8E" }
+            GradientStop { position: 1.0; color: "#45366E" }
+        }
+    }
 
     Hifi.QmlCommerce {
         id: commerce;
 
         onSecurityImageResult: {
-            if (!exists && root.lastPage === "securityImage") {
+            if (!exists && root.lastPage === "step_2") {
                 // ERROR! Invalid security image.
-                securityImageContainer.visible = true;
-                choosePassphraseContainer.visible = false;
+                root.activeView = "step_2";
             }
         }
 
         onWalletAuthenticatedStatusResult: {
-            securityImageContainer.visible = false;
             if (isAuthenticated) {
-                privateKeysReadyContainer.visible = true;
+                root.activeView = "step_4";
             } else {
-                choosePassphraseContainer.visible = true;
+                root.activeView = "step_3";
             }
         }
 
@@ -53,50 +61,154 @@ Rectangle {
         }
     }
 
+
+    //
+    // TITLE BAR START
+    //
+    Item {
+        id: titleBarContainer;
+        // Size
+        width: parent.width;
+        height: 50;
+        // Anchors
+        anchors.left: parent.left;
+        anchors.top: parent.top;
+
+        // Title Bar text
+        RalewayRegular {
+            id: titleBarText;
+            text: "Wallet Setup - Step " + root.activeView.split("_")[1] + " of 4";
+            // Text size
+            size: hifi.fontSizes.overlayTitle;
+            // Anchors
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.leftMargin: 16;
+            anchors.bottom: parent.bottom;
+            width: paintedWidth;
+            // Style
+            color: hifi.colors.faintGray;
+            // Alignment
+            horizontalAlignment: Text.AlignHLeft;
+            verticalAlignment: Text.AlignVCenter;
+        }
+    }
+    //
+    // TITLE BAR END
+    //
+    
+    //
+    // FIRST PAGE START
+    //
+    Item {
+        id: firstPageContainer;
+        visible: root.activeView === "step_1";
+        // Anchors
+        anchors.top: titleBarContainer.bottom;
+        anchors.bottom: parent.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+
+        RalewayRegular {
+            id: firstPage_text01;
+            text: "Let's set up your wallet!";
+            // Text size
+            size: 26;
+            // Anchors
+            anchors.top: parent.top;
+            anchors.topMargin: 100;
+            anchors.left: parent.left;
+            anchors.leftMargin: 16;
+            anchors.right: parent.right;
+            anchors.rightMargin: 16;
+            height: paintedHeight;
+            width: paintedWidth;
+            // Style
+            color: hifi.colors.faintGray;
+            wrapMode: Text.WordWrap;
+            // Alignment
+            horizontalAlignment: Text.AlignHCenter;
+            verticalAlignment: Text.AlignVCenter;
+        }
+
+        RalewayRegular {
+            id: firstPage_text02;
+            text: "Set up your wallet to claim your <b>free High Fidelity Coin (HFC)</b> and get items from the Marketplace.<br><br>" +
+            "No credit card is required.";
+            // Text size
+            size: 18;
+            // Anchors
+            anchors.top: firstPage_text01.bottom;
+            anchors.topMargin: 40;
+            anchors.left: parent.left;
+            anchors.leftMargin: 65;
+            anchors.right: parent.right;
+            anchors.rightMargin: 65;
+            height: paintedHeight;
+            width: paintedWidth;
+            // Style
+            color: hifi.colors.faintGray;
+            wrapMode: Text.WordWrap;
+            // Alignment
+            horizontalAlignment: Text.AlignHCenter;
+            verticalAlignment: Text.AlignVCenter;
+        }
+
+        // "Set Up" button
+        HifiControlsUit.Button {
+            id: firstPage_setUpButton;
+            color: hifi.buttons.blue;
+            colorScheme: hifi.colorSchemes.dark;
+            anchors.top: firstPage_text02.bottom;
+            anchors.topMargin: 40;
+            anchors.horizontalCenter: parent.horizontalCenter;
+            width: parent.width/2;
+            height: 50;
+            text: "Set Up Wallet";
+            onClicked: {
+                root.activeView = "step_2";
+            }
+        }
+
+        // "Cancel" button
+        HifiControlsUit.Button {
+            color: hifi.buttons.none;
+            colorScheme: hifi.colorSchemes.dark;
+            anchors.top: firstPage_setUpButton.bottom;
+            anchors.topMargin: 20;
+            anchors.horizontalCenter: parent.horizontalCenter;
+            width: parent.width/2;
+            height: 50;
+            text: "Cancel";
+            onClicked: {
+                sendSignalToWallet({method: 'walletSetup_cancelClicked'});
+            }
+        }   
+    }
+    //
+    // FIRST PAGE END
+    //
+
     //
     // SECURITY IMAGE SELECTION START
     //
     Item {
         id: securityImageContainer;
+        visible: root.activeView === "step_2";
         // Anchors
-        anchors.fill: parent;
-
-        Item {
-            id: securityImageTitle;
-            // Size
-            width: parent.width;
-            height: 50;
-            // Anchors
-            anchors.left: parent.left;
-            anchors.top: parent.top;
-
-            // Title Bar text
-            RalewaySemiBold {
-                text: "WALLET SETUP - STEP 1 OF 3";
-                // Text size
-                size: hifi.fontSizes.overlayTitle;
-                // Anchors
-                anchors.top: parent.top;
-                anchors.left: parent.left;
-                anchors.leftMargin: 16;
-                anchors.bottom: parent.bottom;
-                width: paintedWidth;
-                // Style
-                color: hifi.colors.faintGray;
-                // Alignment
-                horizontalAlignment: Text.AlignHLeft;
-                verticalAlignment: Text.AlignVCenter;
-            }
-        }
+        anchors.top: titleBarContainer.bottom;
+        anchors.bottom: parent.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
 
         // Text below title bar
         RalewaySemiBold {
             id: securityImageTitleHelper;
-            text: "Choose a Security Picture:";
+            text: "Choose a Security Pic:";
             // Text size
             size: 24;
             // Anchors
-            anchors.top: securityImageTitle.bottom;
+            anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.leftMargin: 16;
             height: 50;
@@ -150,46 +262,42 @@ Rectangle {
         Item {
             // Size
             width: parent.width;
-            height: 100;
+            height: 50;
             // Anchors:
             anchors.left: parent.left;
             anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 50;
 
-            // "Cancel" button
+            // "Back" button
             HifiControlsUit.Button {
                 color: hifi.buttons.black;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;
-                anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 3;
                 anchors.left: parent.left;
                 anchors.leftMargin: 20;
-                width: 100;
-                text: "Cancel"
+                width: 200;
+                text: "Back"
                 onClicked: {
-                    sendSignalToWallet({method: 'walletSetup_cancelClicked'});
+                    root.activeView = "step_1";
                 }
             }
 
             // "Next" button
             HifiControlsUit.Button {
-                color: hifi.buttons.black;
+                color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;
-                anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 3;
                 anchors.right: parent.right;
                 anchors.rightMargin: 20;
-                width: 100;
+                width: 200;
                 text: "Next";
                 onClicked: {
-                    root.lastPage = "securityImage";
+                    root.lastPage = "step_2";
                     var securityImagePath = securityImageSelection.getImagePathFromImageID(securityImageSelection.getSelectedImageIndex())
                     commerce.chooseSecurityImage(securityImagePath);
-                    securityImageContainer.visible = false;
-                    choosePassphraseContainer.visible = true;
+                    root.activeView = "step_3";
                     passphraseSelection.clearPassphraseFields();
                 }
             }
@@ -204,41 +312,16 @@ Rectangle {
     //
     Item {
         id: choosePassphraseContainer;
-        visible: false;
+        visible: root.activeView === "step_3";
         // Anchors
-        anchors.fill: parent;
+        anchors.top: titleBarContainer.bottom;
+        anchors.bottom: parent.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
 
         onVisibleChanged: {
             if (visible) {
                 commerce.getWalletAuthenticatedStatus();
-            }
-        }
-
-        Item {
-            id: passphraseTitle;
-            // Size
-            width: parent.width;
-            height: 50;
-            // Anchors
-            anchors.left: parent.left;
-            anchors.top: parent.top;
-
-            // Title Bar text
-            RalewaySemiBold {
-                text: "WALLET SETUP - STEP 2 OF 3";
-                // Text size
-                size: hifi.fontSizes.overlayTitle;
-                // Anchors
-                anchors.top: parent.top;
-                anchors.left: parent.left;
-                anchors.leftMargin: 16;
-                anchors.bottom: parent.bottom;
-                width: paintedWidth;
-                // Style
-                color: hifi.colors.faintGray;
-                // Alignment
-                horizontalAlignment: Text.AlignHLeft;
-                verticalAlignment: Text.AlignVCenter;
             }
         }
 
@@ -249,7 +332,7 @@ Rectangle {
             // Text size
             size: 24;
             // Anchors
-            anchors.top: passphraseTitle.bottom;
+            anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.leftMargin: 16;
             anchors.right: parent.right;
@@ -285,49 +368,44 @@ Rectangle {
             id: passphraseNavBar;
             // Size
             width: parent.width;
-            height: 100;
+            height: 50;
             // Anchors:
             anchors.left: parent.left;
             anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 50;
 
             // "Back" button
             HifiControlsUit.Button {
                 color: hifi.buttons.black;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;
-                anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 3;
                 anchors.left: parent.left;
                 anchors.leftMargin: 20;
-                width: 100;
+                width: 200;
                 text: "Back"
                 onClicked: {
-                    root.lastPage = "choosePassphrase";
-                    choosePassphraseContainer.visible = false;
-                    securityImageContainer.visible = true;
+                    root.lastPage = "step_3";
+                    root.activeView = "step_2";
                 }
             }
 
             // "Next" button
             HifiControlsUit.Button {
                 id: passphrasePageNextButton;
-                color: hifi.buttons.black;
+                color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;
-                anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 3;
                 anchors.right: parent.right;
                 anchors.rightMargin: 20;
-                width: 100;
+                width: 200;
                 text: "Next";
                 onClicked: {
                     if (passphraseSelection.validateAndSubmitPassphrase()) {
-                        root.lastPage = "choosePassphrase";
+                        root.lastPage = "step_3";
                         commerce.generateKeyPair();
-                        choosePassphraseContainer.visible = false;
-                        privateKeysReadyContainer.visible = true;
+                        root.activeView = "step_4";
                     }
                 }
             }
@@ -342,37 +420,12 @@ Rectangle {
     //
     Item {
         id: privateKeysReadyContainer;
-        visible: false;
+        visible: root.activeView === "step_4";
         // Anchors
-        anchors.fill: parent;
-
-        Item {
-            id: keysReadyTitle;
-            // Size
-            width: parent.width;
-            height: 50;
-            // Anchors
-            anchors.left: parent.left;
-            anchors.top: parent.top;
-
-            // Title Bar text
-            RalewaySemiBold {
-                text: "WALLET SETUP - STEP 3 OF 3";
-                // Text size
-                size: hifi.fontSizes.overlayTitle;
-                // Anchors
-                anchors.top: parent.top;
-                anchors.left: parent.left;
-                anchors.leftMargin: 16;
-                anchors.bottom: parent.bottom;
-                width: paintedWidth;
-                // Style
-                color: hifi.colors.faintGray;
-                // Alignment
-                horizontalAlignment: Text.AlignHLeft;
-                verticalAlignment: Text.AlignVCenter;
-            }
-        }
+        anchors.top: titleBarContainer.bottom;
+        anchors.bottom: parent.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
 
         // Text below title bar
         RalewaySemiBold {
@@ -381,7 +434,7 @@ Rectangle {
             // Text size
             size: 24;
             // Anchors
-            anchors.top: keysReadyTitle.bottom;
+            anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.leftMargin: 16;
             anchors.right: parent.right;
@@ -464,22 +517,21 @@ Rectangle {
         Item {
             // Size
             width: parent.width;
-            height: 100;
+            height: 50;
             // Anchors:
             anchors.left: parent.left;
             anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 50;
             // "Next" button
             HifiControlsUit.Button {
                 id: keysReadyPageNextButton;
-                color: hifi.buttons.black;
+                color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;
-                anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 3;
                 anchors.right: parent.right;
                 anchors.rightMargin: 20;
-                width: 100;
+                width: 200;
                 text: "Finish";
                 onClicked: {
                     root.visible = false;

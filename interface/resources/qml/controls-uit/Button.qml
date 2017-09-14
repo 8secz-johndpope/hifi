@@ -28,6 +28,9 @@ Original.Button {
         background: Rectangle {
             radius: hifi.buttons.radius
 
+            border.width: control.color === hifi.buttons.none ? 1 : 0;
+            border.color: hifi.colors.white;
+
             gradient: Gradient {
                 GradientStop {
                     position: 0.2

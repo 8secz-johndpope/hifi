@@ -50,16 +50,16 @@ Rectangle {
         }
 
         onKeyFilePathIfExistsResult: {
-            if (path === "" && root.activeView !== "notSetUp") {
-                root.activeView = "notSetUp";
+            if (path === "" && root.activeView !== "walletSetup") {
+                root.activeView = "walletSetup";
             } else if (path !== "" && root.activeView === "initialize") {
                 commerce.getSecurityImage();
             }
         }
 
         onSecurityImageResult: {
-            if (!exists && root.activeView !== "notSetUp") { // "If security image is not set up"
-                root.activeView = "notSetUp";
+            if (!exists && root.activeView !== "walletSetup") { // "If security image is not set up"
+                root.activeView = "walletSetup";
             } else if (exists && root.activeView === "initialize") {
                 commerce.getWalletAuthenticatedStatus();
             }
@@ -78,27 +78,29 @@ Rectangle {
         id: securityImageModel;
     }
 
+    onActiveViewChanged: {
+        if (root.activeView === "walletSetup") {
+            passphraseModal.visible = false;
+        }
+    }
+
     Rectangle {
-        id: walletSetupLightboxContainer;
-        visible: walletSetupLightbox.visible || passphraseSelectionLightbox.visible || securityImageSelectionLightbox.visible;
+        id: modalContainer;
+        visible: walletSetup.visible || passphraseSelectionLightbox.visible || securityImageSelectionLightbox.visible;
         z: 998;
         anchors.fill: parent;
         color: "black";
         opacity: 0.5;
     }
-    WalletSetupLightbox {
-        id: walletSetupLightbox;
-        visible: false;
+    WalletSetup {
+        id: walletSetup;
+        visible: root.activeView === "walletSetup";
         z: 998;
-        anchors.centerIn: walletSetupLightboxContainer;
-        width: walletSetupLightboxContainer.width - 50;
-        height: walletSetupLightboxContainer.height - 50;
+        anchors.fill: parent;
 
         Connections {
             onSendSignalToWallet: {
-                if (msg.method === 'walletSetup_cancelClicked') {
-                    walletSetupLightbox.visible = false;
-                } else if (msg.method === 'walletSetup_finished') {
+                if (msg.method === 'walletSetup_finished') {
                     root.activeView = "initialize";
                     commerce.getLoginStatus();
                 } else if (msg.method === 'walletSetup_raiseKeyboard') {
@@ -115,9 +117,9 @@ Rectangle {
         id: passphraseSelectionLightbox;
         visible: false;
         z: 998;
-        anchors.centerIn: walletSetupLightboxContainer;
-        width: walletSetupLightboxContainer.width - 50;
-        height: walletSetupLightboxContainer.height - 50;
+        anchors.centerIn: modalContainer;
+        width: modalContainer.width - 50;
+        height: modalContainer.height - 50;
 
         Connections {
             onSendSignalToWallet: {
@@ -135,9 +137,9 @@ Rectangle {
         id: securityImageSelectionLightbox;
         visible: false;
         z: 998;
-        anchors.centerIn: walletSetupLightboxContainer;
-        width: walletSetupLightboxContainer.width - 50;
-        height: walletSetupLightboxContainer.height - 50;
+        anchors.centerIn: modalContainer;
+        width: modalContainer.width - 50;
+        height: modalContainer.height - 50;
 
         Connections {
             onSendSignalToWallet: {
@@ -244,23 +246,6 @@ Rectangle {
         }
     }
 
-    NotSetUp {
-        id: notSetUp;
-        visible: root.activeView === "notSetUp";
-        anchors.top: titleBarContainer.bottom;
-        anchors.bottom: tabButtonsContainer.top;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-
-        Connections {
-            onSendSignalToWallet: {
-                if (msg.method === 'setUpClicked') {
-                    walletSetupLightbox.visible = true;
-                }
-            }
-        }
-    }
-
     WalletHome {
         id: walletHome;
         visible: root.activeView === "walletHome";
@@ -361,7 +346,7 @@ Rectangle {
         // "WALLET HOME" tab button
         Rectangle {
             id: walletHomeButtonContainer;
-            visible: !notSetUp.visible;
+            visible: !walletSetup.visible;
             color: root.activeView === "walletHome" ? hifi.colors.blueAccent : hifi.colors.black;
             anchors.top: parent.top;
             anchors.left: parent.left;
@@ -384,7 +369,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter;
             }
             MouseArea {
-                enabled: !walletSetupLightboxContainer.visible;
+                enabled: !modalContainer.visible;
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
@@ -399,7 +384,7 @@ Rectangle {
         // "SEND MONEY" tab button
         Rectangle {
             id: sendMoneyButtonContainer;
-            visible: !notSetUp.visible;
+            visible: !walletSetup.visible;
             color: hifi.colors.black;
             anchors.top: parent.top;
             anchors.left: walletHomeButtonContainer.right;
@@ -426,7 +411,7 @@ Rectangle {
         // "EXCHANGE MONEY" tab button
         Rectangle {
             id: exchangeMoneyButtonContainer;
-            visible: !notSetUp.visible;
+            visible: !walletSetup.visible;
             color: hifi.colors.black;
             anchors.top: parent.top;
             anchors.left: sendMoneyButtonContainer.right;
@@ -453,7 +438,7 @@ Rectangle {
         // "SECURITY" tab button
         Rectangle {
             id: securityButtonContainer;
-            visible: !notSetUp.visible;
+            visible: !walletSetup.visible;
             color: root.activeView === "security" ? hifi.colors.blueAccent : hifi.colors.black;
             anchors.top: parent.top;
             anchors.left: exchangeMoneyButtonContainer.right;
@@ -476,7 +461,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter;
             }
             MouseArea {
-                enabled: !walletSetupLightboxContainer.visible;
+                enabled: !modalContainer.visible;
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
@@ -491,7 +476,7 @@ Rectangle {
         // "HELP" tab button
         Rectangle {
             id: helpButtonContainer;
-            visible: !notSetUp.visible;
+            visible: !walletSetup.visible;
             color: root.activeView === "help" ? hifi.colors.blueAccent : hifi.colors.black;
             anchors.top: parent.top;
             anchors.left: securityButtonContainer.right;
@@ -514,7 +499,7 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter;
             }
             MouseArea {
-                enabled: !walletSetupLightboxContainer.visible;
+                enabled: !modalContainer.visible;
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
