@@ -111,7 +111,7 @@
             var randomNumber = Math.floor((Math.random() * 150) + 1);
             tablet.sendToQml({
                 method: 'inspectionCertificate_setItemInfo',
-                itemName: "The Greatest Item (button below works!)",
+                itemName: "The Greatest Item",
                 itemOwner: "ABCDEFG1234567",
                 itemEdition: (Math.floor(Math.random() * randomNumber) + " / " + randomNumber)
             });
@@ -276,6 +276,9 @@
                 break;
             case 'purchases_setIsFirstUse':
                 Settings.setValue("isFirstUseOfPurchases", false);
+                break;
+            case 'inspectionCertificate_closeClicked':
+                tablet.gotoHomeScreen();
                 break;
             case 'inspectionCertificate_showInMarketplaceClicked':
                 tablet.gotoWebScreen(MARKETPLACE_URL + '/items/' + message.itemId, MARKETPLACES_INJECT_SCRIPT_URL);

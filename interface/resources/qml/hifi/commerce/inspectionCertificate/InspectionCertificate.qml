@@ -29,85 +29,76 @@ Rectangle {
     property string itemName: "--";
     property string itemOwner: "--";
     property string itemEdition: "--";
+    property string dateOfPurchase: "";
     // Style
-    color: hifi.colors.baseGray;
+    color: hifi.colors.faintGray;
     Hifi.QmlCommerce {
         id: commerce;
     }
 
-    //
-    // TITLE BAR START
-    //
-    Item {
-        id: titleBarContainer;
-        // Size
-        width: parent.width;
-        height: 50;
+    // Title text
+    RalewayRegular {
+        id: titleBarText;
+        text: "Certificate";
+        // Text size
+        size: 40;
         // Anchors
-        anchors.left: parent.left;
         anchors.top: parent.top;
-
-        // Title Bar text
-        RalewaySemiBold {
-            id: titleBarText;
-            text: "Certificate";
-            // Text size
-            size: hifi.fontSizes.overlayTitle;
-            // Anchors
-            anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
-            anchors.bottom: parent.bottom;
-            width: paintedWidth;
-            // Style
-            color: hifi.colors.faintGray;
-            // Alignment
-            horizontalAlignment: Text.AlignHLeft;
-            verticalAlignment: Text.AlignVCenter;
-        }
-
-        // Separator
-        HifiControlsUit.Separator {
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.bottom: parent.bottom;
-        }
+        anchors.topMargin: 40;
+        anchors.left: parent.left;
+        anchors.leftMargin: 45;
+        anchors.right: parent.right;
+        height: paintedHeight;
+        // Style
+        color: hifi.colors.darkGray;
     }
-    //
-    // TITLE BAR END
-    //
+    // Title text
+    RalewayRegular {
+        id: popText;
+        text: "PROOF OF PURCHASE";
+        // Text size
+        size: 16;
+        // Anchors
+        anchors.top: titleBarText.bottom;
+        anchors.topMargin: 4;
+        anchors.left: titleBarText.left;
+        anchors.right: titleBarText.right;
+        height: paintedHeight;
+        // Style
+        color: hifi.colors.baseGray;
+    }
 
     //
     // "CERTIFICATE" START
     //
     Item {
         id: certificateContainer;
-        anchors.top: titleBarContainer.bottom;
-        anchors.bottom: parent.bottom;
+        anchors.top: popText.bottom;
+        anchors.topMargin: 30;
+        anchors.bottom: buttonsContainer.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
 
-        RalewaySemiBold {
+        RalewayRegular {
             id: itemNameHeader;
-            text: "Item Name";
+            text: "ITEM NAME";
             // Text size
             size: 20;
             // Anchors
             anchors.top: parent.top;
-            anchors.topMargin: 12;
             anchors.left: parent.left;
-            anchors.leftMargin: 16;
+            anchors.leftMargin: 45;
             anchors.right: parent.right;
             anchors.rightMargin: 16;
             height: paintedHeight;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.baseGray;
         }
-        RalewayRegular {
+        RalewaySemiBold {
             id: itemName;
             text: root.itemName;
             // Text size
-            size: 24;
+            size: 28;
             // Anchors
             anchors.top: itemNameHeader.bottom;
             anchors.topMargin: 4;
@@ -115,45 +106,40 @@ Rectangle {
             anchors.right: itemNameHeader.right;
             height: paintedHeight;
             // Style
-            color: hifi.colors.faintGray;
-        }
-        // "Show In Marketplace" button
-        HifiControlsUit.Button {
-            id: showInMarketplaceButton;
-            color: hifi.buttons.blue;
-            colorScheme: hifi.colorSchemes.dark;
-            anchors.top: itemName.bottom;
-            anchors.topMargin: 4;
-            anchors.left: itemName.left;
-            width: 200;
-            height: 50;
-            text: "View In Marketplace"
-            onClicked: {
-                sendToScript({method: 'inspectionCertificate_showInMarketplaceClicked', itemId: root.marketplaceId});
+            color: hifi.colors.blueHighlight;
+            elide: Text.ElideRight;
+            MouseArea {
+                anchors.fill: parent;
+                hoverEnabled: enabled;
+                onClicked: {
+                    sendToScript({method: 'inspectionCertificate_showInMarketplaceClicked', itemId: root.marketplaceId});
+                }
+                onEntered: itemName.color = hifi.colors.blueAccent;
+                onExited: itemName.color = hifi.colors.blueHighlight;
             }
         }
 
-        RalewaySemiBold {
+        RalewayRegular {
             id: ownedByHeader;
-            text: "Owned By";
+            text: "OWNER";
             // Text size
             size: 18;
             // Anchors
-            anchors.top: showInMarketplaceButton.bottom;
+            anchors.top: itemName.bottom;
             anchors.topMargin: 20;
             anchors.left: parent.left;
-            anchors.leftMargin: 16;
+            anchors.leftMargin: 45;
             anchors.right: parent.right;
             anchors.rightMargin: 16;
             height: paintedHeight;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.baseGray;
         }
         RalewayRegular {
             id: ownedBy;
             text: root.itemOwner;
             // Text size
-            size: 20;
+            size: 22;
             // Anchors
             anchors.top: ownedByHeader.bottom;
             anchors.topMargin: 4;
@@ -161,30 +147,31 @@ Rectangle {
             anchors.right: ownedByHeader.right;
             height: paintedHeight;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.darkGray;
+            elide: Text.ElideRight;
         }
 
-        RalewaySemiBold {
+        RalewayRegular {
             id: editionHeader;
-            text: "Edition";
+            text: "EDITION";
             // Text size
             size: 18;
             // Anchors
             anchors.top: ownedBy.bottom;
             anchors.topMargin: 20;
             anchors.left: parent.left;
-            anchors.leftMargin: 16;
+            anchors.leftMargin: 45;
             anchors.right: parent.right;
             anchors.rightMargin: 16;
             height: paintedHeight;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.baseGray;
         }
-        RalewayRegular {
+        AnonymousProRegular {
             id: edition;
             text: root.itemEdition;
             // Text size
-            size: 20;
+            size: 22;
             // Anchors
             anchors.top: editionHeader.bottom;
             anchors.topMargin: 4;
@@ -192,7 +179,40 @@ Rectangle {
             anchors.right: editionHeader.right;
             height: paintedHeight;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.darkGray;
+        }
+
+        RalewayRegular {
+            id: dateOfPurchaseHeader;
+            text: "DATE OF PURCHASE";
+            visible: root.dateOfPurchase !== "";
+            // Text size
+            size: 18;
+            // Anchors
+            anchors.top: ownedBy.bottom;
+            anchors.topMargin: 20;
+            anchors.left: parent.left;
+            anchors.leftMargin: 45;
+            anchors.right: parent.right;
+            anchors.rightMargin: 16;
+            height: paintedHeight;
+            // Style
+            color: hifi.colors.baseGray;
+        }
+        AnonymousProRegular {
+            id: dateOfPurchase;
+            text: root.dateOfPurchase;
+            visible: root.dateOfPurchase !== "";
+            // Text size
+            size: 22;
+            // Anchors
+            anchors.top: editionHeader.bottom;
+            anchors.topMargin: 4;
+            anchors.left: editionHeader.left;
+            anchors.right: editionHeader.right;
+            height: paintedHeight;
+            // Style
+            color: hifi.colors.darkGray;
         }
 
         RalewayRegular {
@@ -202,10 +222,10 @@ Rectangle {
             // Text size
             size: 20;
             // Anchors
-            anchors.top: edition.bottom;
+            anchors.top: root.dateOfPurchase !== "" ? dateOfPurchase.bottom : edition.bottom;
             anchors.topMargin: 40;
-            anchors.left: edition.left;
-            anchors.right: edition.right;
+            anchors.left: root.dateOfPurchase !== "" ? dateOfPurchase.left : edition.left;
+            anchors.right: root.dateOfPurchase !== "" ? dateOfPurchase.right : edition.right;
             anchors.bottom: parent.bottom;
             // Style
             wrapMode: Text.WordWrap;
@@ -216,6 +236,46 @@ Rectangle {
     //
     // "CERTIFICATE" END
     //
+
+    Item {
+        id: buttonsContainer;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 50;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        height: 50;
+        
+        // "Cancel" button
+        HifiControlsUit.Button {
+            color: hifi.buttons.noneBorderless;
+            colorScheme: hifi.colorSchemes.light;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.leftMargin: 30;
+            width: parent.width/2 - 50;
+            height: 50;
+            text: "close";
+            onClicked: {
+                sendToScript({method: 'inspectionCertificate_closeClicked'});
+            }
+        }   
+
+        // "Show In Marketplace" button
+        HifiControlsUit.Button {
+            id: showInMarketplaceButton;
+            color: hifi.buttons.blue;
+            colorScheme: hifi.colorSchemes.light;
+            anchors.top: parent.top;
+            anchors.right: parent.right;
+            anchors.rightMargin: 30;
+            width: parent.width/2 - 50;
+            height: 50;
+            text: "View In Market"
+            onClicked: {
+                sendToScript({method: 'inspectionCertificate_showInMarketplaceClicked', itemId: root.marketplaceId});
+            }
+        }
+    }
 
     //
     // FUNCTION DEFINITIONS START
