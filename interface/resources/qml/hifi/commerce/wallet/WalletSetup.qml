@@ -27,6 +27,7 @@ Item {
     id: root;
     property string activeView: "step_1";
     property string lastPage;
+    property bool hasShownSecurityPicTip: false;
 
     LinearGradient {
         anchors.fill: parent;
@@ -310,6 +311,94 @@ Item {
     //
     // SECURE PASSPHRASE SELECTION START
     //
+
+    Item {
+        id: securityPicTip;
+        visible: false;
+        z: 999;
+        anchors.fill: root;
+        
+        // This object is always used in a popup.
+        // This MouseArea is used to prevent a user from being
+        //     able to click on a button/mouseArea underneath the popup.
+        MouseArea {
+            anchors.fill: parent;
+            propagateComposedEvents: false;
+        }
+
+        Item {
+            id: holePunch;
+            height: 150;
+            width: height;
+            anchors.right: parent.right;
+            anchors.top: parent.top;
+            anchors.topMargin: 135;
+        }        
+        Rectangle {
+            id: leftMaskRect;
+            anchors.top: parent.top;
+            anchors.bottom: parent.bottom;
+            anchors.left: parent.left;
+            anchors.right: holePunch.left;
+            color: "black";
+            opacity: 0.9;
+        }
+        Rectangle {
+            id: topMaskRect;
+            anchors.top: parent.top;
+            anchors.bottom: holePunch.top;
+            anchors.left: leftMaskRect.right;
+            anchors.right: parent.right;
+            color: "black";
+            opacity: leftMaskRect.opacity;
+        }
+        Rectangle {
+            id: bottomMaskRect;
+            anchors.top: holePunch.bottom;
+            anchors.bottom: parent.bottom;
+            anchors.left: leftMaskRect.right;
+            anchors.right: parent.right;
+            color: "black";
+            opacity: leftMaskRect.opacity;
+        }
+
+        RalewayRegular {
+            id: tipText;
+            text: '<font size="5">Tip:</font><br><br>When you see your security picture like this, you know ' +
+            "the page asking for your passphrase is legitimate.";
+            // Text size
+            size: 18;
+            // Anchors
+            anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 230;
+            anchors.left: parent.left;
+            anchors.leftMargin: 60;
+            height: paintedHeight;
+            width: 210;
+            // Style
+            color: hifi.colors.faintGray;
+            wrapMode: Text.WordWrap;
+            // Alignment
+            horizontalAlignment: Text.AlignHCenter;
+        }
+
+        // "Got It" button
+        HifiControlsUit.Button {
+            id: tipGotItButton;
+            color: hifi.buttons.blue;
+            colorScheme: hifi.colorSchemes.dark;
+            anchors.top: tipText.bottom;
+            anchors.topMargin: 20;
+            anchors.horizontalCenter: tipText.horizontalCenter;
+            height: 50;
+            width: 150;
+            text: "Got It";
+            onClicked: {
+                root.hasShownSecurityPicTip = true;
+                securityPicTip.visible = false;
+            }
+        }
+    }
     Item {
         id: choosePassphraseContainer;
         visible: root.activeView === "step_3";
@@ -322,13 +411,16 @@ Item {
         onVisibleChanged: {
             if (visible) {
                 commerce.getWalletAuthenticatedStatus();
+                if (!root.hasShownSecurityPicTip) {
+                    securityPicTip.visible = true;
+                }
             }
         }
 
         // Text below title bar
         RalewaySemiBold {
             id: passphraseTitleHelper;
-            text: "Choose a Secure Passphrase";
+            text: "Set Your Passphrase";
             // Text size
             size: 24;
             // Anchors

@@ -171,15 +171,15 @@ Item {
         }
     }
 
-    // Error text below TextFields
+    // Error text above TextFields
     RalewaySemiBold {
         id: errorText;
         text: "";
         // Text size
         size: 16;
         // Anchors
-        anchors.top: passphraseFieldAgain.bottom;
-        anchors.topMargin: 0;
+        anchors.bottom: passphraseField.top;
+        anchors.bottomMargin: 4;
         anchors.left: parent.left;
         anchors.leftMargin: 16;
         anchors.right: parent.right;
