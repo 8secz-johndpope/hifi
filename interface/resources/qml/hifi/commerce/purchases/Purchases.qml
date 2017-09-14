@@ -35,20 +35,20 @@ Rectangle {
     Hifi.QmlCommerce {
         id: commerce;
 
-        onAccountResult: {
-            if (result.status === "success") {
-                commerce.getKeyFilePathIfExists();
-            } else {
-                // unsure how to handle a failure here. We definitely cannot proceed.
-            }
-        }
-
         onLoginStatusResult: {
             if (!isLoggedIn && root.activeView !== "needsLogIn") {
                 root.activeView = "needsLogIn";
             } else if (isLoggedIn) {
                 root.activeView = "initialize";
                 commerce.account();
+            }
+        }
+
+        onAccountResult: {
+            if (result.status === "success") {
+                commerce.getKeyFilePathIfExists();
+            } else {
+                // unsure how to handle a failure here. We definitely cannot proceed.
             }
         }
 
@@ -77,8 +77,7 @@ Rectangle {
             if (!isAuthenticated && !passphraseModal.visible) {
                 passphraseModal.visible = true;
             } else if (isAuthenticated) {
-                root.activeView = "purchasesMain";
-                commerce.inventory();
+                sendToScript({method: 'purchases_getIsFirstUse'});
             }
         }
 
@@ -215,6 +214,28 @@ Rectangle {
         Connections {
             onSendSignalToParent: {
                 sendToScript(msg);
+            }
+        }
+    }
+
+    FirstUseTutorial {
+        id: firstUseTutorial;
+        visible: root.activeView === "firstUseTutorial";
+        anchors.top: titleBarContainer.bottom;
+        anchors.bottom: parent.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+
+        Connections {
+            onSendSignalToParent: {
+                switch (message.method) {
+                    case 'tutorial_skipClicked':
+                    case 'tutorial_finished':
+                        sendToScript({method: 'purchases_setIsFirstUse'});
+                        root.activeView = "purchasesMain";
+                        commerce.inventory();
+                    break;
+                }
             }
         }
     }
@@ -519,6 +540,14 @@ Rectangle {
         switch (message.method) {
             case 'updatePurchases':
                 referrerURL = message.referrerURL;
+            break;
+            case 'purchases_getIsFirstUseResult':
+                if (message.isFirstUseOfPurchases && root.activeView !== "firstUseTutorial") {
+                    root.activeView = "firstUseTutorial";
+                } else if (!message.isFirstUseOfPurchases && root.activeView === "initialize") {
+                    root.activeView = "purchasesMain";
+                    commerce.inventory();
+                }
             break;
             default:
                 console.log('Unrecognized message from marketplaces.js:', JSON.stringify(message));

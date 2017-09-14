@@ -246,6 +246,15 @@
             case 'maybeEnableHmdPreview':
                 Menu.setIsOptionChecked("Disable Preview", isHmdPreviewDisabled);
                 break;
+            case 'purchases_getIsFirstUse':
+                tablet.sendToQml({
+                    method: 'purchases_getIsFirstUseResult',
+                    isFirstUseOfPurchases: Settings.getValue("isFirstUseOfPurchases", true)
+                });
+                break;
+            case 'purchases_setIsFirstUse':
+                Settings.setValue("isFirstUseOfPurchases", false);
+                break;
             default:
                 print('Unrecognized message from Checkout.qml or Purchases.qml: ' + JSON.stringify(message));
         }
