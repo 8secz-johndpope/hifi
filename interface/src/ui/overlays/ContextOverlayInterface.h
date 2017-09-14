@@ -56,6 +56,9 @@ public:
     bool getIsInMarketplaceInspectionMode() { return _isInMarketplaceInspectionMode; }
     void setIsInMarketplaceInspectionMode(bool mode) { _isInMarketplaceInspectionMode = mode; }
 
+signals:
+    void contextOverlayClicked(const QUuid& currentEntityWithContextOverlay);
+
 public slots:
     bool createOrDestroyContextOverlay(const EntityItemID& entityItemID, const PointerEvent& event);
     bool destroyContextOverlay(const EntityItemID& entityItemID, const PointerEvent& event);
@@ -78,6 +81,7 @@ private:
 
     Setting::Handle<bool> _settingSwitch { "inspectionMode", false };
 
+    void openInspectionCertificate();
     void openMarketplace();
     void enableEntityHighlight(const EntityItemID& entityItemID);
     void disableEntityHighlight(const EntityItemID& entityItemID);

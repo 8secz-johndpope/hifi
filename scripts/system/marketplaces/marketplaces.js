@@ -22,6 +22,7 @@
     var MARKETPLACE_CHECKOUT_QML_PATH = Script.resourcesPath() + "qml/hifi/commerce/checkout/Checkout.qml";
     var MARKETPLACE_PURCHASES_QML_PATH = Script.resourcesPath() + "qml/hifi/commerce/purchases/Purchases.qml";
     var MARKETPLACE_WALLET_QML_PATH = Script.resourcesPath() + "qml/hifi/commerce/wallet/Wallet.qml";
+    var MARKETPLACE_INSPECTIONCERTIFICATE_QML_PATH = "qml/hifi/commerce/inspectionCertificate/InspectionCertificate.qml";
 
     var HOME_BUTTON_TEXTURE = "http://hifi-content.s3.amazonaws.com/alan/dev/tablet-with-home-button.fbx/tablet-with-home-button.fbm/button-root.png";
     // var HOME_BUTTON_TEXTURE = Script.resourcesPath() + "meshes/tablet-with-home-button.fbx/tablet-with-home-button.fbm/button-root.png";
@@ -88,7 +89,8 @@
 
     function onScreenChanged(type, url) {
         onMarketplaceScreen = type === "Web" && url === MARKETPLACE_URL_INITIAL;
-        wireEventBridge(type === "QML" && (url === MARKETPLACE_CHECKOUT_QML_PATH || url === MARKETPLACE_PURCHASES_QML_PATH));
+        wireEventBridge(type === "QML" && (url === MARKETPLACE_CHECKOUT_QML_PATH || url === MARKETPLACE_PURCHASES_QML_PATH || url.indexOf(MARKETPLACE_INSPECTIONCERTIFICATE_QML_PATH) !== -1));
+
         // for toolbar mode: change button to active when window is first openend, false otherwise.
         marketplaceButton.editProperties({ isActive: onMarketplaceScreen });
         if (type === "Web" && url.indexOf(MARKETPLACE_URL) !== -1) {
@@ -98,9 +100,28 @@
         }
     }
 
+    function contextOverlayClicked(currentEntityWithContextOverlay) {
+        wireEventBridge(true);
+        tablet.sendToQml({
+            method: 'inspectionCertificate_setMarketplaceId',
+            marketplaceId: Entities.getEntityProperties(currentEntityWithContextOverlay, ['marketplaceID']).marketplaceID
+        });
+        // ZRF FIXME! Make a call to the endpoint to get item info instead of this silliness
+        Script.setTimeout(function () {
+            var randomNumber = Math.floor((Math.random() * 150) + 1);
+            tablet.sendToQml({
+                method: 'inspectionCertificate_setItemInfo',
+                itemName: "The Greatest Item (button below works!)",
+                itemOwner: "ABCDEFG1234567",
+                itemEdition: (Math.floor(Math.random() * randomNumber) + " / " + randomNumber)
+            });
+        }, 500);
+    }
+
     marketplaceButton.clicked.connect(onClick);
     tablet.screenChanged.connect(onScreenChanged);
     Entities.canWriteAssetsChanged.connect(onCanWriteAssetsChanged);
+    ContextOverlay.contextOverlayClicked.connect(contextOverlayClicked);
 
     function onMessage(message) {
 
@@ -159,6 +180,7 @@
         }
         tablet.removeButton(marketplaceButton);
         tablet.screenChanged.disconnect(onScreenChanged);
+        ContextOverlay.contextOverlayClicked.disconnect(contextOverlayClicked);
         tablet.webEventReceived.disconnect(onMessage);
         Entities.canWriteAssetsChanged.disconnect(onCanWriteAssetsChanged);
     });
@@ -254,6 +276,9 @@
                 break;
             case 'purchases_setIsFirstUse':
                 Settings.setValue("isFirstUseOfPurchases", false);
+                break;
+            case 'inspectionCertificate_showInMarketplaceClicked':
+                tablet.gotoWebScreen(MARKETPLACE_URL + '/items/' + message.itemId, MARKETPLACES_INJECT_SCRIPT_URL);
                 break;
             default:
                 print('Unrecognized message from Checkout.qml or Purchases.qml: ' + JSON.stringify(message));

@@ -210,8 +210,8 @@ bool ContextOverlayInterface::destroyContextOverlay(const EntityItemID& entityIt
 void ContextOverlayInterface::contextOverlays_mousePressOnOverlay(const OverlayID& overlayID, const PointerEvent& event) {
     if (overlayID == _contextOverlayID  && event.getButton() == PointerEvent::PrimaryButton) {
         qCDebug(context_overlay) << "Clicked Context Overlay. Entity ID:" << _currentEntityWithContextOverlay << "Overlay ID:" << overlayID;
-        openMarketplace();
-        destroyContextOverlay(_currentEntityWithContextOverlay, PointerEvent());
+        openInspectionCertificate();
+        emit contextOverlayClicked(_currentEntityWithContextOverlay);
         _contextOverlayJustClicked = true;
     }
 }
@@ -245,6 +245,16 @@ void ContextOverlayInterface::contextOverlays_hoverEnterEntity(const EntityItemI
 void ContextOverlayInterface::contextOverlays_hoverLeaveEntity(const EntityItemID& entityID, const PointerEvent& event) {
     if (_currentEntityWithContextOverlay != entityID) {
         disableEntityHighlight(entityID);
+    }
+}
+
+static const QString INSPECTION_CERTIFICATE_QML_PATH = qApp->applicationDirPath() + "../../../qml/hifi/commerce/inspectionCertificate/InspectionCertificate.qml";
+void ContextOverlayInterface::openInspectionCertificate() {
+    // lets open the tablet to the inspection certificate QML
+    if (!_currentEntityWithContextOverlay.isNull() && _entityMarketplaceID.length() > 0) {
+        auto tablet = dynamic_cast<TabletProxy*>(_tabletScriptingInterface->getTablet("com.highfidelity.interface.tablet.system"));
+        tablet->loadQMLSource(INSPECTION_CERTIFICATE_QML_PATH);
+        _hmdScriptingInterface->openTablet();
     }
 }
 
