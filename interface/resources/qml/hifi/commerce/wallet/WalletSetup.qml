@@ -515,14 +515,15 @@ Item {
         visible: root.activeView === "step_4";
         // Anchors
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: 30;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
 
         // Text below title bar
-        RalewaySemiBold {
+        RalewayRegular {
             id: keysReadyTitleHelper;
-            text: "Your Private Keys are Ready";
+            text: "Back Up Your Private Keys";
             // Text size
             size: 24;
             // Anchors
@@ -539,18 +540,115 @@ Item {
             verticalAlignment: Text.AlignVCenter;
         }
 
+        Rectangle {
+            id: pathAndInstructionsContainer;
+            anchors.top: keysReadyTitleHelper.bottom;
+            anchors.topMargin: 8;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 200;
+            color: Qt.rgba(0, 0, 0, 0.5);
+
+            Item {
+                id: instructions01Container;
+                anchors.fill: parent;
+            
+                HifiControlsUit.Button {
+                    id: clipboardButton;
+                    color: hifi.buttons.black;
+                    colorScheme: hifi.colorSchemes.dark;
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 30;
+                    anchors.top: parent.top;
+                    anchors.topMargin: 45;
+                    height: 24;
+                    width: height;
+                    HiFiGlyphs {
+                        text: hifi.glyphs.question;
+                        // Size
+                        size: parent.height*1.3;
+                        // Anchors
+                        anchors.fill: parent;
+                        // Style
+                        horizontalAlignment: Text.AlignHCenter;
+                        color: enabled ? hifi.colors.blueHighlight : hifi.colors.faintGray;
+                    }
+
+                    onClicked: {
+                        Window.copyToClipboard(keyFilePath.text);
+                    }
+                }
+                RalewayRegular {
+                    id: keyFilePath;
+                    size: 18;
+                    anchors.top: clipboardButton.top;
+                    anchors.left: clipboardButton.right;
+                    anchors.leftMargin: 8;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 30;
+                    height: paintedHeight;
+                    wrapMode: Text.WordWrap;
+                    color: hifi.colors.blueHighlight;
+
+                    onVisibleChanged: {
+                        if (visible) {
+                            commerce.getKeyFilePathIfExists();
+                        }
+                    }
+                }
+
+                // "Open Instructions" button
+                HifiControlsUit.Button {
+                    id: openInstructionsButton;
+                    color: hifi.buttons.blue;
+                    colorScheme: hifi.colorSchemes.dark;
+                    anchors.top: keyFilePath.bottom;
+                    anchors.topMargin: 30;
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 30;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 30;
+                    height: 40;
+                    text: "Open Instructions for Later";
+                    onClicked: {
+                        instructions01Container.visible = false;
+                        instructions02Container.visible = true;
+                        keysReadyPageFinishButton.visible = true;
+                        sendSignalToWallet({method: 'walletSetup_openInstructions'});
+                    }
+                }
+            }
+
+            Item {
+                id: instructions02Container;
+                anchors.fill: parent;
+                visible: false;
+
+                RalewayRegular {
+                    text: "All set!<br>Instructions for backing up your keys have been opened on your desktop. " +
+                    "Be sure to look them over after your session.";
+                    size: 22;
+                    anchors.fill: parent;
+                    anchors.leftMargin: 30;
+                    anchors.rightMargin: 30;
+                    wrapMode: Text.WordWrap;
+                    color: hifi.colors.white;
+                    horizontalAlignment: Text.AlignHCenter;
+                    verticalAlignment: Text.AlignVCenter;
+                }
+            }
+        }
+
         // Text below checkbox
         RalewayRegular {
             id: explanationText;
-            text: "Your money and purchases are secured with private keys that only you have access to. " +
-            "<b>If they are lost, you will not be able to access your money or purchases.</b><br><br>" +
-            "<b>To protect your privacy, High Fidelity has no access to your private keys and cannot " +
-            "recover them for any reason.<br><br>To safeguard your private keys, backup this file on a regular basis:</b>";
+            text: "To protect your privacy, you control your private keys. High Fidelity has no access to your private keys and cannot " +
+            "recover them for you.<br><br><b>If they are lost, you will not be able to access your money or purchases.</b>";
             // Text size
-            size: 16;
+            size: 20;
             // Anchors
-            anchors.top: keysReadyTitleHelper.bottom;
-            anchors.topMargin: 16;
+            anchors.top: pathAndInstructionsContainer.bottom;
+            anchors.topMargin: 24;
             anchors.left: parent.left;
             anchors.leftMargin: 16;
             anchors.right: parent.right;
@@ -560,49 +658,8 @@ Item {
             color: hifi.colors.white;
             wrapMode: Text.WordWrap;
             // Alignment
-            horizontalAlignment: Text.AlignHLeft;
+            horizontalAlignment: Text.AlignHCenter;
             verticalAlignment: Text.AlignVCenter;
-        }
-
-        HifiControlsUit.TextField {
-            id: keyFilePath;
-            anchors.top: explanationText.bottom;
-            anchors.topMargin: 10;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
-            anchors.right: clipboardButton.left;
-            height: 40;
-            readOnly: true;
-
-            onVisibleChanged: {
-                if (visible) {
-                    commerce.getKeyFilePathIfExists();
-                }
-            }
-        }
-        HifiControlsUit.Button {
-            id: clipboardButton;
-            color: hifi.buttons.black;
-            colorScheme: hifi.colorSchemes.dark;
-            anchors.right: parent.right;
-            anchors.rightMargin: 16;
-            anchors.top: keyFilePath.top;
-            anchors.bottom: keyFilePath.bottom;
-            width: height;
-            HiFiGlyphs {
-                text: hifi.glyphs.question;
-                // Size
-                size: parent.height*1.3;
-                // Anchors
-                anchors.fill: parent;
-                // Style
-                horizontalAlignment: Text.AlignHCenter;
-                color: enabled ? hifi.colors.white : hifi.colors.faintGray;
-            }
-
-            onClicked: {
-                Window.copyToClipboard(keyFilePath.text);
-            }
         }
 
         // Navigation Bar
@@ -614,9 +671,10 @@ Item {
             anchors.left: parent.left;
             anchors.bottom: parent.bottom;
             anchors.bottomMargin: 50;
-            // "Next" button
+            // "Finish" button
             HifiControlsUit.Button {
-                id: keysReadyPageNextButton;
+                id: keysReadyPageFinishButton;
+                visible: false;
                 color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;
