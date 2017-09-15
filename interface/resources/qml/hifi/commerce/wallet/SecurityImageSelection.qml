@@ -24,6 +24,7 @@ Item {
     HifiConstants { id: hifi; }
 
     id: root;
+    property int currentIndex: securityImageGrid.currentIndex;
     
     // This will cause a bug -- if you bring up security image selection in HUD mode while
     // in HMD while having HMD preview enabled, then move, then finish passphrase selection,
@@ -43,6 +44,7 @@ Item {
 
     GridView {
         id: securityImageGrid;
+        interactive: false;
         clip: true;
         // Anchors
         anchors.fill: parent;

@@ -64,7 +64,6 @@ class EntityItemProperties {
     friend class PolyVoxEntityItem; // TODO: consider removing this friend relationship and use public methods
     friend class PolyLineEntityItem; // TODO: consider removing this friend relationship and use public methods
     friend class ShapeEntityItem; // TODO: consider removing this friend relationship and use public methods
-    friend class CertifiedItem; // TODO: consider removing this friend relationship and use public methods
 public:
     EntityItemProperties(EntityPropertyFlags desiredProperties = EntityPropertyFlags());
     virtual ~EntityItemProperties() = default;
@@ -228,7 +227,7 @@ public:
 
     DEFINE_PROPERTY_REF(PROP_SERVER_SCRIPTS, ServerScripts, serverScripts, QString, ENTITY_ITEM_DEFAULT_SERVER_SCRIPTS);
 
-    DEFINE_PROPERTY_REF(PROP_CERTIFICATE_ID, CertificateID, certificateID, QUuid, ENTITY_ITEM_DEFAULT_CERTIFICATE_ID);
+    DEFINE_PROPERTY(PROP_CERTIFICATE_ID, CertificateID, certificateID, QUuid, ENTITY_ITEM_DEFAULT_CERTIFICATE_ID);
 
     static QString getBackgroundModeString(BackgroundMode mode);
 

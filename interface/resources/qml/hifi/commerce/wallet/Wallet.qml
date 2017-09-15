@@ -234,10 +234,8 @@ Rectangle {
     PassphraseModal {
         id: passphraseModal;
         visible: false;
-        anchors.top: titleBarContainer.bottom;
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
+        anchors.fill: parent;
+        titleBarText: "Wallet";
 
         Connections {
             onSendSignalToParent: {

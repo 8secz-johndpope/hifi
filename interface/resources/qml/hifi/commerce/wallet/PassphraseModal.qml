@@ -13,6 +13,7 @@
 
 import Hifi 1.0 as Hifi
 import QtQuick 2.5
+import QtGraphicalEffects 1.0
 import QtQuick.Controls 1.4
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
@@ -26,6 +27,18 @@ Item {
     id: root;
     z: 998;
     property bool keyboardRaised: false;
+    property string titleBarIcon: "";
+    property string titleBarText: "";
+
+    LinearGradient {
+        anchors.fill: parent;
+        start: Qt.point(parent.width, 0);
+        end: Qt.point(0, parent.width);
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "#1A7E8E" }
+            GradientStop { position: 1.0; color: "#45366E" }
+        }
+    }
 
     Hifi.QmlCommerce {
         id: commerce;
@@ -66,24 +79,49 @@ Item {
         }
     }
 
-    // Background rectangle
-    Rectangle {
-        anchors.fill: parent;
-        color: "black";
-        opacity: 0.9;
-    }
-
-    Rectangle {
+    Item {
+        id: titleBar;
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
+        height: 50;
+        Image {
+            id: titleBarIcon;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.bottom: parent.bottom;
+            width: height;
+            fillMode: Image.PreserveAspectFit;
+            mipmap: true;
+            source: root.titleBarIcon;
+        }
+        RalewaySemiBold {
+            id: titleBarText;
+            text: root.titleBarText;
+            anchors.top: parent.top;
+            anchors.left: titleBarIcon.right;
+            anchors.leftMargin: 8;
+            anchors.bottom: parent.bottom;
+            anchors.right: parent.right;
+            size: 20;
+            color: hifi.colors.faintGray;
+            verticalAlignment: Text.AlignVCenter;
+        }
+    }
+
+    Item {
+        id: passphraseContainer;
+        anchors.top: titleBar.bottom;
+        anchors.left: parent.left;
+        anchors.leftMargin: 8;
+        anchors.right: parent.right;
+        anchors.rightMargin: 8;
         height: 250;
-        color: hifi.colors.baseGray;
 
         RalewaySemiBold {
             id: instructionsText;
-            text: "Enter Wallet Passphrase";
-            size: 16;
+            text: "Please Enter Your Passphrase";
+            size: 24;
             anchors.top: parent.top;
             anchors.topMargin: 30;
             anchors.left: parent.left;
@@ -99,9 +137,9 @@ Item {
         HifiControlsUit.TextField {
             id: passphraseField;
             anchors.top: instructionsText.bottom;
-            anchors.topMargin: 4;
+            anchors.topMargin: 40;
             anchors.left: instructionsText.left;
-            width: 280;
+            width: 260;
             height: 50;
             echoMode: TextInput.Password;
             placeholderText: "passphrase";
@@ -133,7 +171,7 @@ Item {
             anchors.top: passphraseField.bottom;
             anchors.topMargin: 8;
             height: 30;
-            text: "Show passphrase as plain text";
+            text: "Show passphrase";
             boxSize: 24;
             onClicked: {
                 passphraseField.echoMode = checked ? TextInput.Normal : TextInput.Password;
@@ -144,16 +182,18 @@ Item {
         Item {
             id: securityImageContainer;
             // Anchors
-            anchors.top: instructionsText.top;
+            anchors.top: passphraseField.top;
             anchors.left: passphraseField.right;
-            anchors.leftMargin: 12;
+            anchors.leftMargin: 8;
             anchors.right: parent.right;
+            anchors.rightMargin: 8;
+            height: 145;
             Image {
                 id: passphraseModalSecurityImage;
                 anchors.top: parent.top;
-                anchors.horizontalCenter: parent.horizontalCenter;
-                height: 75;
-                width: height;
+                anchors.left: parent.left;
+                anchors.right: parent.right;
+                anchors.bottom: iconAndTextContainer.top;
                 fillMode: Image.PreserveAspectFit;
                 mipmap: true;
                 source: "image://security/securityImage";
@@ -162,32 +202,42 @@ Item {
                     commerce.getSecurityImage();
                 }
             }
-            Image {
-                id: passphraseModalSecurityImageOverlay;
-                source: "images/lockOverlay.png";
-                width: passphraseModalSecurityImage.width * 0.45;
-                height: passphraseModalSecurityImage.height * 0.45;
-                anchors.bottom: passphraseModalSecurityImage.bottom;
+            Item {
+                id: iconAndTextContainer;
+                anchors.left: passphraseModalSecurityImage.left;
                 anchors.right: passphraseModalSecurityImage.right;
-                mipmap: true;
-                opacity: 0.9;
-            }
-            // "Security image" text below pic
-            RalewayRegular {
-                text: "security image";
-                // Text size
-                size: 12;
-                // Anchors
-                anchors.top: passphraseModalSecurityImage.bottom;
-                anchors.topMargin: 4;
-                anchors.left: securityImageContainer.left;
-                anchors.right: securityImageContainer.right;
-                height: paintedHeight;
-                // Style
-                color: hifi.colors.faintGray;
-                // Alignment
-                horizontalAlignment: Text.AlignHCenter;
-                verticalAlignment: Text.AlignVCenter;
+                anchors.bottom: parent.bottom;
+                height: 24;
+                // Lock icon
+                Image {
+                    id: lockIcon;
+                    source: "images/lockIcon.png";
+                    anchors.bottom: parent.bottom;
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 30;
+                    height: 22;
+                    width: height;
+                    mipmap: true;
+                    verticalAlignment: Text.AlignBottom;
+                }
+                // "Security image" text below pic
+                RalewayRegular {
+                    id: securityPicText;
+                    text: "SECURITY PIC";
+                    // Text size
+                    size: 12;
+                    // Anchors
+                    anchors.bottom: parent.bottom;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: lockIcon.anchors.leftMargin;
+                    width: paintedWidth;
+                    height: 22;
+                    // Style
+                    color: hifi.colors.faintGray;
+                    // Alignment
+                    horizontalAlignment: Text.AlignRight;
+                    verticalAlignment: Text.AlignBottom;
+                }
             }
         }
 
@@ -217,24 +267,20 @@ Item {
         //
         Item {
             id: passphrasePopupActionButtonsContainer;
-            // Size
-            width: root.width;
-            height: 50;
             // Anchors
-            anchors.left: parent.left;
+            anchors.left: passphraseField.left;
+            anchors.right: passphraseField.right;
             anchors.bottom: parent.bottom;
-            anchors.bottomMargin: 10;
 
             // "Cancel" button
             HifiControlsUit.Button {
                 id: cancelPassphraseInputButton;
-                color: hifi.buttons.black;
+                color: hifi.buttons.noneBorderlessWhite;
                 colorScheme: hifi.colorSchemes.dark;
-                anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
                 height: 40;
                 anchors.left: parent.left;
-                anchors.leftMargin: 20;
-                width: parent.width/2 - anchors.leftMargin*2;
+                width: parent.width/2 - 4;
                 text: "Cancel"
                 onClicked: {
                     sendSignalToParent({method: 'passphrasePopup_cancelClicked'});
@@ -246,11 +292,10 @@ Item {
                 id: submitPassphraseInputButton;
                 color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
-                anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
                 height: 40;
                 anchors.right: parent.right;
-                anchors.rightMargin: 20;
-                width: parent.width/2 - anchors.rightMargin*2;
+                width: parent.width/2 -4;
                 text: "Submit"
                 onClicked: {
                     submitPassphraseInputButton.enabled = false;

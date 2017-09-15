@@ -85,7 +85,7 @@ Rectangle {
         // Text below title bar
         RalewaySemiBold {
             id: securityImageTitleHelper;
-            text: "Choose a Security Picture:";
+            text: "Choose a Security Pic:";
             // Text size
             size: 24;
             // Anchors

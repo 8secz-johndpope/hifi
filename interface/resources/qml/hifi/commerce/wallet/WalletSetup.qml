@@ -88,7 +88,7 @@ Item {
             anchors.bottom: parent.bottom;
             width: paintedWidth;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             // Alignment
             horizontalAlignment: Text.AlignHLeft;
             verticalAlignment: Text.AlignVCenter;
@@ -125,7 +125,7 @@ Item {
             height: paintedHeight;
             width: paintedWidth;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             wrapMode: Text.WordWrap;
             // Alignment
             horizontalAlignment: Text.AlignHCenter;
@@ -148,7 +148,7 @@ Item {
             height: paintedHeight;
             width: paintedWidth;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             wrapMode: Text.WordWrap;
             // Alignment
             horizontalAlignment: Text.AlignHCenter;
@@ -198,12 +198,15 @@ Item {
         visible: root.activeView === "step_2";
         // Anchors
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: 30;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
+        anchors.leftMargin: 16;
         anchors.right: parent.right;
+        anchors.rightMargin: 16;
 
         // Text below title bar
-        RalewaySemiBold {
+        RalewayRegular {
             id: securityImageTitleHelper;
             text: "Choose a Security Pic:";
             // Text size
@@ -211,11 +214,10 @@ Item {
             // Anchors
             anchors.top: parent.top;
             anchors.left: parent.left;
-            anchors.leftMargin: 16;
             height: 50;
             width: paintedWidth;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             // Alignment
             horizontalAlignment: Text.AlignHLeft;
             verticalAlignment: Text.AlignVCenter;
@@ -226,10 +228,8 @@ Item {
             // Anchors
             anchors.top: securityImageTitleHelper.bottom;
             anchors.left: parent.left;
-            anchors.leftMargin: 16;
             anchors.right: parent.right;
-            anchors.rightMargin: 16;
-            height: 280;
+            height: 300;
 
             Connections {
                 onSendSignalToWallet: {
@@ -247,12 +247,10 @@ Item {
             anchors.top: securityImageSelection.bottom;
             anchors.topMargin: 40;
             anchors.left: parent.left;
-            anchors.leftMargin: 16;
             anchors.right: parent.right;
-            anchors.rightMargin: 16;
             height: paintedHeight;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             wrapMode: Text.WordWrap;
             // Alignment
             horizontalAlignment: Text.AlignHLeft;
@@ -271,7 +269,7 @@ Item {
 
             // "Back" button
             HifiControlsUit.Button {
-                color: hifi.buttons.black;
+                color: hifi.buttons.noneBorderlessWhite;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;
                 anchors.bottom: parent.bottom;
@@ -286,6 +284,7 @@ Item {
 
             // "Next" button
             HifiControlsUit.Button {
+                enabled: securityImageSelection.currentIndex !== -1;
                 color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;
@@ -328,8 +327,8 @@ Item {
 
         Item {
             id: holePunch;
-            height: 150;
-            width: height;
+            height: 180;
+            width: 230;
             anchors.right: parent.right;
             anchors.top: parent.top;
             anchors.topMargin: 135;
@@ -376,7 +375,7 @@ Item {
             height: paintedHeight;
             width: 210;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             wrapMode: Text.WordWrap;
             // Alignment
             horizontalAlignment: Text.AlignHCenter;
@@ -404,6 +403,7 @@ Item {
         visible: root.activeView === "step_3";
         // Anchors
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: 30;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -418,9 +418,9 @@ Item {
         }
 
         // Text below title bar
-        RalewaySemiBold {
+        RalewayRegular {
             id: passphraseTitleHelper;
-            text: "Set Your Passphrase";
+            text: "Set Your Passphrase:";
             // Text size
             size: 24;
             // Anchors
@@ -431,7 +431,7 @@ Item {
             anchors.rightMargin: 16;
             height: 50;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             // Alignment
             horizontalAlignment: Text.AlignHLeft;
             verticalAlignment: Text.AlignVCenter;
@@ -468,7 +468,7 @@ Item {
 
             // "Back" button
             HifiControlsUit.Button {
-                color: hifi.buttons.black;
+                color: hifi.buttons.noneBorderlessWhite;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;
                 anchors.bottom: parent.bottom;
@@ -533,7 +533,7 @@ Item {
             anchors.rightMargin: 16;
             height: 50;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             // Alignment
             horizontalAlignment: Text.AlignHLeft;
             verticalAlignment: Text.AlignVCenter;
@@ -557,7 +557,7 @@ Item {
             anchors.rightMargin: 16;
             height: paintedHeight;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             wrapMode: Text.WordWrap;
             // Alignment
             horizontalAlignment: Text.AlignHLeft;

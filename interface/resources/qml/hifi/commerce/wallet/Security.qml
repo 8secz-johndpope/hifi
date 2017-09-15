@@ -63,60 +63,68 @@ Item {
         anchors.left: parent.left;
         anchors.right: securityImageContainer.left;
     }
+    
 
     // Security Image
     Item {
         id: securityImageContainer;
         // Anchors
-        anchors.top: parent.top;
+        anchors.top: instructionsText.top;
+        anchors.left: passphraseField.right;
+        anchors.leftMargin: 8;
         anchors.right: parent.right;
-        width: 75;
-        height: childrenRect.height;
-
-        onVisibleChanged: {
-            if (visible) {
-                commerce.getSecurityImage();
-            }
-        }
-
+        anchors.rightMargin: 8;
+        anchors.bottom: passphraseFieldAgain.bottom;
         Image {
             id: topSecurityImage;
-            // Anchors
             anchors.top: parent.top;
-            anchors.horizontalCenter: parent.horizontalCenter;
-            height: parent.width - 10;
-            width: height;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.bottom: iconAndTextContainer.top;
             fillMode: Image.PreserveAspectFit;
             mipmap: true;
             source: "image://security/securityImage";
             cache: false;
+            onVisibleChanged: {
+                commerce.getSecurityImage();
+            }
         }
-        Image {
-            id: topSecurityImageMask;
-            source: "images/lockOverlay.png";
-            width: topSecurityImage.width * 0.45;
-            height: topSecurityImage.height * 0.45;
-            anchors.bottom: topSecurityImage.bottom;
+        Item {
+            id: iconAndTextContainer;
+            anchors.left: topSecurityImage.left;
             anchors.right: topSecurityImage.right;
-            mipmap: true;
-            opacity: 0.9;
-        }
-        // "Security image" text below pic
-        RalewayRegular {
-            text: "security image";
-            // Text size
-            size: 12;
-            // Anchors
-            anchors.top: topSecurityImage.bottom;
-            anchors.topMargin: 4;
-            anchors.left: securityImageContainer.left;
-            anchors.right: securityImageContainer.right;
-            height: paintedHeight;
-            // Style
-            color: hifi.colors.faintGray;
-            // Alignment
-            horizontalAlignment: Text.AlignHCenter;
-            verticalAlignment: Text.AlignVCenter;
+            anchors.bottom: parent.bottom;
+            height: 22;
+            // Lock icon
+            Image {
+                id: lockIcon;
+                source: "images/lockIcon.png";
+                anchors.bottom: parent.bottom;
+                anchors.left: parent.left;
+                anchors.leftMargin: 26;
+                height: 22;
+                width: height;
+                mipmap: true;
+                verticalAlignment: Text.AlignBottom;
+            }
+            // "Security image" text below pic
+            RalewayRegular {
+                id: securityPicText;
+                text: "SECURITY PIC";
+                // Text size
+                size: 12;
+                // Anchors
+                anchors.bottom: parent.bottom;
+                anchors.right: parent.right;
+                anchors.rightMargin: lockIcon.anchors.leftMargin;
+                width: paintedWidth;
+                height: 22;
+                // Style
+                color: hifi.colors.faintGray;
+                // Alignment
+                horizontalAlignment: Text.AlignRight;
+                verticalAlignment: Text.AlignBottom;
+            }
         }
     }
 
@@ -157,7 +165,7 @@ Item {
                 anchors.left: parent.left;
                 height: parent.height;
                 width: height;
-                source: "images/lockOverlay.png";
+                source: "images/lockIcon.png";
                 fillMode: Image.PreserveAspectFit;
                 mipmap: true;
                 cache: false;

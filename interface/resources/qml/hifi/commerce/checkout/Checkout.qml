@@ -176,7 +176,7 @@ Rectangle {
         }
         Image {
             id: securityImageOverlay;
-            source: "../wallet/images/lockOverlay.png";
+            source: "../wallet/images/lockIcon.png";
             width: securityImage.width * 0.45;
             height: securityImage.height * 0.45;
             anchors.bottom: securityImage.bottom;
@@ -237,10 +237,8 @@ Rectangle {
     HifiWallet.PassphraseModal {
         id: passphraseModal;
         visible: false;
-        anchors.top: titleBarContainer.bottom;
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
+        anchors.fill: parent;
+        titleBarText: "Checkout";
 
         Connections {
             onSendSignalToParent: {

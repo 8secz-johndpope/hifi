@@ -167,51 +167,56 @@ Item {
         anchors.right: parent.right;
         width: 75;
         height: childrenRect.height;
-
-        onVisibleChanged: {
-            if (visible) {
+        Image {
+            id: securityImage;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.bottom: iconAndTextContainer.top;
+            fillMode: Image.PreserveAspectFit;
+            mipmap: true;
+            source: "image://security/securityImage";
+            cache: false;
+            onVisibleChanged: {
                 commerce.getSecurityImage();
             }
         }
-
-        Image {
-            id: securityImage;
-            // Anchors
-            anchors.top: parent.top;
-            anchors.horizontalCenter: parent.horizontalCenter;
-            height: parent.width - 10;
-            width: height;
-            fillMode: Image.PreserveAspectFit;
-            mipmap: true;
-            cache: false;
-            source: "image://security/securityImage";
-        }
-        Image {
-            id: securityImageOverlay;
-            source: "images/lockOverlay.png";
-            width: securityImage.width * 0.45;
-            height: securityImage.height * 0.45;
-            anchors.bottom: securityImage.bottom;
+        Item {
+            id: iconAndTextContainer;
+            anchors.left: securityImage.left;
             anchors.right: securityImage.right;
-            mipmap: true;
-            opacity: 0.9;
-        }
-        // "Security image" text below pic
-        RalewayRegular {
-            text: "security image";
-            // Text size
-            size: 12;
-            // Anchors
-            anchors.top: securityImage.bottom;
-            anchors.topMargin: 4;
-            anchors.left: securityImageContainer.left;
-            anchors.right: securityImageContainer.right;
-            height: paintedHeight;
-            // Style
-            color: hifi.colors.faintGray;
-            // Alignment
-            horizontalAlignment: Text.AlignHCenter;
-            verticalAlignment: Text.AlignVCenter;
+            anchors.bottom: parent.bottom;
+            height: 22;
+            // Lock icon
+            Image {
+                id: lockIcon;
+                source: "images/lockIcon.png";
+                anchors.bottom: parent.bottom;
+                anchors.left: parent.left;
+                anchors.leftMargin: 26;
+                height: 22;
+                width: height;
+                mipmap: true;
+                verticalAlignment: Text.AlignBottom;
+            }
+            // "Security image" text below pic
+            RalewayRegular {
+                id: securityPicText;
+                text: "SECURITY PIC";
+                // Text size
+                size: 12;
+                // Anchors
+                anchors.bottom: parent.bottom;
+                anchors.right: parent.right;
+                anchors.rightMargin: lockIcon.anchors.leftMargin;
+                width: paintedWidth;
+                height: 22;
+                // Style
+                color: hifi.colors.faintGray;
+                // Alignment
+                horizontalAlignment: Text.AlignRight;
+                verticalAlignment: Text.AlignBottom;
+            }
         }
     }
 
