@@ -79,6 +79,9 @@
                 onButtonClicked();
                 onButtonClicked();
                 break;
+            case 'transactionHistory_linkClicked':
+                tablet.gotoWebScreen(message.marketplaceLink, MARKETPLACES_INJECT_SCRIPT_URL);
+                break;
             default:
                 print('Unrecognized message from QML:', JSON.stringify(message));
         }

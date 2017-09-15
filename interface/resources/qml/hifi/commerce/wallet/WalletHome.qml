@@ -196,18 +196,37 @@ Item {
                     width: parent.width;
                     height: transactionText.height + 30;
                     AnonymousProRegular {
-                        id: transactionText;
-                        text: model.text;
+                        id: dateText;
+                        text: getFormattedDate(model.created_at * 1000);
                         // Style
                         size: 18;
-                        width: parent.width;
+                        anchors.left: parent.left;
+                        anchors.top: parent.top;
+                        anchors.topMargin: 15;
+                        width: 118;
                         height: paintedHeight;
-                        anchors.verticalCenter: parent.verticalCenter;
-                        color: "black";
+                        color: hifi.colors.blueHighlight;
                         wrapMode: Text.WordWrap;
                         // Alignment
-                        horizontalAlignment: Text.AlignLeft;
-                        verticalAlignment: Text.AlignVCenter;
+                        horizontalAlignment: Text.AlignRight;
+                    }
+
+                    AnonymousProRegular {
+                        id: transactionText;
+                        text: model.text;
+                        size: 18;
+                        anchors.top: parent.top;
+                        anchors.topMargin: 15;
+                        anchors.left: dateText.right;
+                        anchors.leftMargin: 20;
+                        anchors.right: parent.right;
+                        height: paintedHeight;
+                        color: "black";
+                        wrapMode: Text.WordWrap;
+
+                        onLinkActivated: {
+                            sendSignalToWallet({method: 'transactionHistory_linkClicked', marketplaceLink: link});
+                        }
                     }
 
                     HifiControlsUit.Separator {
@@ -241,6 +260,26 @@ Item {
     //
     // FUNCTION DEFINITIONS START
     //
+
+    function getFormattedDate(timestamp) {
+        var a = new Date(timestamp);
+        var year = a.getFullYear();
+        var month = a.getMonth();
+        var day = a.getDate();
+        var hour = a.getHours();
+        var drawnHour = hour;
+        var amOrPm = "AM";
+        if (hour === 0) {
+            drawnHour = 12;
+        } else if (hour > 12) {
+            drawnHour -= 12;
+            amOrPm = "PM";
+        }
+        var min = a.getMinutes();
+        var sec = a.getSeconds();
+        return year + '-' + month + '-' + day + '<br>' + drawnHour + ':' + min + amOrPm;
+    }
+
     //
     // Function Name: fromScript()
     //

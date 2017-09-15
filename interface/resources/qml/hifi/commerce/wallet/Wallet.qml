@@ -254,6 +254,12 @@ Rectangle {
         anchors.bottom: tabButtonsContainer.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
+
+        Connections {
+            onSendSignalToWallet: {
+                sendToScript(msg);
+            }
+        }
     }
 
     SendMoney {
