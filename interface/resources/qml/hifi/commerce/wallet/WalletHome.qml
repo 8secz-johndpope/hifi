@@ -13,7 +13,7 @@
 
 import Hifi 1.0 as Hifi
 import QtQuick 2.5
-import QtQuick.Controls 1.4
+import QtQuick.Controls 2.2
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
 import "../../../controls" as HifiControls
@@ -174,18 +174,18 @@ Item {
             anchors.leftMargin: 24;
             anchors.right: parent.right;
             anchors.rightMargin: 24;
-
-            HifiControlsUit.Separator {
-                colorScheme: 1;
-                anchors.left: parent.left;
-                anchors.leftMargin: 6;
-                anchors.right: parent.right;
-                anchors.rightMargin: 6;
-                anchors.top: parent.top;
-            }
-
+            
             ListView {
                 id: transactionHistory;
+                ScrollBar.vertical: ScrollBar {
+                policy: transactionHistory.contentHeight > parent.parent.height ? ScrollBar.AlwaysOn : ScrollBar.AsNeeded;
+                parent: transactionHistory.parent;
+                anchors.top: transactionHistory.top;
+                anchors.left: transactionHistory.right;
+                anchors.leftMargin: 4;
+                anchors.bottom: transactionHistory.bottom;
+                width: 20;
+                }
                 anchors.centerIn: parent;
                 width: parent.width - 12;
                 height: parent.height - 12;
@@ -195,6 +195,15 @@ Item {
                 delegate: Item {
                     width: parent.width;
                     height: transactionText.height + 30;
+
+                    HifiControlsUit.Separator {
+                    visible: index === 0;
+                    colorScheme: 1;
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    anchors.top: parent.top;
+                    }
+
                     AnonymousProRegular {
                         id: dateText;
                         text: getFormattedDate(model.created_at * 1000);
