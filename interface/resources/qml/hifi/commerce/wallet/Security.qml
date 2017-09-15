@@ -55,261 +55,266 @@ Item {
         // Text size
         size: 24;
         // Style
-        color: hifi.colors.faintGray;
+        color: hifi.colors.white;
         elide: Text.ElideRight;
         // Anchors
-        anchors.top: securityImageContainer.top;
-        anchors.bottom: securityImageContainer.bottom;
+        anchors.top: parent.top;
         anchors.left: parent.left;
-        anchors.right: securityImageContainer.left;
-    }
-    
-
-    // Security Image
-    Item {
-        id: securityImageContainer;
-        // Anchors
-        anchors.top: instructionsText.top;
-        anchors.left: passphraseField.right;
-        anchors.leftMargin: 8;
-        anchors.right: parent.right;
-        anchors.rightMargin: 8;
-        anchors.bottom: passphraseFieldAgain.bottom;
-        Image {
-            id: topSecurityImage;
-            anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.bottom: iconAndTextContainer.top;
-            fillMode: Image.PreserveAspectFit;
-            mipmap: true;
-            source: "image://security/securityImage";
-            cache: false;
-            onVisibleChanged: {
-                commerce.getSecurityImage();
-            }
-        }
-        Item {
-            id: iconAndTextContainer;
-            anchors.left: topSecurityImage.left;
-            anchors.right: topSecurityImage.right;
-            anchors.bottom: parent.bottom;
-            height: 22;
-            // Lock icon
-            Image {
-                id: lockIcon;
-                source: "images/lockIcon.png";
-                anchors.bottom: parent.bottom;
-                anchors.left: parent.left;
-                anchors.leftMargin: 26;
-                height: 22;
-                width: height;
-                mipmap: true;
-                verticalAlignment: Text.AlignBottom;
-            }
-            // "Security image" text below pic
-            RalewayRegular {
-                id: securityPicText;
-                text: "SECURITY PIC";
-                // Text size
-                size: 12;
-                // Anchors
-                anchors.bottom: parent.bottom;
-                anchors.right: parent.right;
-                anchors.rightMargin: lockIcon.anchors.leftMargin;
-                width: paintedWidth;
-                height: 22;
-                // Style
-                color: hifi.colors.faintGray;
-                // Alignment
-                horizontalAlignment: Text.AlignRight;
-                verticalAlignment: Text.AlignBottom;
-            }
-        }
+        anchors.leftMargin: 20;
+        width: parent.width/2;
+        height: 80;
     }
 
     Item {
         id: securityContainer;
-        anchors.top: securityImageContainer.bottom;
+        anchors.top: usernameText.bottom;
         anchors.topMargin: 20;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        height: childrenRect.height;
+        anchors.bottom: parent.bottom;
 
-        RalewayRegular {
+        RalewaySemiBold {
             id: securityText;
             text: "Security";
             // Anchors
             anchors.top: parent.top;
             anchors.left: parent.left;
+            anchors.leftMargin: 20;
             anchors.right: parent.right;
             height: 30;
             // Text size
-            size: 22;
+            size: 18;
+            // Style
+            color: hifi.colors.blueHighlight;
+        }
+
+        Rectangle {
+            id: securityTextSeparator;
+            // Size
+            width: parent.width;
+            height: 1;
+            // Anchors
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.top: securityText.bottom;
+            anchors.topMargin: 8;
             // Style
             color: hifi.colors.faintGray;
         }
 
         Item {
             id: changePassphraseContainer;
-            anchors.top: securityText.bottom;
-            anchors.topMargin: 16;
+            anchors.top: securityTextSeparator.bottom;
+            anchors.topMargin: 8;
             anchors.left: parent.left;
+            anchors.leftMargin: 55;
             anchors.right: parent.right;
+            anchors.rightMargin: 55;
             height: 75;
 
             Image {
                 id: changePassphraseImage;
                 // Anchors
                 anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
                 anchors.left: parent.left;
-                height: parent.height;
-                width: height;
-                source: "images/lockIcon.png";
+                width: 70;
+                source: "images/changePassphraseImage.png";
                 fillMode: Image.PreserveAspectFit;
                 mipmap: true;
                 cache: false;
                 visible: false;
+                horizontalAlignment: Image.AlignHCenter;
+                verticalAlignment: Image.AlignVCenter;
             }
-            ColorOverlay {
-                anchors.fill: changePassphraseImage;
-                source: changePassphraseImage;
-                color: "white"
+
+            RalewaySemiBold {
+                text: "Passphrase";
+                // Anchors
+                anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
+                anchors.left: changePassphraseImage.right;
+                anchors.leftMargin: 30;
+                width: 50;
+                // Text size
+                size: 18;
+                // Style
+                color: hifi.colors.white;
             }
+
             // "Change Passphrase" button
             HifiControlsUit.Button {
                 id: changePassphraseButton;
-                color: hifi.buttons.black;
+                color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
+                anchors.right: parent.right;
                 anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: changePassphraseImage.right;
-                anchors.leftMargin: 16;
-                width: 250;
-                height: 50;
-                text: "Change My Passphrase";
+                width: 140;
+                height: 40;
+                text: "Change";
                 onClicked: {
                     sendSignalToWallet({method: 'walletSecurity_changePassphrase'});
                 }
             }
         }
 
-        Item {
-            id: changeSecurityImageContainer;
-            anchors.top: changePassphraseContainer.bottom;
-            anchors.topMargin: 8;
+        Rectangle {
+            id: changePassphraseSeparator;
+            // Size
+            width: parent.width;
+            height: 1;
+            // Anchors
             anchors.left: parent.left;
             anchors.right: parent.right;
+            anchors.top: changePassphraseContainer.bottom;
+            anchors.topMargin: 8;
+            // Style
+            color: hifi.colors.faintGray;
+        }
+
+        Item {
+            id: changeSecurityImageContainer;
+            anchors.top: changePassphraseSeparator.bottom;
+            anchors.topMargin: 8;
+            anchors.left: parent.left;
+            anchors.leftMargin: 55;
+            anchors.right: parent.right;
+            anchors.rightMargin: 55;
             height: 75;
 
             Image {
                 id: changeSecurityImageImage;
                 // Anchors
                 anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
                 anchors.left: parent.left;
-                height: parent.height;
-                width: height;
+                width: 70;
+                source: "images/changeSecurityPicImage.png";
                 fillMode: Image.PreserveAspectFit;
                 mipmap: true;
                 cache: false;
-                source: "image://security/securityImage";
+                visible: false;
+                horizontalAlignment: Image.AlignHCenter;
+                verticalAlignment: Image.AlignVCenter;
             }
-            // "Change Security Image" button
+
+            RalewaySemiBold {
+                text: "Security Pic";
+                // Anchors
+                anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
+                anchors.left: changeSecurityImageImage.right;
+                anchors.leftMargin: 30;
+                width: 50;
+                // Text size
+                size: 18;
+                // Style
+                color: hifi.colors.white;
+            }
+
+            // "Change Passphrase" button
             HifiControlsUit.Button {
                 id: changeSecurityImageButton;
-                color: hifi.buttons.black;
+                color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
+                anchors.right: parent.right;
                 anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: changeSecurityImageImage.right;
-                anchors.leftMargin: 16;
-                width: 250;
-                height: 50;
-                text: "Change My Security Image";
+                width: 140;
+                height: 40;
+                text: "Change";
                 onClicked: {
                     sendSignalToWallet({method: 'walletSecurity_changeSecurityImage'});
                 }
             }
         }
-    }
 
-    Item {
-        id: yourPrivateKeysContainer;
-        anchors.top: securityContainer.bottom;
-        anchors.topMargin: 20;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        height: childrenRect.height;
-
-        RalewaySemiBold {
-            id: yourPrivateKeysText;
-            text: "Your Private Keys";
+        Rectangle {
+            id: privateKeysSeparator;
+            // Size
+            width: parent.width;
+            height: 1;
             // Anchors
-            anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 30;
-            // Text size
-            size: 22;
+            anchors.top: changeSecurityImageContainer.bottom;
+            anchors.topMargin: 8;
             // Style
             color: hifi.colors.faintGray;
         }
 
-        // Text below "your private keys"
-        RalewayRegular {
-            id: explanitoryText;
-            text: "Your money and purchases are secured with private keys that only you " +
-            "have access to. <b>If they are lost, you will not be able to access your money or purchases. " +
-            "To safeguard your private keys, back up this file regularly:</b>";
-            // Text size
-            size: 18;
-            // Anchors
-            anchors.top: yourPrivateKeysText.bottom;
-            anchors.topMargin: 10;
+        Item {
+            id: yourPrivateKeysContainer;
+            anchors.top: privateKeysSeparator.bottom;
+            anchors.topMargin: 32;
             anchors.left: parent.left;
+            anchors.leftMargin: 55;
             anchors.right: parent.right;
-            height: paintedHeight;
-            // Style
-            color: hifi.colors.faintGray;
-            wrapMode: Text.WordWrap;
-            // Alignment
-            horizontalAlignment: Text.AlignLeft;
-            verticalAlignment: Text.AlignVCenter;
-        }
-        HifiControlsUit.TextField {
-            id: keyFilePath;
-            anchors.top: explanitoryText.bottom;
-            anchors.topMargin: 10;
-            anchors.left: parent.left;
-            anchors.right: clipboardButton.left;
-            height: 40;
-            readOnly: true;
+            anchors.rightMargin: 55;
+            anchors.bottom: parent.bottom;
 
-            onVisibleChanged: {
-                if (visible) {
-                    commerce.getKeyFilePathIfExists();
-                }
-            }
-        }
-        HifiControlsUit.Button {
-            id: clipboardButton;
-            color: hifi.buttons.black;
-            colorScheme: hifi.colorSchemes.dark;
-            anchors.right: parent.right;
-            anchors.top: keyFilePath.top;
-            anchors.bottom: keyFilePath.bottom;
-            width: height;
-            HiFiGlyphs {
-                text: hifi.glyphs.question;
-                // Size
-                size: parent.height*1.3;
+            Image {
+                id: yourPrivateKeysImage;
                 // Anchors
-                anchors.fill: parent;
-                // Style
-                horizontalAlignment: Text.AlignHCenter;
-                color: enabled ? hifi.colors.white : hifi.colors.faintGray;
+                anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
+                anchors.left: parent.left;
+                width: 70;
+                source: "images/yourPrivateKeysImage.png";
+                fillMode: Image.PreserveAspectFit;
+                mipmap: true;
+                cache: false;
+                visible: false;
+                horizontalAlignment: Image.AlignHCenter;
             }
 
-            onClicked: {
-                Window.copyToClipboard(keyFilePath.text);
+            RalewaySemiBold {
+                id: yourPrivateKeysText;
+                text: "Private Keys";
+                size: 18;
+                // Anchors
+                anchors.top: parent.top;
+                anchors.left: yourPrivateKeysImage.right;
+                anchors.leftMargin: 30;
+                anchors.right: parent.right;
+                height: 30;
+                // Style
+                color: hifi.colors.white;
+            }
+
+            // Text below "private keys"
+            RalewayRegular {
+                id: explanitoryText;
+                text: "Your money and purchases are secured with private keys that only you have access to.";
+                // Text size
+                size: 18;
+                // Anchors
+                anchors.top: yourPrivateKeysText.bottom;
+                anchors.topMargin: 10;
+                anchors.left: yourPrivateKeysText.left;
+                anchors.right: yourPrivateKeysText.right;
+                height: paintedHeight;
+                // Style
+                color: hifi.colors.white;
+                wrapMode: Text.WordWrap;
+                // Alignment
+                horizontalAlignment: Text.AlignLeft;
+                verticalAlignment: Text.AlignVCenter;
+            }
+
+            HifiControlsUit.Button {
+                id: backupInstructionsButton;
+                text: "View Backup Instructions";
+                color: hifi.buttons.blue;
+                colorScheme: hifi.colorSchemes.dark;
+                anchors.left: explanitoryText.left;
+                anchors.right: explanitoryText.right;
+                anchors.top: explanitoryText.bottom;
+                anchors.topMargin: 16;
+                height: 40;
+
+                onClicked: {
+                    Window.copyToClipboard(keyFilePath.text);
+                }
             }
         }
     }
