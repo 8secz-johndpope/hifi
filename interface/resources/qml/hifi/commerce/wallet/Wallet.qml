@@ -13,6 +13,7 @@
 
 import Hifi 1.0 as Hifi
 import QtQuick 2.5
+import QtGraphicalEffects 1.0
 import QtQuick.Controls 1.4
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
@@ -29,7 +30,16 @@ Rectangle {
     property bool keyboardRaised: false;
 
     // Style
-    color: hifi.colors.baseGray;
+    LinearGradient {
+        anchors.fill: parent;
+        start: Qt.point(parent.width, 0);
+        end: Qt.point(0, parent.width);
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: "#1A7E8E" }
+            GradientStop { position: 1.0; color: "#45366E" }
+        }
+    }
+
     Hifi.QmlCommerce {
         id: commerce;
 
@@ -175,17 +185,10 @@ Rectangle {
             anchors.bottom: parent.bottom;
             width: paintedWidth;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             // Alignment
             horizontalAlignment: Text.AlignHLeft;
             verticalAlignment: Text.AlignVCenter;
-        }
-
-        // Separator
-        HifiControlsUit.Separator {
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.bottom: parent.bottom;
         }
     }
     //
@@ -248,39 +251,27 @@ Rectangle {
         id: walletHome;
         visible: root.activeView === "walletHome";
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: 16;
         anchors.bottom: tabButtonsContainer.top;
-        anchors.bottomMargin: 16;
         anchors.left: parent.left;
-        anchors.leftMargin: 16;
         anchors.right: parent.right;
-        anchors.rightMargin: 16;
     }
 
     SendMoney {
         id: sendMoney;
         visible: root.activeView === "sendMoney";
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: 16;
         anchors.bottom: tabButtonsContainer.top;
-        anchors.bottomMargin: 16;
         anchors.left: parent.left;
-        anchors.leftMargin: 16;
         anchors.right: parent.right;
-        anchors.rightMargin: 16;
     }
 
     Security {
         id: security;
         visible: root.activeView === "security";
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: 16;
         anchors.bottom: tabButtonsContainer.top;
-        anchors.bottomMargin: 16;
         anchors.left: parent.left;
-        anchors.leftMargin: 16;
         anchors.right: parent.right;
-        anchors.rightMargin: 16;
 
         Connections {
             onSendSignalToWallet: {
@@ -298,13 +289,9 @@ Rectangle {
         id: help;
         visible: root.activeView === "help";
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: 16;
         anchors.bottom: tabButtonsContainer.top;
-        anchors.bottomMargin: 16;
         anchors.left: parent.left;
-        anchors.leftMargin: 16;
         anchors.right: parent.right;
-        anchors.rightMargin: 16;
 
         Connections {
             onSendSignalToWallet: {

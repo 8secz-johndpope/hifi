@@ -29,14 +29,6 @@ Item {
     Hifi.QmlCommerce {
         id: commerce;
 
-        onSecurityImageResult: {
-            if (exists) {
-                // just set the source again (to be sure the change was noticed)
-                securityImage.source = "";
-                securityImage.source = "image://security/securityImage";
-            }
-        }
-
         onBalanceResult : {
             balanceText.text = result.data.balance;
         }
@@ -48,10 +40,6 @@ Item {
                 transactionHistoryModel.append(result.data.history);
             }
         }
-    }
-
-    SecurityImageModel {
-        id: securityImageModel;
     }
 
     Connections {
@@ -68,190 +56,133 @@ Item {
         // Text size
         size: 24;
         // Style
-        color: hifi.colors.faintGray;
+        color: hifi.colors.white;
         elide: Text.ElideRight;
         // Anchors
-        anchors.top: securityImageContainer.top;
-        anchors.bottom: securityImageContainer.bottom;
+        anchors.top: parent.top;
         anchors.left: parent.left;
-        anchors.right: hfcBalanceContainer.left;
+        anchors.leftMargin: 20;
+        width: parent.width/2;
+        height: 80;
     }
 
     // HFC Balance Container
     Item {
         id: hfcBalanceContainer;
         // Anchors
-        anchors.top: securityImageContainer.top;
-        anchors.right: securityImageContainer.left;
-        anchors.rightMargin: 16;
-        width: 175;
-        height: 60;
-        Rectangle {
-            id: hfcBalanceField;
-            color: hifi.colors.darkGray;
-            anchors.right: parent.right;
-            anchors.left: parent.left;
-            anchors.bottom: parent.bottom;
-            height: parent.height - 15;
+        anchors.top: parent.top;
+        anchors.right: parent.right;
+        anchors.leftMargin: 20;
+        width: parent.width/2;
+        height: 80;
 
-            // "HFC" balance label
-            FiraSansRegular {
-                id: balanceLabel;
-                text: "HFC";
-                // Text size
-                size: 20;
-                // Anchors
-                anchors.top: parent.top;
-                anchors.bottom: parent.bottom;
-                anchors.right: hfcBalanceField.right;
-                anchors.rightMargin: 4;
-                width: paintedWidth;
-                // Style
-                color: hifi.colors.lightGrayText;
-                // Alignment
-                horizontalAlignment: Text.AlignRight;
-                verticalAlignment: Text.AlignVCenter;
-
-                onVisibleChanged: {
-                    if (visible) {
-                        historyReceived = false;
-                        commerce.balance();
-                        commerce.history();
-                    }
-                }
-            }
-
-            // Balance Text
-            FiraSansSemiBold {
-                id: balanceText;
-                text: "--";
-                // Text size
-                size: 28;
-                // Anchors
-                anchors.top: parent.top;
-                anchors.bottom: parent.bottom;
-                anchors.left: parent.left;
-                anchors.right: balanceLabel.left;
-                anchors.rightMargin: 4;
-                // Style
-                color: hifi.colors.lightGrayText;
-                // Alignment
-                horizontalAlignment: Text.AlignRight;
-                verticalAlignment: Text.AlignVCenter;
-            }
-        }
-        // "balance" text above field
-        RalewayRegular {
-            text: "balance";
+        // "HFC" balance label
+        FiraSansRegular {
+            id: balanceLabel;
+            text: "HFC";
             // Text size
-            size: 12;
+            size: 20;
             // Anchors
+            anchors.left: parent.left;
             anchors.top: parent.top;
-            anchors.bottom: hfcBalanceField.top;
-            anchors.bottomMargin: 4;
-            anchors.left: hfcBalanceField.left;
-            anchors.right: hfcBalanceField.right;
+            anchors.bottom: parent.bottom;
+            width: paintedWidth;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             // Alignment
             horizontalAlignment: Text.AlignLeft;
             verticalAlignment: Text.AlignVCenter;
         }
-    }
 
-    // Security Image
-    Item {
-        id: securityImageContainer;
-        // Anchors
-        anchors.top: parent.top;
-        anchors.right: parent.right;
-        width: 75;
-        height: childrenRect.height;
-        Image {
-            id: securityImage;
-            anchors.top: parent.top;
-            anchors.left: parent.left;
+        // Balance Text
+        FiraSansRegular {
+            id: balanceText;
+            text: "--";
+            // Text size
+            size: 28;
+            // Anchors
+            anchors.top: balanceLabel.top;
+            anchors.bottom: balanceLabel.bottom;
+            anchors.left: balanceLabel.right;
+            anchors.leftMargin: 10;
             anchors.right: parent.right;
-            anchors.bottom: iconAndTextContainer.top;
-            fillMode: Image.PreserveAspectFit;
-            mipmap: true;
-            source: "image://security/securityImage";
-            cache: false;
+            anchors.rightMargin: 4;
+            // Style
+            color: hifi.colors.white;
+            // Alignment
+            verticalAlignment: Text.AlignVCenter;
+
             onVisibleChanged: {
-                commerce.getSecurityImage();
+                if (visible) {
+                    historyReceived = false;
+                    commerce.balance();
+                    commerce.history();
+                }
             }
         }
-        Item {
-            id: iconAndTextContainer;
-            anchors.left: securityImage.left;
-            anchors.right: securityImage.right;
-            anchors.bottom: parent.bottom;
-            height: 22;
-            // Lock icon
-            Image {
-                id: lockIcon;
-                source: "images/lockIcon.png";
-                anchors.bottom: parent.bottom;
-                anchors.left: parent.left;
-                anchors.leftMargin: 26;
-                height: 22;
-                width: height;
-                mipmap: true;
-                verticalAlignment: Text.AlignBottom;
-            }
-            // "Security image" text below pic
-            RalewayRegular {
-                id: securityPicText;
-                text: "SECURITY PIC";
-                // Text size
-                size: 12;
-                // Anchors
-                anchors.bottom: parent.bottom;
-                anchors.right: parent.right;
-                anchors.rightMargin: lockIcon.anchors.leftMargin;
-                width: paintedWidth;
-                height: 22;
-                // Style
-                color: hifi.colors.faintGray;
-                // Alignment
-                horizontalAlignment: Text.AlignRight;
-                verticalAlignment: Text.AlignBottom;
-            }
+
+        // "balance" text below field
+        RalewayRegular {
+            text: "BALANCE (HFC)";
+            // Text size
+            size: 14;
+            // Anchors
+            anchors.top: balanceLabel.top;
+            anchors.topMargin: balanceText.paintedHeight + 10;
+            anchors.bottom: balanceLabel.bottom;
+            anchors.left: balanceText.left;
+            anchors.right: balanceText.right;
+            height: paintedHeight;
+            // Style
+            color: hifi.colors.white;
         }
     }
 
     // Recent Activity
-    Item {
+    Rectangle {
         id: recentActivityContainer;
-        anchors.top: securityImageContainer.bottom;
-        anchors.topMargin: 8;
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
+        height: 440;
+        color: hifi.colors.faintGray;
 
-        RalewayRegular {
+        RalewaySemiBold {
             id: recentActivityText;
             text: "Recent Activity";
             // Anchors
             anchors.top: parent.top;
+            anchors.topMargin: 26;
             anchors.left: parent.left;
+            anchors.leftMargin: 30;
             anchors.right: parent.right;
+            anchors.rightMargin: 30;
             height: 30;
             // Text size
             size: 22;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.baseGray;
         }
         ListModel {
             id: transactionHistoryModel;
         }
-        Rectangle {
+        Item {
             anchors.top: recentActivityText.bottom;
-            anchors.topMargin: 4;
+            anchors.topMargin: 26;
             anchors.bottom: parent.bottom;
             anchors.left: parent.left;
+            anchors.leftMargin: 24;
             anchors.right: parent.right;
-            color: "white";
+            anchors.rightMargin: 24;
+
+            HifiControlsUit.Separator {
+                colorScheme: 1;
+                anchors.left: parent.left;
+                anchors.leftMargin: 6;
+                anchors.right: parent.right;
+                anchors.rightMargin: 6;
+                anchors.top: parent.top;
+            }
 
             ListView {
                 id: transactionHistory;
@@ -264,7 +195,7 @@ Item {
                 delegate: Item {
                     width: parent.width;
                     height: transactionText.height + 30;
-                    FiraSansRegular {
+                    AnonymousProRegular {
                         id: transactionText;
                         text: model.text;
                         // Style
@@ -280,6 +211,7 @@ Item {
                     }
 
                     HifiControlsUit.Separator {
+                    colorScheme: 1;
                         anchors.left: parent.left;
                         anchors.right: parent.right;
                         anchors.bottom: parent.bottom;
