@@ -104,7 +104,7 @@ Item {
             anchors.bottom: parent.bottom;
             anchors.right: parent.right;
             size: 20;
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             verticalAlignment: Text.AlignVCenter;
         }
     }
@@ -129,9 +129,25 @@ Item {
             width: passphraseField.width;
             height: paintedHeight;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.white;
             // Alignment
             horizontalAlignment: Text.AlignLeft;
+        }
+
+        // Error text above buttons
+        RalewaySemiBold {
+            id: errorText;
+            text: "";
+            // Text size
+            size: 16;
+            // Anchors
+            anchors.bottom: passphraseField.top;
+            anchors.bottomMargin: 4;
+            anchors.left: passphraseField.left;
+            anchors.right: parent.right;
+            height: 20;
+            // Style
+            color: hifi.colors.redHighlight;
         }
 
         HifiControlsUit.TextField {
@@ -233,33 +249,12 @@ Item {
                     width: paintedWidth;
                     height: 22;
                     // Style
-                    color: hifi.colors.faintGray;
+                    color: hifi.colors.white;
                     // Alignment
                     horizontalAlignment: Text.AlignRight;
                     verticalAlignment: Text.AlignBottom;
                 }
             }
-        }
-
-        // Error text above buttons
-        RalewaySemiBold {
-            id: errorText;
-            text: "";
-            // Text size
-            size: 16;
-            // Anchors
-            anchors.bottom: passphrasePopupActionButtonsContainer.top;
-            anchors.bottomMargin: 4;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
-            anchors.right: parent.right;
-            anchors.rightMargin: 16;
-            height: 30;
-            // Style
-            color: hifi.colors.redHighlight;
-            // Alignment
-            horizontalAlignment: Text.AlignHCenter;
-            verticalAlignment: Text.AlignVCenter;
         }
         
         //
