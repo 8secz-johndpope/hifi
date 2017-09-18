@@ -262,38 +262,46 @@ Item {
         Item {
             id: passphrasePopupActionButtonsContainer;
             // Anchors
-            anchors.left: passphraseField.left;
-            anchors.right: passphraseField.right;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
             anchors.bottom: parent.bottom;
-
-            // "Cancel" button
-            HifiControlsUit.Button {
-                id: cancelPassphraseInputButton;
-                color: hifi.buttons.noneBorderlessWhite;
-                colorScheme: hifi.colorSchemes.dark;
-                anchors.bottom: parent.bottom;
-                height: 40;
-                anchors.left: parent.left;
-                width: parent.width/2 - 4;
-                text: "Cancel"
-                onClicked: {
-                    sendSignalToParent({method: 'passphrasePopup_cancelClicked'});
-                }
-            }
 
             // "Submit" button
             HifiControlsUit.Button {
                 id: submitPassphraseInputButton;
                 color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
-                anchors.bottom: parent.bottom;
+                anchors.top: parent.top;
+                anchors.topMargin: 20;
                 height: 40;
+                anchors.left: parent.left;
+                anchors.leftMargin: 16;
                 anchors.right: parent.right;
+                anchors.rightMargin: 16;
                 width: parent.width/2 -4;
                 text: "Submit"
                 onClicked: {
                     submitPassphraseInputButton.enabled = false;
                     commerce.setPassphrase(passphraseField.text);
+                }
+            }
+
+            // "Cancel" button
+            HifiControlsUit.Button {
+                id: cancelPassphraseInputButton;
+                color: hifi.buttons.noneBorderlessWhite;
+                colorScheme: hifi.colorSchemes.dark;
+                anchors.top: submitPassphraseInputButton.bottom;
+                anchors.topMargin: 20;
+                height: 40;
+                anchors.left: parent.left;
+                anchors.leftMargin: 16;
+                anchors.right: parent.right;
+                anchors.rightMargin: 16;
+                width: parent.width/2 - 4;
+                text: "Cancel"
+                onClicked: {
+                    sendSignalToParent({method: 'passphrasePopup_cancelClicked'});
                 }
             }
         }
