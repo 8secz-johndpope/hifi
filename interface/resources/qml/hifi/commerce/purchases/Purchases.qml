@@ -112,6 +112,8 @@ Rectangle {
             onSendToParent: {
                 if (msg.method === 'needsLogIn' && root.activeView !== "needsLogIn") {
                     root.activeView = "needsLogIn";
+                } else {
+                    sendToScript(msg);
                 }
             }
         }
@@ -480,6 +482,7 @@ Rectangle {
         switch (message.method) {
             case 'updatePurchases':
                 referrerURL = message.referrerURL;
+                titleBarContainer.referrerURL = message.referrerURL;
             break;
             case 'purchases_getIsFirstUseResult':
                 if (message.isFirstUseOfPurchases && root.activeView !== "firstUseTutorial") {

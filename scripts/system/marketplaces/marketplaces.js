@@ -248,6 +248,7 @@
                     tablet.gotoWebScreen(MARKETPLACE_URL + '/items/' + itemId, MARKETPLACES_INJECT_SCRIPT_URL);
                 }
                 break;
+            case 'header_marketplaceImageClicked':
             case 'purchases_backClicked':
                 tablet.gotoWebScreen(message.referrerURL, MARKETPLACES_INJECT_SCRIPT_URL);
                 break;

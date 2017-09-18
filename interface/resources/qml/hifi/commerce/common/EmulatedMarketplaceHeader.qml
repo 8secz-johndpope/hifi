@@ -25,6 +25,7 @@ Rectangle {
     HifiConstants { id: hifi; }
 
     id: root;
+    property string referrerURL: "https://metaverse.highfidelity.com/marketplace?";
 
     // Style
     color: hifi.colors.white;
@@ -66,8 +67,16 @@ Rectangle {
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
         anchors.left: parent.left;
-        width: 200;
+        anchors.leftMargin: 8;
+        width: 140;
         fillMode: Image.PreserveAspectFit;
+
+        MouseArea {
+            anchors.fill: parent;
+            onClicked: {
+                sendToParent({method: "header_marketplaceImageClicked", referrerURL: root.referrerURL});
+            }
+        }
     }
 
     Item {
