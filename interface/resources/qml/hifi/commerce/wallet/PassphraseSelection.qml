@@ -91,6 +91,10 @@ Item {
                 sendSignalToWallet({method: 'walletSetup_raiseKeyboard'});
             }
         }
+
+        onAccepted: {
+            passphraseField.focus = true;
+        }
     }
 
     HifiControlsUit.TextField {
