@@ -70,6 +70,20 @@ Item {
         anchors.left: parent.left;
         anchors.top: parent.top;
 
+        // Wallet icon
+        HiFiGlyphs {
+            id: walletIcon;
+            text: hifi.glyphs.wallet;
+            // Size
+            size: parent.height * 0.8;
+            // Anchors
+            anchors.left: parent.left;
+            anchors.leftMargin: 8;
+            anchors.verticalCenter: parent.verticalCenter;
+            // Style
+            color: hifi.colors.blueHighlight;
+        }
+
         // Title Bar text
         RalewayRegular {
             id: titleBarText;
@@ -78,8 +92,8 @@ Item {
             size: hifi.fontSizes.overlayTitle;
             // Anchors
             anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
+            anchors.left: walletIcon.right;
+            anchors.leftMargin: 8;
             anchors.bottom: parent.bottom;
             width: paintedWidth;
             // Style
@@ -105,14 +119,26 @@ Item {
         anchors.left: parent.left;
         anchors.right: parent.right;
 
+        HiFiGlyphs {
+            id: bigWalletIcon;
+            text: hifi.glyphs.wallet;
+            // Size
+            size: 180;
+            // Anchors
+            anchors.top: parent.top;
+            anchors.topMargin: 40;
+            anchors.horizontalCenter: parent.horizontalCenter;
+            // Style
+            color: hifi.colors.white;
+        }
+
         RalewayRegular {
             id: firstPage_text01;
             text: "Let's set up your wallet!";
             // Text size
             size: 26;
             // Anchors
-            anchors.top: parent.top;
-            anchors.topMargin: 100;
+            anchors.top: bigWalletIcon.bottom;
             anchors.left: parent.left;
             anchors.leftMargin: 16;
             anchors.right: parent.right;
@@ -130,7 +156,7 @@ Item {
         RalewayRegular {
             id: firstPage_text02;
             text: "Set up your wallet to claim your <b>free High Fidelity Coin (HFC)</b> and get items from the Marketplace.<br><br>" +
-            "No credit card is required.";
+            "<b>No credit card is required.</b>";
             // Text size
             size: 18;
             // Anchors

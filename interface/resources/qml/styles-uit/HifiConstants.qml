@@ -341,5 +341,14 @@ Item {
         readonly property string stop_square: "\ue01e"
         readonly property string avatarTPose: "\ue01f"
         readonly property string lock: "\ue006"
+        readonly property string checkmark: "\ue020"
+        readonly property string leftRightArrows: "\ue021"
+        readonly property string hfc: "\ue022"
+        readonly property string home2: "\ue023"
+        readonly property string walletKey: "\ue024"
+        readonly property string lightning: "\ue025"
+        readonly property string securityImage: "\ue026"
+        readonly property string wallet: "\ue027"
+        readonly property string paperPlane: "\ue028"
     }
 }

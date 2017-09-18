@@ -184,6 +184,7 @@ Item {
             // "Submit" button
             HifiControlsUit.Button {
                 id: securityImageSubmitButton;
+                enabled: securityImageSelection.currentIndex !== -1;
                 color: hifi.buttons.blue;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.top: parent.top;

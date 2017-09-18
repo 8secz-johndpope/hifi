@@ -94,25 +94,22 @@ Item {
             anchors.top: securityTextSeparator.bottom;
             anchors.topMargin: 8;
             anchors.left: parent.left;
-            anchors.leftMargin: 55;
+            anchors.leftMargin: 40;
             anchors.right: parent.right;
             anchors.rightMargin: 55;
             height: 75;
 
-            Image {
+            HiFiGlyphs {
                 id: changePassphraseImage;
+                text: hifi.glyphs.securityImage;
+                // Size
+                size: 80;
                 // Anchors
                 anchors.top: parent.top;
                 anchors.bottom: parent.bottom;
                 anchors.left: parent.left;
-                width: 70;
-                source: "images/changePassphraseImage.png";
-                fillMode: Image.PreserveAspectFit;
-                mipmap: true;
-                cache: false;
-                visible: false;
-                horizontalAlignment: Image.AlignHCenter;
-                verticalAlignment: Image.AlignVCenter;
+                // Style
+                color: hifi.colors.white;
             }
 
             RalewaySemiBold {
@@ -164,25 +161,22 @@ Item {
             anchors.top: changePassphraseSeparator.bottom;
             anchors.topMargin: 8;
             anchors.left: parent.left;
-            anchors.leftMargin: 55;
+            anchors.leftMargin: 40;
             anchors.right: parent.right;
             anchors.rightMargin: 55;
             height: 75;
 
-            Image {
+            HiFiGlyphs {
                 id: changeSecurityImageImage;
+                text: hifi.glyphs.securityImage;
+                // Size
+                size: 80;
                 // Anchors
                 anchors.top: parent.top;
                 anchors.bottom: parent.bottom;
                 anchors.left: parent.left;
-                width: 70;
-                source: "images/changeSecurityImageImage.png";
-                fillMode: Image.PreserveAspectFit;
-                mipmap: true;
-                cache: false;
-                visible: false;
-                horizontalAlignment: Image.AlignHCenter;
-                verticalAlignment: Image.AlignVCenter;
+                // Style
+                color: hifi.colors.white;
             }
 
             RalewaySemiBold {
@@ -232,26 +226,23 @@ Item {
         Item {
             id: yourPrivateKeysContainer;
             anchors.top: privateKeysSeparator.bottom;
-            anchors.topMargin: 32;
             anchors.left: parent.left;
-            anchors.leftMargin: 55;
+            anchors.leftMargin: 40;
             anchors.right: parent.right;
             anchors.rightMargin: 55;
             anchors.bottom: parent.bottom;
 
-            Image {
+            HiFiGlyphs {
                 id: yourPrivateKeysImage;
+                text: hifi.glyphs.walletKey;
+                // Size
+                size: 80;
                 // Anchors
                 anchors.top: parent.top;
-                anchors.bottom: parent.bottom;
+                anchors.topMargin: 20;
                 anchors.left: parent.left;
-                width: 70;
-                source: "images/yourPrivateKeysImage.png";
-                fillMode: Image.PreserveAspectFit;
-                mipmap: true;
-                cache: false;
-                visible: false;
-                horizontalAlignment: Image.AlignHCenter;
+                // Style
+                color: hifi.colors.white;
             }
 
             RalewaySemiBold {
@@ -260,6 +251,7 @@ Item {
                 size: 18;
                 // Anchors
                 anchors.top: parent.top;
+                anchors.topMargin: 32;
                 anchors.left: yourPrivateKeysImage.right;
                 anchors.leftMargin: 30;
                 anchors.right: parent.right;

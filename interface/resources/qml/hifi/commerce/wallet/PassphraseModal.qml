@@ -79,22 +79,27 @@ Item {
         anchors.left: parent.left;
         anchors.right: parent.right;
         height: 50;
-        Image {
+
+        // Wallet icon
+        HiFiGlyphs {
             id: titleBarIcon;
-            anchors.top: parent.top;
+            text: root.titleBarIcon;
+            // Size
+            size: parent.height * 0.8;
+            // Anchors
             anchors.left: parent.left;
-            anchors.bottom: parent.bottom;
-            width: height;
-            fillMode: Image.PreserveAspectFit;
-            mipmap: true;
-            source: root.titleBarIcon;
+            anchors.leftMargin: 8;
+            anchors.verticalCenter: parent.verticalCenter;
+            // Style
+            color: hifi.colors.blueHighlight;
         }
+
         RalewaySemiBold {
             id: titleBarText;
             text: root.titleBarText;
             anchors.top: parent.top;
             anchors.left: titleBarIcon.right;
-            anchors.leftMargin: 8;
+            anchors.leftMargin: 4;
             anchors.bottom: parent.bottom;
             anchors.right: parent.right;
             size: 20;

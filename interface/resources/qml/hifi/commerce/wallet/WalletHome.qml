@@ -75,23 +75,19 @@ Item {
         anchors.leftMargin: 20;
         width: parent.width/2;
         height: 80;
-
+        
         // "HFC" balance label
-        FiraSansRegular {
+        HiFiGlyphs {
             id: balanceLabel;
-            text: "HFC";
-            // Text size
-            size: 20;
+            text: hifi.glyphs.hfc;
+            // Size
+            size: 40;
             // Anchors
             anchors.left: parent.left;
             anchors.top: parent.top;
             anchors.bottom: parent.bottom;
-            width: paintedWidth;
             // Style
             color: hifi.colors.white;
-            // Alignment
-            horizontalAlignment: Text.AlignLeft;
-            verticalAlignment: Text.AlignVCenter;
         }
 
         // Balance Text
@@ -128,7 +124,7 @@ Item {
             size: 14;
             // Anchors
             anchors.top: balanceLabel.top;
-            anchors.topMargin: balanceText.paintedHeight + 10;
+            anchors.topMargin: balanceText.paintedHeight + 20;
             anchors.bottom: balanceLabel.bottom;
             anchors.left: balanceText.left;
             anchors.right: balanceText.right;
@@ -277,13 +273,17 @@ Item {
         var day = a.getDate();
         var hour = a.getHours();
         var drawnHour = hour;
-        var amOrPm = "AM";
         if (hour === 0) {
             drawnHour = 12;
         } else if (hour > 12) {
             drawnHour -= 12;
+        }
+        
+        var amOrPm = "AM";
+        if (hour >= 12) {
             amOrPm = "PM";
         }
+
         var min = a.getMinutes();
         var sec = a.getSeconds();
         return year + '-' + month + '-' + day + '<br>' + drawnHour + ':' + min + amOrPm;

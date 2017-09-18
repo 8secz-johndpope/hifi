@@ -102,6 +102,20 @@ Rectangle {
         anchors.left: parent.left;
         anchors.top: parent.top;
 
+        // Wallet icon
+        HiFiGlyphs {
+            id: walletIcon;
+            text: hifi.glyphs.wallet;
+            // Size
+            size: parent.height * 0.8;
+            // Anchors
+            anchors.left: parent.left;
+            anchors.leftMargin: 8;
+            anchors.verticalCenter: parent.verticalCenter;
+            // Style
+            color: hifi.colors.blueHighlight;
+        }
+
         // Title Bar text
         RalewaySemiBold {
             id: titleBarText;
@@ -110,14 +124,13 @@ Rectangle {
             size: hifi.fontSizes.overlayTitle;
             // Anchors
             anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
+            anchors.left: walletIcon.right;
+            anchors.leftMargin: 4;
             anchors.bottom: parent.bottom;
             width: paintedWidth;
             // Style
             color: hifi.colors.white;
             // Alignment
-            horizontalAlignment: Text.AlignHLeft;
             verticalAlignment: Text.AlignVCenter;
         }
     }
@@ -237,6 +250,7 @@ Rectangle {
         visible: false;
         anchors.fill: parent;
         titleBarText: "Wallet";
+        titleBarIcon: hifi.glyphs.wallet;
 
         Connections {
             onSendSignalToParent: {
@@ -320,7 +334,7 @@ Rectangle {
         property int numTabs: 5;
         // Size
         width: root.width;
-        height: 80;
+        height: 90;
         // Anchors
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
@@ -341,23 +355,40 @@ Rectangle {
             anchors.left: parent.left;
             anchors.bottom: parent.bottom;
             width: parent.width / tabButtonsContainer.numTabs;
+        
+            HiFiGlyphs {
+                id: homeTabIcon;
+                text: hifi.glyphs.home2;
+                // Size
+                size: 50;
+                // Anchors
+                anchors.horizontalCenter: parent.horizontalCenter;
+                anchors.top: parent.top;
+                anchors.topMargin: -2;
+                // Style
+                color: root.activeView === "walletHome" || walletHomeTabMouseArea.containsMouse ? hifi.colors.white : hifi.colors.blueHighlight;
+            }
 
             RalewaySemiBold {
                 text: "WALLET HOME";
                 // Text size
-                size: hifi.fontSizes.overlayTitle;
+                size: 16;
                 // Anchors
-                anchors.fill: parent;
+                anchors.bottom: parent.bottom;
+                height: parent.height/2;
+                anchors.left: parent.left;
                 anchors.leftMargin: 4;
+                anchors.right: parent.right;
                 anchors.rightMargin: 4;
                 // Style
-                color: hifi.colors.faintGray;
+                color: root.activeView === "walletHome" || walletHomeTabMouseArea.containsMouse ? hifi.colors.white : hifi.colors.blueHighlight;
                 wrapMode: Text.WordWrap;
                 // Alignment
                 horizontalAlignment: Text.AlignHCenter;
-                verticalAlignment: Text.AlignVCenter;
+                verticalAlignment: Text.AlignTop;
             }
             MouseArea {
+                id: walletHomeTabMouseArea;
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
@@ -369,57 +400,90 @@ Rectangle {
             }
         }
 
-        // "SEND MONEY" tab button
-        Rectangle {
-            id: sendMoneyButtonContainer;
-            visible: !walletSetup.visible;
-            color: hifi.colors.black;
-            anchors.top: parent.top;
-            anchors.left: walletHomeButtonContainer.right;
-            anchors.bottom: parent.bottom;
-            width: parent.width / tabButtonsContainer.numTabs;
-
-            RalewaySemiBold {
-                text: "SEND MONEY";
-                // Text size
-                size: 14;
-                // Anchors
-                anchors.fill: parent;
-                anchors.leftMargin: 4;
-                anchors.rightMargin: 4;
-                // Style
-                color: hifi.colors.lightGray50;
-                wrapMode: Text.WordWrap;
-                // Alignment
-                horizontalAlignment: Text.AlignHCenter;
-                verticalAlignment: Text.AlignVCenter;
-            }
-        }
-
         // "EXCHANGE MONEY" tab button
         Rectangle {
             id: exchangeMoneyButtonContainer;
             visible: !walletSetup.visible;
             color: hifi.colors.black;
             anchors.top: parent.top;
-            anchors.left: sendMoneyButtonContainer.right;
+            anchors.left: walletHomeButtonContainer.right;
             anchors.bottom: parent.bottom;
             width: parent.width / tabButtonsContainer.numTabs;
+        
+            HiFiGlyphs {
+                id: exchangeMoneyTabIcon;
+                text: hifi.glyphs.leftRightArrows;
+                // Size
+                size: 50;
+                // Anchors
+                anchors.horizontalCenter: parent.horizontalCenter;
+                anchors.top: parent.top;
+                anchors.topMargin: -2;
+                // Style
+                color: hifi.colors.lightGray50;
+            }
 
             RalewaySemiBold {
                 text: "EXCHANGE MONEY";
                 // Text size
-                size: 14;
+                size: 16;
                 // Anchors
-                anchors.fill: parent;
+                anchors.bottom: parent.bottom;
+                height: parent.height/2;
+                anchors.left: parent.left;
                 anchors.leftMargin: 4;
+                anchors.right: parent.right;
                 anchors.rightMargin: 4;
                 // Style
                 color: hifi.colors.lightGray50;
                 wrapMode: Text.WordWrap;
                 // Alignment
                 horizontalAlignment: Text.AlignHCenter;
-                verticalAlignment: Text.AlignVCenter;
+                verticalAlignment: Text.AlignTop;
+            }
+        }
+
+
+        // "SEND MONEY" tab button
+        Rectangle {
+            id: sendMoneyButtonContainer;
+            visible: !walletSetup.visible;
+            color: hifi.colors.black;
+            anchors.top: parent.top;
+            anchors.left: exchangeMoneyButtonContainer.right;
+            anchors.bottom: parent.bottom;
+            width: parent.width / tabButtonsContainer.numTabs;
+        
+            HiFiGlyphs {
+                id: sendMoneyTabIcon;
+                text: hifi.glyphs.paperPlane;
+                // Size
+                size: 46;
+                // Anchors
+                anchors.horizontalCenter: parent.horizontalCenter;
+                anchors.top: parent.top;
+                anchors.topMargin: -2;
+                // Style
+                color: hifi.colors.lightGray50;
+            }
+
+            RalewaySemiBold {
+                text: "SEND MONEY";
+                // Text size
+                size: 16;
+                // Anchors
+                anchors.bottom: parent.bottom;
+                height: parent.height/2;
+                anchors.left: parent.left;
+                anchors.leftMargin: 4;
+                anchors.right: parent.right;
+                anchors.rightMargin: 4;
+                // Style
+                color: hifi.colors.lightGray50;
+                wrapMode: Text.WordWrap;
+                // Alignment
+                horizontalAlignment: Text.AlignHCenter;
+                verticalAlignment: Text.AlignTop;
             }
         }
 
@@ -429,26 +493,43 @@ Rectangle {
             visible: !walletSetup.visible;
             color: root.activeView === "security" ? hifi.colors.blueAccent : hifi.colors.black;
             anchors.top: parent.top;
-            anchors.left: exchangeMoneyButtonContainer.right;
+            anchors.left: sendMoneyButtonContainer.right;
             anchors.bottom: parent.bottom;
             width: parent.width / tabButtonsContainer.numTabs;
+        
+            HiFiGlyphs {
+                id: securityTabIcon;
+                text: hifi.glyphs.lock;
+                // Size
+                size: 38;
+                // Anchors
+                anchors.horizontalCenter: parent.horizontalCenter;
+                anchors.top: parent.top;
+                anchors.topMargin: 2;
+                // Style
+                color: root.activeView === "security" || securityTabMouseArea.containsMouse ? hifi.colors.white : hifi.colors.blueHighlight;
+            }
 
             RalewaySemiBold {
                 text: "SECURITY";
                 // Text size
-                size: hifi.fontSizes.overlayTitle;
+                size: 16;
                 // Anchors
-                anchors.fill: parent;
+                anchors.bottom: parent.bottom;
+                height: parent.height/2;
+                anchors.left: parent.left;
                 anchors.leftMargin: 4;
+                anchors.right: parent.right;
                 anchors.rightMargin: 4;
                 // Style
-                color: hifi.colors.faintGray;
+                color: root.activeView === "security" || securityTabMouseArea.containsMouse ? hifi.colors.white : hifi.colors.blueHighlight;
                 wrapMode: Text.WordWrap;
                 // Alignment
                 horizontalAlignment: Text.AlignHCenter;
-                verticalAlignment: Text.AlignVCenter;
+                verticalAlignment: Text.AlignTop;
             }
             MouseArea {
+                id: securityTabMouseArea;
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
@@ -459,7 +540,7 @@ Rectangle {
                 onExited: parent.color = root.activeView === "security" ? hifi.colors.blueAccent : hifi.colors.black;
             }
         }
-
+        
         // "HELP" tab button
         Rectangle {
             id: helpButtonContainer;
@@ -469,23 +550,40 @@ Rectangle {
             anchors.left: securityButtonContainer.right;
             anchors.bottom: parent.bottom;
             width: parent.width / tabButtonsContainer.numTabs;
+        
+            HiFiGlyphs {
+                id: helpTabIcon;
+                text: hifi.glyphs.question;
+                // Size
+                size: 55;
+                // Anchors
+                anchors.horizontalCenter: parent.horizontalCenter;
+                anchors.top: parent.top;
+                anchors.topMargin: -6;
+                // Style
+                color: root.activeView === "help" || helpTabMouseArea.containsMouse ? hifi.colors.white : hifi.colors.blueHighlight;
+            }
 
             RalewaySemiBold {
                 text: "HELP";
                 // Text size
-                size: hifi.fontSizes.overlayTitle;
+                size: 16;
                 // Anchors
-                anchors.fill: parent;
+                anchors.bottom: parent.bottom;
+                height: parent.height/2;
+                anchors.left: parent.left;
                 anchors.leftMargin: 4;
+                anchors.right: parent.right;
                 anchors.rightMargin: 4;
                 // Style
-                color: hifi.colors.faintGray;
+                color: root.activeView === "help" || helpTabMouseArea.containsMouse ? hifi.colors.white : hifi.colors.blueHighlight;
                 wrapMode: Text.WordWrap;
                 // Alignment
                 horizontalAlignment: Text.AlignHCenter;
-                verticalAlignment: Text.AlignVCenter;
+                verticalAlignment: Text.AlignTop;
             }
             MouseArea {
+                id: helpTabMouseArea;
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
@@ -496,6 +594,7 @@ Rectangle {
                 onExited: parent.color = root.activeView === "help" ? hifi.colors.blueAccent : hifi.colors.black;
             }
         }
+
 
         function resetTabButtonColors() {
             walletHomeButtonContainer.color = hifi.colors.black;
