@@ -24,6 +24,7 @@ Item {
     HifiConstants { id: hifi; }
 
     id: root;
+    property bool isChangingPassphrase: false;
 
     // This object is always used in a popup.
     // This MouseArea is used to prevent a user from being
@@ -51,22 +52,58 @@ Item {
     // TODO: Fix this unlikely bug
     onVisibleChanged: {
         if (visible) {
-            passphraseField.focus = true;
+            if (root.isChangingPassphrase) {
+                currentPassphraseField.focus = true;
+            } else {
+                passphraseField.focus = true;
+            }
             sendMessageToLightbox({method: 'disableHmdPreview'});
         } else {
             sendMessageToLightbox({method: 'maybeEnableHmdPreview'});
         }
     }
+    
+
+    HifiControlsUit.TextField {
+        id: currentPassphraseField;
+        colorScheme: hifi.colorSchemes.dark;
+        visible: root.isChangingPassphrase;
+        anchors.top: parent.top;
+        anchors.left: parent.left;
+        anchors.leftMargin: 20;
+        anchors.right: passphraseField.right;
+        height: 50;
+        echoMode: TextInput.Password;
+        placeholderText: "enter current passphrase";
+
+        onFocusChanged: {
+            if (focus) {
+                sendSignalToWallet({method: 'walletSetup_raiseKeyboard'});
+            } else if (!passphraseFieldAgain.focus) {
+                sendSignalToWallet({method: 'walletSetup_lowerKeyboard'});
+            }
+        }
+
+        MouseArea {
+            anchors.fill: parent;
+            onClicked: {
+                parent.focus = true;
+                sendSignalToWallet({method: 'walletSetup_raiseKeyboard'});
+            }
+        }
+    }
 
     HifiControlsUit.TextField {
         id: passphraseField;
-        anchors.top: parent.top;
+        colorScheme: hifi.colorSchemes.dark;
+        anchors.top: root.isChangingPassphrase ? currentPassphraseField.bottom : parent.top;
+        anchors.topMargin: root.isChangingPassphrase ? 40 : 0;
         anchors.left: parent.left;
-        anchors.leftMargin: 16;
-        width: 260;
+        anchors.leftMargin: 20;
+        width: 285;
         height: 50;
         echoMode: TextInput.Password;
-        placeholderText: "passphrase";
+        placeholderText: "enter new passphrase";
 
         onFocusChanged: {
             if (focus) {
@@ -90,13 +127,14 @@ Item {
     }
     HifiControlsUit.TextField {
         id: passphraseFieldAgain;
+        colorScheme: hifi.colorSchemes.dark;
         anchors.top: passphraseField.bottom;
-        anchors.topMargin: 36;
+        anchors.topMargin: root.isChangingPassphrase ? 20 : 40;
         anchors.left: passphraseField.left;
         anchors.right: passphraseField.right;
         height: 50;
         echoMode: TextInput.Password;
-        placeholderText: "re-enter passphrase";
+        placeholderText: "re-enter new passphrase";
 
         onFocusChanged: {
             if (focus) {
@@ -123,12 +161,10 @@ Item {
     Item {
         id: securityImageContainer;
         // Anchors
-        anchors.top: passphraseField.top;
+        anchors.top: root.isChangingPassphrase ? currentPassphraseField.top : passphraseField.top;
         anchors.left: passphraseField.right;
-        anchors.leftMargin: 8;
         anchors.right: parent.right;
-        anchors.rightMargin: 8;
-        anchors.bottom: passphraseFieldAgain.bottom;
+        anchors.bottom: root.isChangingPassphrase ? passphraseField.bottom : passphraseFieldAgain.bottom;
         Image {
             id: passphrasePageSecurityImage;
             anchors.top: parent.top;
@@ -155,7 +191,7 @@ Item {
                 source: "images/lockIcon.png";
                 anchors.bottom: parent.bottom;
                 anchors.left: parent.left;
-                anchors.leftMargin: 40;
+                anchors.leftMargin: 35;
                 height: 22;
                 width: height;
                 mipmap: true;
@@ -192,7 +228,7 @@ Item {
         anchors.bottom: passphraseField.top;
         anchors.bottomMargin: 4;
         anchors.left: parent.left;
-        anchors.leftMargin: 16;
+        anchors.leftMargin: 20;
         anchors.right: parent.right;
         anchors.rightMargin: 16;
         height: 30;
@@ -208,7 +244,7 @@ Item {
         id: showPassphrase;
         colorScheme: hifi.colorSchemes.dark;
         anchors.left: parent.left;
-        anchors.leftMargin: 16;
+        anchors.leftMargin: 20;
         anchors.top: passphraseFieldAgain.bottom;
         anchors.topMargin: 16;
         height: 30;
@@ -217,6 +253,9 @@ Item {
         onClicked: {
             passphraseField.echoMode = checked ? TextInput.Normal : TextInput.Password;
             passphraseFieldAgain.echoMode = checked ? TextInput.Normal : TextInput.Password;
+            if (root.isChangingPassphrase) {
+                currentPassphraseField.echoMode = checked ? TextInput.Normal : TextInput.Password;
+            }
         }
     }
 
@@ -260,6 +299,7 @@ Item {
     }
 
     function clearPassphraseFields() {
+        currentPassphraseField.text = "";
         passphraseField.text = "";
         passphraseFieldAgain.text = "";
         setErrorText("");

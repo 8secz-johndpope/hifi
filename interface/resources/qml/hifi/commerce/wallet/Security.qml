@@ -25,27 +25,14 @@ Item {
     HifiConstants { id: hifi; }
 
     id: root;
+    property string keyFilePath: "";
 
     Hifi.QmlCommerce {
         id: commerce;
 
-        onSecurityImageResult: {
-            if (exists) { // "If security image is set up"
-                var path = "image://security/securityImage";
-                topSecurityImage.source = "";
-                topSecurityImage.source = path;
-                changeSecurityImageImage.source = "";
-                changeSecurityImageImage.source = path;
-            }
-        }
-
         onKeyFilePathIfExistsResult: {
-            keyFilePath.text = path;
+            keyFilePath = path;
         }
-    }
-
-    SecurityImageModel {
-        id: securityImageModel;
     }
 
     // Username Text
@@ -313,7 +300,7 @@ Item {
                 height: 40;
 
                 onClicked: {
-                    Window.copyToClipboard(keyFilePath.text);
+                    Window.copyToClipboard(keyFilePath);
                 }
             }
         }

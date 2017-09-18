@@ -94,13 +94,11 @@ Rectangle {
         }
     }
 
-    Rectangle {
+    Item {
         id: modalContainer;
-        visible: walletSetup.visible || passphraseSelectionLightbox.visible || securityImageSelectionLightbox.visible;
+        visible: walletSetup.visible || securityImageSelectionLightbox.visible;
         z: 998;
         anchors.fill: parent;
-        color: "black";
-        opacity: 0.5;
     }
     WalletSetup {
         id: walletSetup;
@@ -123,13 +121,14 @@ Rectangle {
             }
         }
     }
-    PassphraseSelectionLightbox {
-        id: passphraseSelectionLightbox;
-        visible: false;
+    PassphraseChange {
+        id: passphraseChange;
+        visible: root.activeView === "passphraseChange";
         z: 998;
-        anchors.centerIn: modalContainer;
-        width: modalContainer.width - 50;
-        height: modalContainer.height - 50;
+        anchors.top: titleBarContainer.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
 
         Connections {
             onSendSignalToWallet: {
@@ -137,6 +136,10 @@ Rectangle {
                     root.keyboardRaised = true;
                 } else if (msg.method === 'walletSetup_lowerKeyboard') {
                     root.keyboardRaised = false;
+                } else if (msg.method === 'walletSecurity_changePassphraseCancelled') {
+                    root.activeView = "security";
+                } else if (msg.method === 'walletSecurity_changePassphraseSuccess') {
+                    root.activeView = "security";
                 } else {
                     sendToScript(msg);
                 }
@@ -282,8 +285,8 @@ Rectangle {
         Connections {
             onSendSignalToWallet: {
                 if (msg.method === 'walletSecurity_changePassphrase') {
-                    passphraseSelectionLightbox.visible = true;
-                    passphraseSelectionLightbox.clearPassphraseFields();
+                    root.activeView = "passphraseChange";
+                    passphraseChange.clearPassphraseFields();
                 } else if (msg.method === 'walletSecurity_changeSecurityImage') {
                     securityImageSelectionLightbox.visible = true;
                 }
@@ -318,7 +321,7 @@ Rectangle {
     //
     Item {
         id: tabButtonsContainer;
-        visible: !needsLogIn.visible;
+        visible: !needsLogIn.visible && root.activeView !== "passphraseChange" && root.activeView !== "securityPicChange";
         property int numTabs: 5;
         // Size
         width: root.width;
