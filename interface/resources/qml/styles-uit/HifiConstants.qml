@@ -350,5 +350,6 @@ Item {
         readonly property string securityImage: "\ue026"
         readonly property string wallet: "\ue027"
         readonly property string paperPlane: "\ue028"
+        readonly property string passphrase: "\ue029"
     }
 }

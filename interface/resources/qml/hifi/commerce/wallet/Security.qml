@@ -101,7 +101,7 @@ Item {
 
             HiFiGlyphs {
                 id: changePassphraseImage;
-                text: hifi.glyphs.securityImage;
+                text: hifi.glyphs.passphrase;
                 // Size
                 size: 80;
                 // Anchors

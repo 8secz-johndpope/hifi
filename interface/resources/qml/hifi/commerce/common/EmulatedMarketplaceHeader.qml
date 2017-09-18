@@ -113,6 +113,7 @@ Rectangle {
         }
 
         Rectangle {
+            id: myUsernameButton;
             anchors.right: parent.right;
             anchors.verticalCenter: parent.verticalCenter;
             height: 40;

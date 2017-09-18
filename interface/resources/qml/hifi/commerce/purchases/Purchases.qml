@@ -18,6 +18,7 @@ import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
 import "../../../controls" as HifiControls
 import "../wallet" as HifiWallet
+import "../common" as HifiCommerceCommon
 
 // references XXX from root context
 
@@ -31,7 +32,7 @@ Rectangle {
     property bool purchasesReceived: false;
     property bool punctuationMode: false;
     // Style
-    color: hifi.colors.baseGray;
+    color: hifi.colors.white;
     Hifi.QmlCommerce {
         id: commerce;
 
@@ -94,72 +95,25 @@ Rectangle {
         }
     }
 
-    HifiWallet.SecurityImageModel {
-        id: securityImageModel;
-    }
-
     //
     // TITLE BAR START
     //
-    Item {
+    HifiCommerceCommon.EmulatedMarketplaceHeader {
         id: titleBarContainer;
         visible: !needsLogIn.visible;
         // Size
-        height: 50;
+        width: parent.width;
+        height: 70;
         // Anchors
         anchors.left: parent.left;
-        anchors.right: parent.right;
         anchors.top: parent.top;
 
-        // Title Bar text
-        RalewaySemiBold {
-            id: titleBarText;
-            text: "PURCHASES";
-            // Text size
-            size: hifi.fontSizes.overlayTitle;
-            // Anchors
-            anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
-            anchors.bottom: parent.bottom;
-            width: paintedWidth;
-            // Style
-            color: hifi.colors.faintGray;
-            // Alignment
-            horizontalAlignment: Text.AlignHLeft;
-            verticalAlignment: Text.AlignVCenter;
-        }
-
-        // Security Image (TEMPORARY!)
-        Image {
-            id: securityImage;
-            // Anchors
-            anchors.top: parent.top;
-            anchors.right: parent.right;
-            anchors.verticalCenter: parent.verticalCenter;
-            height: parent.height - 10;
-            width: height;
-            fillMode: Image.PreserveAspectFit;
-            mipmap: true;
-            cache: false;
-            source: "image://security/securityImage";
-        }
-        Image {
-            id: securityImageOverlay;
-            source: "../wallet/images/lockOverlay.png";
-            width: securityImage.width * 0.45;
-            height: securityImage.height * 0.45;
-            anchors.bottom: securityImage.bottom;
-            anchors.right: securityImage.right;
-            mipmap: true;
-            opacity: 0.9;
-        }
-
-        // Separator
-        HifiControlsUit.Separator {
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.bottom: parent.bottom;
+        Connections {
+            onSendToParent: {
+                if (msg.method === 'needsLogIn' && root.activeView !== "needsLogIn") {
+                    root.activeView = "needsLogIn";
+                }
+            }
         }
     }
     //
@@ -173,7 +127,7 @@ Rectangle {
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        color: hifi.colors.baseGray;
+        color: hifi.colors.white;
 
         Component.onCompleted: {
             securityImageResultReceived = false;
@@ -329,13 +283,10 @@ Rectangle {
         visible: root.activeView === "purchasesMain";
         // Anchors
         anchors.left: parent.left;
-        anchors.leftMargin: 4;
         anchors.right: parent.right;
-        anchors.rightMargin: 4;
         anchors.top: titleBarContainer.bottom;
         anchors.topMargin: 8;
-        anchors.bottom: actionButtonsContainer.top;
-        anchors.bottomMargin: 8;
+        anchors.bottom: parent.bottom;
 
         //
         // FILTER BAR START
@@ -348,15 +299,33 @@ Rectangle {
             anchors.left: parent.left;
             anchors.leftMargin: 8;
             anchors.right: parent.right;
-            anchors.rightMargin: 8;
+            anchors.rightMargin: 12;
             anchors.top: parent.top;
             anchors.topMargin: 4;
+
+            RalewayRegular {
+                id: myPurchasesText;
+                anchors.top: parent.top;
+                anchors.topMargin: 10;
+                anchors.bottom: parent.bottom;
+                anchors.bottomMargin: 10;
+                anchors.left: parent.left;
+                anchors.leftMargin: 4;
+                width: paintedWidth;
+                text: "My Purchases";
+                color: hifi.colors.baseGray;
+                size: 28;
+            }
 
             HifiControlsUit.TextField {
                 id: filterBar;
                 property int previousLength: 0;
-                anchors.fill: parent;
-                placeholderText: "Filter";
+                anchors.left: myPurchasesText.right;
+                anchors.leftMargin: 16;
+                anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
+                anchors.right: parent.right;
+                placeholderText: "filter items";
 
                 onTextChanged: {
                     if (filterBar.text.length < previousLength) {
@@ -385,6 +354,15 @@ Rectangle {
         // FILTER BAR END
         //
 
+        HifiControlsUit.Separator {
+            id: separator;
+            colorScheme: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.top: filterBarContainer.bottom;
+            anchors.topMargin: 16;
+        }
+
         ListModel {
             id: purchasesModel;
         }
@@ -398,7 +376,7 @@ Rectangle {
             clip: true;
             model: filteredPurchasesModel;
             // Anchors
-            anchors.top: filterBarContainer.bottom;
+            anchors.top: separator.bottom;
             anchors.topMargin: 12;
             anchors.left: parent.left;
             anchors.bottom: parent.bottom;
@@ -469,42 +447,6 @@ Rectangle {
     }
     //
     // PURCHASES CONTENTS END
-    //
-
-    //
-    // ACTION BUTTONS START
-    //
-    Item {
-        id: actionButtonsContainer;
-        visible: purchasesContentsContainer.visible;
-        // Size
-        width: parent.width;
-        height: 40;
-        // Anchors
-        anchors.left: parent.left;
-        anchors.bottom: keyboard.top;
-        anchors.bottomMargin: 8;
-
-        // "Back" button
-        HifiControlsUit.Button {
-            id: backButton;
-            color: hifi.buttons.black;
-            colorScheme: hifi.colorSchemes.dark;
-            anchors.top: parent.top;
-            anchors.topMargin: 3;
-            anchors.bottom: parent.bottom;
-            anchors.bottomMargin: 3;
-            anchors.left: parent.left;
-            anchors.leftMargin: 20;
-            width: parent.width/2 - anchors.leftMargin*2;
-            text: "Back"
-            onClicked: {
-                sendToScript({method: 'purchases_backClicked', referrerURL: referrerURL});
-            }
-        }
-    }
-    //
-    // ACTION BUTTONS END
     //
 
     HifiControlsUit.Keyboard {
