@@ -34,6 +34,11 @@ Rectangle {
     color: hifi.colors.faintGray;
     Hifi.QmlCommerce {
         id: commerce;
+    }    
+
+    Image {
+        anchors.fill: parent;
+        source: "images/cert-bg.jpg";
     }
 
     // Title text

@@ -29,15 +29,9 @@ Rectangle {
     property string activeView: "initialize";
     property bool keyboardRaised: false;
 
-    // Style
-    LinearGradient {
+    Image {
         anchors.fill: parent;
-        start: Qt.point(parent.width, 0);
-        end: Qt.point(0, parent.width);
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: "#1A7E8E" }
-            GradientStop { position: 1.0; color: "#45366E" }
-        }
+        source: "images/wallet-bg.jpg";
     }
 
     Hifi.QmlCommerce {

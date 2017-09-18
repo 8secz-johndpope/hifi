@@ -29,14 +29,9 @@ Item {
     property string lastPage;
     property bool hasShownSecurityImageTip: false;
 
-    LinearGradient {
+    Image {
         anchors.fill: parent;
-        start: Qt.point(parent.width, 0);
-        end: Qt.point(0, parent.width);
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: "#1A7E8E" }
-            GradientStop { position: 1.0; color: "#45366E" }
-        }
+        source: "images/wallet-bg.jpg";
     }
 
     Hifi.QmlCommerce {
@@ -540,18 +535,54 @@ Item {
             verticalAlignment: Text.AlignVCenter;
         }
 
+        RalewayRegular {
+            id: explanationText;
+            text: "To protect your privacy, you control your private keys. High Fidelity has no access to your private keys and cannot " +
+            "recover them for you.<br><br><b>If they are lost, you will not be able to access your money or purchases.</b>";
+            // Text size
+            size: 20;
+            // Anchors
+            anchors.top: keysReadyTitleHelper.bottom;
+            anchors.topMargin: 24;
+            anchors.left: parent.left;
+            anchors.leftMargin: 16;
+            anchors.right: parent.right;
+            anchors.rightMargin: 16;
+            height: paintedHeight;
+            // Style
+            color: hifi.colors.white;
+            wrapMode: Text.WordWrap;
+            // Alignment
+            horizontalAlignment: Text.AlignHCenter;
+            verticalAlignment: Text.AlignVCenter;
+        }
+
         Rectangle {
             id: pathAndInstructionsContainer;
-            anchors.top: keysReadyTitleHelper.bottom;
-            anchors.topMargin: 8;
+            anchors.top: explanationText.bottom;
+            anchors.topMargin: 24;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 200;
+            height: 240;
             color: Qt.rgba(0, 0, 0, 0.5);
 
             Item {
                 id: instructions01Container;
                 anchors.fill: parent;
+                
+                RalewaySemiBold {
+                    id: keyFilePathText;
+                    text: "Private Key File Location:";
+                    size: 18;
+                    anchors.top: parent.top;
+                    anchors.topMargin: 40;
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 30;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 30;
+                    height: paintedHeight;
+                    color: hifi.colors.white;
+                }
             
                 HifiControlsUit.Button {
                     id: clipboardButton;
@@ -559,8 +590,8 @@ Item {
                     colorScheme: hifi.colorSchemes.dark;
                     anchors.left: parent.left;
                     anchors.leftMargin: 30;
-                    anchors.top: parent.top;
-                    anchors.topMargin: 45;
+                    anchors.top: keyFilePathText.bottom;
+                    anchors.topMargin: 8;
                     height: 24;
                     width: height;
                     HiFiGlyphs {
@@ -637,29 +668,6 @@ Item {
                     verticalAlignment: Text.AlignVCenter;
                 }
             }
-        }
-
-        // Text below checkbox
-        RalewayRegular {
-            id: explanationText;
-            text: "To protect your privacy, you control your private keys. High Fidelity has no access to your private keys and cannot " +
-            "recover them for you.<br><br><b>If they are lost, you will not be able to access your money or purchases.</b>";
-            // Text size
-            size: 20;
-            // Anchors
-            anchors.top: pathAndInstructionsContainer.bottom;
-            anchors.topMargin: 24;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
-            anchors.right: parent.right;
-            anchors.rightMargin: 16;
-            height: paintedHeight;
-            // Style
-            color: hifi.colors.white;
-            wrapMode: Text.WordWrap;
-            // Alignment
-            horizontalAlignment: Text.AlignHCenter;
-            verticalAlignment: Text.AlignVCenter;
         }
 
         // Navigation Bar

@@ -18,6 +18,7 @@ import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
 import "../../../controls" as HifiControls
 import "../wallet" as HifiWallet
+import "../common" as HifiCommerceCommon
 
 // references XXX from root context
 
@@ -37,7 +38,7 @@ Rectangle {
     property bool itemIsJson: true;
     property bool shouldBuyWithControlledFailure: false;
     // Style
-    color: hifi.colors.baseGray;
+    color: hifi.colors.white;
     Hifi.QmlCommerce {
         id: commerce;
 
@@ -131,65 +132,22 @@ Rectangle {
     //
     // TITLE BAR START
     //
-    Item {
+    HifiCommerceCommon.EmulatedMarketplaceHeader {
         id: titleBarContainer;
         visible: !needsLogIn.visible;
         // Size
         width: parent.width;
-        height: 50;
+        height: 70;
         // Anchors
         anchors.left: parent.left;
         anchors.top: parent.top;
 
-        // Title Bar text
-        RalewaySemiBold {
-            id: titleBarText;
-            text: "MARKETPLACE";
-            // Text size
-            size: hifi.fontSizes.overlayTitle;
-            // Anchors
-            anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
-            anchors.bottom: parent.bottom;
-            width: paintedWidth;
-            // Style
-            color: hifi.colors.faintGray;
-            // Alignment
-            horizontalAlignment: Text.AlignHLeft;
-            verticalAlignment: Text.AlignVCenter;
-        }
-
-        // Security Image (TEMPORARY!)
-        Image {
-            id: securityImage;
-            // Anchors
-            anchors.top: parent.top;
-            anchors.right: parent.right;
-            anchors.verticalCenter: parent.verticalCenter;
-            height: parent.height - 10;
-            width: height;
-            fillMode: Image.PreserveAspectFit;
-            mipmap: true;
-            cache: false;
-            source: "image://security/securityImage";
-        }
-        Image {
-            id: securityImageOverlay;
-            source: "../wallet/images/lockIcon.png";
-            width: securityImage.width * 0.45;
-            height: securityImage.height * 0.45;
-            anchors.bottom: securityImage.bottom;
-            anchors.right: securityImage.right;
-            mipmap: true;
-            opacity: 0.9;
-        }
-
-        // Separator
-        HifiControlsUit.Separator {
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.bottom: parent.bottom;
+        Connections {
+            onSendToParent: {
+                if (msg.method === 'needsLogIn' && root.activeView !== "needsLogIn") {
+                    root.activeView = "needsLogIn";
+                }
+            }
         }
     }
     //
@@ -203,7 +161,7 @@ Rectangle {
         anchors.bottom: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        color: hifi.colors.baseGray;
+        color: hifi.colors.white;
 
         Component.onCompleted: {
             securityImageResultReceived = false;
@@ -272,7 +230,7 @@ Rectangle {
             anchors.right: parent.right;
             anchors.rightMargin: 16;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.black;
             wrapMode: Text.WordWrap;
             // Alignment
             horizontalAlignment: Text.AlignHCenter;
@@ -377,7 +335,7 @@ Rectangle {
                     // Text size
                     size: 30;
                     // Style
-                    color: hifi.colors.lightGrayText;
+                    color: hifi.colors.black;
                     // Alignment
                     horizontalAlignment: Text.AlignLeft;
                     verticalAlignment: Text.AlignVCenter;
@@ -395,7 +353,7 @@ Rectangle {
                     anchors.rightMargin: 16;
                     height: paintedHeight;
                     // Style
-                    color: hifi.colors.lightGrayText;
+                    color: hifi.colors.black;
                     // Alignment
                     horizontalAlignment: Text.AlignRight;
                     verticalAlignment: Text.AlignVCenter;
@@ -425,7 +383,7 @@ Rectangle {
                     // Text size
                     size: 20;
                     // Style
-                    color: hifi.colors.lightGrayText;
+                    color: hifi.colors.black;
                     // Alignment
                     horizontalAlignment: Text.AlignLeft;
                     verticalAlignment: Text.AlignVCenter;
@@ -442,7 +400,7 @@ Rectangle {
                     anchors.rightMargin: 16;
                     height: paintedHeight;
                     // Style
-                    color: hifi.colors.lightGrayText;
+                    color: hifi.colors.black;
                     elide: Text.ElideRight;
                     // Alignment
                     horizontalAlignment: Text.AlignRight;
@@ -474,7 +432,7 @@ Rectangle {
                     // Text size
                     size: 20;
                     // Style
-                    color: hifi.colors.lightGrayText;
+                    color: hifi.colors.black;
                     // Alignment
                     horizontalAlignment: Text.AlignLeft;
                     verticalAlignment: Text.AlignVCenter;
@@ -491,7 +449,7 @@ Rectangle {
                     anchors.rightMargin: 16;
                     height: paintedHeight;
                     // Style
-                    color: hifi.colors.lightGrayText;
+                    color: hifi.colors.black;
                     elide: Text.ElideRight;
                     // Alignment
                     horizontalAlignment: Text.AlignRight;
@@ -522,7 +480,7 @@ Rectangle {
                     // Text size
                     size: 30;
                     // Style
-                    color: hifi.colors.lightGrayText;
+                    color: hifi.colors.black;
                     // Alignment
                     horizontalAlignment: Text.AlignLeft;
                     verticalAlignment: Text.AlignVCenter;
@@ -540,7 +498,7 @@ Rectangle {
                     anchors.rightMargin: 16;
                     height: paintedHeight;
                     // Style
-                    color: (balanceAfterPurchase >= 0) ? hifi.colors.lightGrayText : hifi.colors.redHighlight;
+                    color: (balanceAfterPurchase >= 0) ? hifi.colors.black : hifi.colors.redHighlight;
                     // Alignment
                     horizontalAlignment: Text.AlignRight;
                     verticalAlignment: Text.AlignVCenter;
@@ -570,7 +528,7 @@ Rectangle {
                     // Text size
                     size: 20;
                     // Style
-                    color: hifi.colors.lightGrayText;
+                    color: hifi.colors.black;
                     // Alignment
                     horizontalAlignment: Text.AlignLeft;
                     verticalAlignment: Text.AlignVCenter;
@@ -588,7 +546,7 @@ Rectangle {
                     anchors.rightMargin: 16;
                     height: paintedHeight;
                     // Style
-                    color: (balanceAfterPurchase >= 0) ? hifi.colors.lightGrayText : hifi.colors.redHighlight;
+                    color: (balanceAfterPurchase >= 0) ? hifi.colors.black : hifi.colors.redHighlight;
                     // Alignment
                     horizontalAlignment: Text.AlignRight;
                     verticalAlignment: Text.AlignVCenter;
@@ -690,7 +648,7 @@ Rectangle {
                 anchors.right: parent.right;
                 anchors.rightMargin: 10;
                 // Style
-                color: hifi.colors.faintGray;
+                color: hifi.colors.black;
                 wrapMode: Text.WordWrap;
                 // Alignment
                 horizontalAlignment: Text.AlignHCenter;
@@ -728,7 +686,7 @@ Rectangle {
             anchors.left: parent.left;
             anchors.right: parent.right;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.black;
             wrapMode: Text.WordWrap;
             // Alignment
             horizontalAlignment: Text.AlignHCenter;
@@ -840,7 +798,7 @@ Rectangle {
             anchors.left: parent.left;
             anchors.right: parent.right;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.black;
             wrapMode: Text.WordWrap;
             // Alignment
             horizontalAlignment: Text.AlignHCenter;
@@ -858,7 +816,7 @@ Rectangle {
             anchors.left: parent.left;
             anchors.right: parent.right;
             // Style
-            color: hifi.colors.faintGray;
+            color: hifi.colors.black;
             wrapMode: Text.WordWrap;
             // Alignment
             horizontalAlignment: Text.AlignHCenter;

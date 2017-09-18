@@ -13,7 +13,6 @@
 
 import Hifi 1.0 as Hifi
 import QtQuick 2.5
-import QtGraphicalEffects 1.0
 import QtQuick.Controls 1.4
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
@@ -30,14 +29,9 @@ Item {
     property string titleBarIcon: "";
     property string titleBarText: "";
 
-    LinearGradient {
+    Image {
         anchors.fill: parent;
-        start: Qt.point(parent.width, 0);
-        end: Qt.point(0, parent.width);
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: "#1A7E8E" }
-            GradientStop { position: 1.0; color: "#45366E" }
-        }
+        source: "images/wallet-bg.jpg";
     }
 
     Hifi.QmlCommerce {
