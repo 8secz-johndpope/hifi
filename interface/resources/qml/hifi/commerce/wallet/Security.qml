@@ -176,7 +176,7 @@ Item {
                 anchors.bottom: parent.bottom;
                 anchors.left: parent.left;
                 width: 70;
-                source: "images/changeSecurityPicImage.png";
+                source: "images/changeSecurityImageImage.png";
                 fillMode: Image.PreserveAspectFit;
                 mipmap: true;
                 cache: false;

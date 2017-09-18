@@ -27,7 +27,7 @@ Item {
     id: root;
     property string activeView: "step_1";
     property string lastPage;
-    property bool hasShownSecurityPicTip: false;
+    property bool hasShownSecurityImageTip: false;
 
     LinearGradient {
         anchors.fill: parent;
@@ -312,7 +312,7 @@ Item {
     //
 
     Item {
-        id: securityPicTip;
+        id: securityImageTip;
         visible: false;
         z: 999;
         anchors.fill: root;
@@ -393,8 +393,8 @@ Item {
             width: 150;
             text: "Got It";
             onClicked: {
-                root.hasShownSecurityPicTip = true;
-                securityPicTip.visible = false;
+                root.hasShownSecurityImageTip = true;
+                securityImageTip.visible = false;
             }
         }
     }
@@ -411,8 +411,8 @@ Item {
         onVisibleChanged: {
             if (visible) {
                 commerce.getWalletAuthenticatedStatus();
-                if (!root.hasShownSecurityPicTip) {
-                    securityPicTip.visible = true;
+                if (!root.hasShownSecurityImageTip) {
+                    securityImageTip.visible = true;
                 }
             }
         }

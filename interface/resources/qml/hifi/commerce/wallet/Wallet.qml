@@ -94,12 +94,43 @@ Rectangle {
         }
     }
 
+
+    //
+    // TITLE BAR START
+    //
     Item {
-        id: modalContainer;
-        visible: walletSetup.visible || securityImageSelectionLightbox.visible;
-        z: 998;
-        anchors.fill: parent;
+        id: titleBarContainer;
+        visible: !needsLogIn.visible;
+        // Size
+        width: parent.width;
+        height: 50;
+        // Anchors
+        anchors.left: parent.left;
+        anchors.top: parent.top;
+
+        // Title Bar text
+        RalewaySemiBold {
+            id: titleBarText;
+            text: "WALLET";
+            // Text size
+            size: hifi.fontSizes.overlayTitle;
+            // Anchors
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.leftMargin: 16;
+            anchors.bottom: parent.bottom;
+            width: paintedWidth;
+            // Style
+            color: hifi.colors.white;
+            // Alignment
+            horizontalAlignment: Text.AlignHLeft;
+            verticalAlignment: Text.AlignVCenter;
+        }
     }
+    //
+    // TITLE BAR END
+    //
+
     WalletSetup {
         id: walletSetup;
         visible: root.activeView === "walletSetup";
@@ -146,57 +177,27 @@ Rectangle {
             }
         }
     }
-    SecurityImageSelectionLightbox {
-        id: securityImageSelectionLightbox;
-        visible: false;
+    SecurityImageChange {
+        id: securityImageChange;
+        visible: root.activeView === "securityImageChange";
         z: 998;
-        anchors.centerIn: modalContainer;
-        width: modalContainer.width - 50;
-        height: modalContainer.height - 50;
+        anchors.top: titleBarContainer.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
 
         Connections {
             onSendSignalToWallet: {
-                sendToScript(msg);
+                if (msg.method === 'walletSecurity_changeSecurityImageCancelled') {
+                    root.activeView = "security";
+                } else if (msg.method === 'walletSecurity_changeSecurityImageSuccess') {
+                    root.activeView = "security";
+                } else {
+                    sendToScript(msg);
+                }
             }
         }
     }
-
-
-    //
-    // TITLE BAR START
-    //
-    Item {
-        id: titleBarContainer;
-        visible: !needsLogIn.visible;
-        // Size
-        width: parent.width;
-        height: 50;
-        // Anchors
-        anchors.left: parent.left;
-        anchors.top: parent.top;
-
-        // Title Bar text
-        RalewaySemiBold {
-            id: titleBarText;
-            text: "WALLET";
-            // Text size
-            size: hifi.fontSizes.overlayTitle;
-            // Anchors
-            anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
-            anchors.bottom: parent.bottom;
-            width: paintedWidth;
-            // Style
-            color: hifi.colors.white;
-            // Alignment
-            horizontalAlignment: Text.AlignHLeft;
-            verticalAlignment: Text.AlignVCenter;
-        }
-    }
-    //
-    // TITLE BAR END
-    //
 
     //
     // TAB CONTENTS START
@@ -288,7 +289,7 @@ Rectangle {
                     root.activeView = "passphraseChange";
                     passphraseChange.clearPassphraseFields();
                 } else if (msg.method === 'walletSecurity_changeSecurityImage') {
-                    securityImageSelectionLightbox.visible = true;
+                    root.activeView = "securityImageChange";
                 }
             }
         }
@@ -321,7 +322,7 @@ Rectangle {
     //
     Item {
         id: tabButtonsContainer;
-        visible: !needsLogIn.visible && root.activeView !== "passphraseChange" && root.activeView !== "securityPicChange";
+        visible: !needsLogIn.visible && root.activeView !== "passphraseChange" && root.activeView !== "securityImageChange";
         property int numTabs: 5;
         // Size
         width: root.width;
@@ -363,7 +364,6 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter;
             }
             MouseArea {
-                enabled: !modalContainer.visible;
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
@@ -455,7 +455,6 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter;
             }
             MouseArea {
-                enabled: !modalContainer.visible;
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
@@ -493,7 +492,6 @@ Rectangle {
                 verticalAlignment: Text.AlignVCenter;
             }
             MouseArea {
-                enabled: !modalContainer.visible;
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {

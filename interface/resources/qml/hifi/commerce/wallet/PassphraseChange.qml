@@ -24,7 +24,6 @@ Item {
     HifiConstants { id: hifi; }
 
     id: root;
-    
 
     SecurityImageModel {
         id: securityImageModel;
@@ -61,7 +60,7 @@ Item {
         // "Change Passphrase" text
         RalewaySemiBold {
             id: passphraseTitle;
-            text: "Change Passphrase";
+            text: "Change Passphrase:";
             // Text size
             size: 18;
             anchors.top: parent.top;

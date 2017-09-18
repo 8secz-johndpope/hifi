@@ -199,7 +199,7 @@ Item {
             }
             // "Security image" text below pic
             RalewayRegular {
-                id: securityPicText;
+                id: securityImageText;
                 text: "SECURITY PIC";
                 // Text size
                 size: 12;
@@ -229,13 +229,12 @@ Item {
         anchors.bottomMargin: 4;
         anchors.left: parent.left;
         anchors.leftMargin: 20;
-        anchors.right: parent.right;
-        anchors.rightMargin: 16;
+        anchors.right: securityImageContainer.left;
+        anchors.rightMargin: 4;
         height: 30;
         // Style
         color: hifi.colors.redHighlight;
         // Alignment
-        horizontalAlignment: Text.AlignHLeft;
         verticalAlignment: Text.AlignVCenter;
     }
 

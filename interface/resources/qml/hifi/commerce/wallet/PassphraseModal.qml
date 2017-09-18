@@ -238,7 +238,7 @@ Item {
                 }
                 // "Security image" text below pic
                 RalewayRegular {
-                    id: securityPicText;
+                    id: securityImageText;
                     text: "SECURITY PIC";
                     // Text size
                     size: 12;
