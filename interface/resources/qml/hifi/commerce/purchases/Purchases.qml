@@ -32,6 +32,7 @@ Rectangle {
     property bool purchasesReceived: false;
     property bool punctuationMode: false;
     property bool canRezCertifiedItems: false;
+    property bool pendingInventoryReply: true;
     // Style
     color: hifi.colors.white;
     Hifi.QmlCommerce {
@@ -85,14 +86,20 @@ Rectangle {
 
         onInventoryResult: {
             purchasesReceived = true;
+
             if (result.status !== 'success') {
                 console.log("Failed to get purchases", result.message);
             } else {
                 purchasesModel.clear();
                 purchasesModel.append(result.data.assets);
-                filteredPurchasesModel.clear();
-                filteredPurchasesModel.append(result.data.assets);
+                buildFilteredPurchasesModel();
+
+                if (root.pendingInventoryReply) {
+                    inventoryTimer.start();
+                }
             }
+
+            root.pendingInventoryReply = false;
         }
     }
 
@@ -335,7 +342,6 @@ Rectangle {
             HifiControlsUit.TextField {
                 id: filterBar;
                 hasRoundedBorder: true;
-                property int previousLength: 0;
                 anchors.left: myPurchasesText.right;
                 anchors.leftMargin: 16;
                 anchors.top: parent.top;
@@ -344,21 +350,7 @@ Rectangle {
                 placeholderText: "filter items";
 
                 onTextChanged: {
-                    if (filterBar.text.length < previousLength) {
-                        filteredPurchasesModel.clear();
-
-                        for (var i = 0; i < purchasesModel.count; i++) {
-                            filteredPurchasesModel.append(purchasesModel.get(i));
-                        }
-                    }
-
-                    for (var i = 0; i < filteredPurchasesModel.count; i++) {
-                        if (filteredPurchasesModel.get(i).title.toLowerCase().indexOf(filterBar.text.toLowerCase()) === -1) {
-                            filteredPurchasesModel.remove(i);
-                            i--;
-                        }
-                    }
-                    previousLength = filterBar.text.length;
+                    buildFilteredPurchasesModel();
                 }
 
                 onAccepted: {
@@ -579,9 +571,36 @@ Rectangle {
         }
     }
 
+    onVisibleChanged: {
+        if (!visible) {
+            inventoryTimer.stop();
+        }
+    }
+
+    Timer {
+        id: inventoryTimer;
+        interval: 90000;
+        onTriggered: {
+            if (root.activeView === "purchasesMain" && !root.pendingInventoryReply) {
+                root.pendingInventoryReply = true;
+                commerce.inventory();
+            }
+        }
+    }
+
     //
     // FUNCTION DEFINITIONS START
     //
+
+    function buildFilteredPurchasesModel() {
+        filteredPurchasesModel.clear();
+        for (var i = 0; i < purchasesModel.count; i++) {
+            if (purchasesModel.get(i).title.toLowerCase().indexOf(filterBar.text.toLowerCase()) !== -1) {
+                filteredPurchasesModel.append(purchasesModel.get(i));
+            }
+        }
+    }
+
     //
     // Function Name: fromScript()
     //
@@ -601,6 +620,7 @@ Rectangle {
                 referrerURL = message.referrerURL;
                 titleBarContainer.referrerURL = message.referrerURL;
                 root.canRezCertifiedItems = message.canRezCertifiedItems;
+
             break;
             case 'purchases_getIsFirstUseResult':
                 if (message.isFirstUseOfPurchases && root.activeView !== "firstUseTutorial") {

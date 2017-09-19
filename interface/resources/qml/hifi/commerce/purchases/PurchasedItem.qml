@@ -59,7 +59,6 @@ Item {
             anchors.bottom: parent.bottom;
             width: height;
             fillMode: Image.PreserveAspectCrop;
-            mipmap: true;
 
             MouseArea {
                 anchors.fill: parent;
