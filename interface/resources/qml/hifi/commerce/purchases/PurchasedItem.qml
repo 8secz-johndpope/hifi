@@ -27,12 +27,14 @@ Item {
     HifiConstants { id: hifi; }
 
     id: root;
-    property bool isPending: false;
+    property string status;
     property bool canRezCertifiedItems: false;
-    property string itemName: "";
-    property string itemId: "";
-    property string itemPreviewImageUrl: "";
-    property string itemHref: "";
+    property string itemName;
+    property string itemId;
+    property string itemPreviewImageUrl;
+    property string itemHref;
+    property int ownedItemCount;
+    property int itemEdition;
 
     height: 110;
     width: parent.width;
@@ -155,8 +157,9 @@ Item {
         }
 
         Item {
-            id: pendingContainer
-            visible: root.isPending;
+            id: statusContainer;
+
+            visible: root.status || root.ownedItemCount > 1;
             anchors.left: itemName.left;
             anchors.top: certificateContainer.bottom;
             anchors.topMargin: 8;
@@ -164,30 +167,62 @@ Item {
             anchors.right: buttonContainer.left;
             anchors.rightMargin: 2;
 
-            RalewayRegular {
-                id: pendingText;
+            RalewaySemiBold {
+                id: statusText;
                 anchors.left: parent.left;
                 anchors.top: parent.top;
                 anchors.bottom: parent.bottom;
                 width: paintedWidth;
-                text: "PENDING...";
+                text: {
+                        if (root.status === "pending") {
+                            "PENDING...";
+                        } else if (root.status === "invalidated") {
+                            "INVALIDATED";
+                        } else if (root.ownedItemCount > 1) {
+                            "(#" + root.itemEdition + ") You own " + root.ownedItemCount + " others";
+                        }
+                    }
                 size: 18;
-                color: hifi.colors.blueHighlight;
+                color: {
+                        if (root.status === "pending") {
+                            hifi.colors.blueHighlight;
+                        } else if (root.status === "invalidated") {
+                            hifi.colors.redAccent;
+                        } else if (root.ownedItemCount > 1) {
+                            hifi.colors.baseGray;
+                        }
+                    }
                 verticalAlignment: Text.AlignTop;
             }
         
             HiFiGlyphs {
-                id: pendingIcon;
-                text: hifi.glyphs.question;
+                id: statusIcon;
+                text: {
+                        if (root.status === "pending") {
+                            hifi.glyphs.question;
+                        } else if (root.status === "invalidated") {
+                            hifi.glyphs.question;
+                        } else {
+                            "";
+                        }
+                    }
                 // Size
                 size: 36;
                 // Anchors
                 anchors.top: parent.top;
                 anchors.topMargin: -8;
-                anchors.left: pendingText.right;
+                anchors.left: statusText.right;
                 anchors.bottom: parent.bottom;
                 // Style
-                color: hifi.colors.blueHighlight;
+                color: {
+                        if (root.status === "pending") {
+                            hifi.colors.blueHighlight;
+                        } else if (root.status === "invalidated") {
+                            hifi.colors.redAccent;
+                        } else if (root.ownedItemCount > 1) {
+                            hifi.colors.baseGray;
+                        }
+                    }
                 verticalAlignment: Text.AlignTop;
             }
 
@@ -195,15 +230,37 @@ Item {
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
-                    sendToPurchases({method: 'purchases_itemPendingClicked'});
+                    if (root.status === "pending") {
+                        sendToPurchases({method: 'showPendingLightbox'});
+                    } else if (root.status === "invalidated") {
+                        sendToPurchases({method: 'showInvalidatedLightbox'});
+                    } else if (root.ownedItemCount > 1) {
+                        sendToPurchases({method: 'setFilterText', filterText: root.itemName});
+                    }
                 }
                 onEntered: {
-                    pendingText.color = hifi.colors.blueAccent;
-                    pendingIcon.color = hifi.colors.blueAccent;
+                    if (root.status === "pending") {
+                        statusText.color = hifi.colors.blueAccent;
+                        statusIcon.color = hifi.colors.blueAccent;
+                    } else if (root.status === "invalidated") {
+                        statusText.color = hifi.colors.redAccent;
+                        statusIcon.color = hifi.colors.redAccent;
+                    } else if (root.ownedItemCount > 1) {
+                        statusText.color = hifi.colors.black;
+                        statusIcon.color = hifi.colors.black;
+                    }
                 }
                 onExited: {
-                    pendingText.color = hifi.colors.blueHighlight;
-                    pendingIcon.color = hifi.colors.blueHighlight;
+                    if (root.status === "pending") {
+                        statusText.color = hifi.colors.blueHighlight;
+                        statusIcon.color = hifi.colors.blueHighlight;
+                    } else if (root.status === "invalidated") {
+                        statusText.color = hifi.colors.redHighlight;
+                        statusIcon.color = hifi.colors.redHighlight;
+                    } else if (root.ownedItemCount > 1) {
+                        statusText.color = hifi.colors.baseGray;
+                        statusIcon.color = hifi.colors.baseGray;
+                    }
                 }
             }
         }
@@ -244,7 +301,7 @@ Item {
             anchors.bottom: parent.bottom;
             anchors.right: parent.right;
             width: height;
-            enabled: root.canRezCertifiedItems;
+            enabled: root.canRezCertifiedItems && root.status !== "pending" && root.status !== "invalidated";
             
             onClicked: {
                 if (urlHandler.canHandleUrl(root.itemHref)) {

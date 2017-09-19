@@ -100,12 +100,6 @@ Rectangle {
         id: lightboxPopup;
         visible: false;
         anchors.fill: parent;
-        bodyText: "You don't have permission to rez certified items in this domain.<br><br>" +
-            "Use the <b>GO TO app</b> to visit another domain or <b>go to your own sandbox.</b>";
-        button1text: "CLOSE";
-        button1method: "root.visible = false;"
-        button2text: "OPEN GOTO";
-        button2method: "sendToParent({method: 'purchases_openGoTo'});";
 
         Connections {
             onSendToParent: {
@@ -465,6 +459,12 @@ Rectangle {
                 }
 
                 onClicked: {
+                    lightboxPopup.bodyText = "You don't have permission to rez certified items in this domain.<br><br>" +
+                        "Use the <b>GO TO app</b> to visit another domain or <b>go to your own sandbox.</b>";
+                    lightboxPopup.button1text = "CLOSE";
+                    lightboxPopup.button1method = "root.visible = false;"
+                    lightboxPopup.button2text = "OPEN GOTO";
+                    lightboxPopup.button2method = "sendToParent({method: 'purchases_openGoTo'});";
                     lightboxPopup.visible = true;
                 }
             }
@@ -494,6 +494,22 @@ Rectangle {
                     onSendToPurchases: {
                         if (msg.method === 'purchases_itemInfoClicked') {
                             sendToScript({method: 'purchases_itemInfoClicked', itemId: itemId});
+                        } else if (msg.method === "showInvalidatedLightbox") {
+                            lightboxPopup.titleText = "Item Invalidated";
+                            lightboxPopup.bodyText = 'Your item is marked "invalidated" because this item has been suspended ' +
+                            "from the Marketplace due to a claim against its author.";
+                            lightboxPopup.button1text = "CLOSE";
+                            lightboxPopup.button1method = "root.visible = false;"
+                            lightboxPopup.visible = true;
+                        } else if (msg.method === "showPendingLightbox") {
+                            lightboxPopup.titleText = "Item Pending";
+                            lightboxPopup.bodyText = 'Your item is marked "pending" while your purchase is being confirmed. ' +
+                            "Usually, purchases take about 90 seconds to confirm.";
+                            lightboxPopup.button1text = "CLOSE";
+                            lightboxPopup.button1method = "root.visible = false;"
+                            lightboxPopup.visible = true;
+                        } else if (msg.method === "setFilterText") {
+                            filterBar.text = msg.filterText;
                         }
                     }
                 }

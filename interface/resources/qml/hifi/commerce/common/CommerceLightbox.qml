@@ -98,7 +98,7 @@ Rectangle {
                 anchors.bottom: parent.bottom;
                 anchors.left: parent.left;
                 anchors.leftMargin: 10;
-                width: parent.width/2 - anchors.leftMargin*2;
+                width: root.button2text ? parent.width/2 - anchors.leftMargin*2 : parent.width - anchors.leftMargin * 2;
                 text: root.button1text;
                 onClicked: {
                     eval(button1method);
@@ -107,6 +107,7 @@ Rectangle {
 
             // Button 2
             HifiControlsUit.Button {
+                visible: root.button2text;
                 color: hifi.buttons.noneBorderless;
                 colorScheme: hifi.colorSchemes.light;
                 anchors.top: parent.top;
