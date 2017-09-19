@@ -77,22 +77,27 @@ Item {
         id: helpModel;
 
         ListElement {
+            isExpanded: false;
             question: "What are private keys?"
             answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
         }
         ListElement {
+            isExpanded: false;
             question: "Where are my private keys stored?"
             answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
         }
         ListElement {
+            isExpanded: false;
             question: "What happens if I lose my passphrase?"
             answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
         }
         ListElement {
+            isExpanded: false;
             question: "Do I get charged money when a transaction fails?"
             answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
         }
         ListElement {
+            isExpanded: false;
             question: "How do I convert HFC to other currencies?"
             answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
         }
@@ -116,9 +121,8 @@ Item {
         clip: true;
         model: helpModel;
         delegate: Item {
-            property bool isExpanded: false;
             width: parent.width;
-            height: isExpanded ? childrenRect.height : questionContainer.height;
+            height: model.isExpanded ? questionContainer.height + answerContainer.height : questionContainer.height;
 
             HifiControlsUit.Separator {
             colorScheme: 1;
@@ -137,10 +141,10 @@ Item {
             
                 RalewaySemiBold {
                     id: plusMinusButton;
-                    text: isExpanded ? "-" : "+";
+                    text: model.isExpanded ? "-" : "+";
                     // Anchors
                     anchors.top: parent.top;
-                    anchors.topMargin: isExpanded ? -9 : 0;
+                    anchors.topMargin: model.isExpanded ? -9 : 0;
                     anchors.bottom: parent.bottom;
                     anchors.left: parent.left;
                     width: 60;
@@ -171,14 +175,17 @@ Item {
                     id: securityTabMouseArea;
                     anchors.fill: parent;
                     onClicked: {
-                        isExpanded = !isExpanded;
+                        model.isExpanded = !model.isExpanded;
+                        if (model.isExpanded) {
+                            collapseAllOtherHelpItems(index);
+                        }
                     }
                 }
             }
 
             Rectangle {
                 id: answerContainer;
-                visible: isExpanded;
+                visible: model.isExpanded;
                 color: Qt.rgba(0, 0, 0, 0.5);
                 anchors.top: questionContainer.bottom;
                 anchors.left: parent.left;
@@ -233,6 +240,14 @@ Item {
         }
     }
     signal sendSignalToWallet(var msg);
+
+    function collapseAllOtherHelpItems(thisIndex) {
+        for (var i = 0; i < helpModel.count; i++) {
+            if (i !== thisIndex) {
+                helpModel.setProperty(i, "isExpanded", false);
+            }
+        }
+    }
     //
     // FUNCTION DEFINITIONS END
     //
