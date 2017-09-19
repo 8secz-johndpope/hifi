@@ -180,6 +180,8 @@ Item {
                             "INVALIDATED"
                         } else if (root.ownedItemCount > 1) {
                             "(#" + root.itemEdition + ") You own " + root.ownedItemCount + " others"
+                        } else {
+                            ""
                         }
                     }
                 size: 18;
@@ -189,6 +191,8 @@ Item {
                         } else if (root.status === "invalidated") {
                             hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
+                            hifi.colors.baseGray
+                        } else {
                             hifi.colors.baseGray
                         }
                     }
@@ -220,6 +224,8 @@ Item {
                         } else if (root.status === "invalidated") {
                             hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
+                            hifi.colors.baseGray
+                        } else {
                             hifi.colors.baseGray
                         }
                     }

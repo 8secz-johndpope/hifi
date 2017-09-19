@@ -124,12 +124,12 @@
     Entities.canWriteAssetsChanged.connect(onCanWriteAssetsChanged);
     ContextOverlay.contextOverlayClicked.connect(setCertificateInfo);
 
-    function goToPurchases() {
+    function goToPurchases(referrerURL) {
         tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
         tablet.sendToQml({
             method: 'updatePurchases',
             canRezCertifiedItems: Entities.canRezCertified || Entities.canRezTmpCertified,
-            referrerURL: parsedJsonMessage.referrerURL
+            referrerURL: referrerURL
         });
     }
 
@@ -173,7 +173,7 @@
                     data: Settings.getValue("inspectionMode", false)
                 }));
             } else if (parsedJsonMessage.type === "PURCHASES") {
-                goToPurchases();
+                goToPurchases(parsedJsonMessage.referrerURL);
             }
         }
     }
@@ -238,7 +238,7 @@
                 //tablet.popFromStack();
                 break;
             case 'checkout_goToPurchases':
-                goToPurchases()
+                goToPurchases(MARKETPLACE_URL_INITIAL);
                 break;
             case 'checkout_continueShopping':
                 tablet.gotoWebScreen(MARKETPLACE_URL + '/items/' + message.itemId, MARKETPLACES_INJECT_SCRIPT_URL);
@@ -289,7 +289,7 @@
                 break;
             case 'inspectionCertificate_closeClicked':
                 if (message.closeGoesToPurchases) {
-                    goToPurchases();
+                    goToPurchases(MARKETPLACE_URL_INITIAL);
                 } else {
                     tablet.gotoHomeScreen();
                 }
