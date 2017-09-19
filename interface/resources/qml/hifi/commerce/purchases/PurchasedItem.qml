@@ -27,7 +27,8 @@ Item {
     HifiConstants { id: hifi; }
 
     id: root;
-    property bool isPending: true;
+    property bool isPending: false;
+    property bool canRezCertifiedItems: false;
     property string itemName: "";
     property string itemId: "";
     property string itemPreviewImageUrl: "";
@@ -208,12 +209,14 @@ Item {
 
         Button {
             id: buttonContainer;
+            property int color: hifi.buttons.red;
+            property int colorScheme: hifi.colorSchemes.light;
+
             anchors.top: parent.top;
             anchors.bottom: parent.bottom;
             anchors.right: parent.right;
             width: height;
-            property int color: hifi.buttons.red
-            property int colorScheme: hifi.colorSchemes.light
+            enabled: root.canRezCertifiedItems;
             
             onClicked: {
                 if (urlHandler.canHandleUrl(root.itemHref)) {

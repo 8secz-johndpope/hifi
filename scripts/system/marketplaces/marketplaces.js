@@ -166,6 +166,7 @@
                 tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
                 tablet.sendToQml({
                     method: 'updatePurchases',
+                    canRezCertifiedItems: Entities.canRezCertified || Entities.canRezTmpCertified,
                     referrerURL: parsedJsonMessage.referrerURL
                 });
             }

@@ -31,6 +31,7 @@ Rectangle {
     property bool securityImageResultReceived: false;
     property bool purchasesReceived: false;
     property bool punctuationMode: false;
+    property bool canRezCertifiedItems: false;
     // Style
     color: hifi.colors.white;
     Hifi.QmlCommerce {
@@ -372,18 +373,97 @@ Rectangle {
             id: filteredPurchasesModel;
         }
 
+        Rectangle {
+            id: cantRezCertified;
+            visible: !root.canRezCertifiedItems;
+            color: "#FFC3CD";
+            radius: 4;
+            border.color: hifi.colors.redAccent;
+            border.width: 1;
+            anchors.top: separator.bottom;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 16;
+            anchors.right: parent.right;
+            anchors.rightMargin: 16;
+            height: 80;
+
+            HiFiGlyphs {
+                id: lightningIcon;
+                text: hifi.glyphs.lightning;
+                // Size
+                size: 36;
+                // Anchors
+                anchors.top: parent.top;
+                anchors.topMargin: 18;
+                anchors.left: parent.left;
+                anchors.leftMargin: 12;
+                horizontalAlignment: Text.AlignHCenter;
+                // Style
+                color: hifi.colors.lightGray;
+            }
+
+            RalewayRegular {
+                text: "You don't have permission to rez certified items in this domain.";
+                // Text size
+                size: 18;
+                // Anchors
+                anchors.top: parent.top;
+                anchors.topMargin: 4;
+                anchors.left: lightningIcon.right;
+                anchors.leftMargin: 8;
+                anchors.right: helpButton.left;
+                anchors.rightMargin: 16;
+                anchors.bottom: parent.bottom;
+                anchors.bottomMargin: 4;
+                // Style
+                color: hifi.colors.baseGray;
+                wrapMode: Text.WordWrap;
+                // Alignment
+                verticalAlignment: Text.AlignVCenter;
+            }
+            
+            HifiControlsUit.Button {
+                id: helpButton;
+                color: hifi.buttons.red;
+                colorScheme: hifi.colorSchemes.light;
+                anchors.top: parent.top;
+                anchors.topMargin: 12;
+                anchors.bottom: parent.bottom;
+                anchors.bottomMargin: 8;
+                anchors.right: parent.right;
+                anchors.rightMargin: 12;
+                width: height;
+                HiFiGlyphs {
+                    text: hifi.glyphs.question;
+                    // Size
+                    size: parent.height*1.3;
+                    // Anchors
+                    anchors.fill: parent;
+                    // Style
+                    horizontalAlignment: Text.AlignHCenter;
+                    color: hifi.colors.faintGray;
+                }
+
+                onClicked: {
+                    
+                }
+            }
+        }
+
         ListView {
             id: purchasesContentsList;
             visible: purchasesModel.count !== 0;
             clip: true;
             model: filteredPurchasesModel;
             // Anchors
-            anchors.top: separator.bottom;
+            anchors.top: cantRezCertified.bottom;
             anchors.topMargin: 12;
             anchors.left: parent.left;
             anchors.bottom: parent.bottom;
             width: parent.width;
             delegate: PurchasedItem {
+                canRezCertifiedItems: root.canRezCertifiedItems;
                 itemName: title;
                 itemId: id;
                 itemPreviewImageUrl: preview;
@@ -483,6 +563,7 @@ Rectangle {
             case 'updatePurchases':
                 referrerURL = message.referrerURL;
                 titleBarContainer.referrerURL = message.referrerURL;
+                //root.canRezCertifiedItems = message.canRezCertifiedItems;
             break;
             case 'purchases_getIsFirstUseResult':
                 if (message.isFirstUseOfPurchases && root.activeView !== "firstUseTutorial") {
