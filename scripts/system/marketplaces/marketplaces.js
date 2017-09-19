@@ -22,7 +22,7 @@
     var MARKETPLACE_CHECKOUT_QML_PATH = Script.resourcesPath() + "qml/hifi/commerce/checkout/Checkout.qml";
     var MARKETPLACE_PURCHASES_QML_PATH = Script.resourcesPath() + "qml/hifi/commerce/purchases/Purchases.qml";
     var MARKETPLACE_WALLET_QML_PATH = Script.resourcesPath() + "qml/hifi/commerce/wallet/Wallet.qml";
-    var MARKETPLACE_INSPECTIONCERTIFICATE_QML_PATH = "qml/hifi/commerce/inspectionCertificate/InspectionCertificate.qml";
+    var MARKETPLACE_INSPECTIONCERTIFICATE_QML_PATH = "commerce/inspectionCertificate/InspectionCertificate.qml";
 
     var HOME_BUTTON_TEXTURE = "http://hifi-content.s3.amazonaws.com/alan/dev/tablet-with-home-button.fbx/tablet-with-home-button.fbm/button-root.png";
     // var HOME_BUTTON_TEXTURE = Script.resourcesPath() + "meshes/tablet-with-home-button.fbx/tablet-with-home-button.fbm/button-root.png";
@@ -100,11 +100,12 @@
         }
     }
 
-    function contextOverlayClicked(currentEntityWithContextOverlay) {
+    function setCertificateInfo(currentEntityWithContextOverlay, itemMarketplaceId, closeGoesToPurchases) {
         wireEventBridge(true);
         tablet.sendToQml({
             method: 'inspectionCertificate_setMarketplaceId',
-            marketplaceId: Entities.getEntityProperties(currentEntityWithContextOverlay, ['marketplaceID']).marketplaceID
+            marketplaceId: itemMarketplaceId || Entities.getEntityProperties(currentEntityWithContextOverlay, ['marketplaceID']).marketplaceID,
+            closeGoesToPurchases: closeGoesToPurchases
         });
         // ZRF FIXME! Make a call to the endpoint to get item info instead of this silliness
         Script.setTimeout(function () {
@@ -121,7 +122,16 @@
     marketplaceButton.clicked.connect(onClick);
     tablet.screenChanged.connect(onScreenChanged);
     Entities.canWriteAssetsChanged.connect(onCanWriteAssetsChanged);
-    ContextOverlay.contextOverlayClicked.connect(contextOverlayClicked);
+    ContextOverlay.contextOverlayClicked.connect(setCertificateInfo);
+
+    function goToPurchases() {
+        tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
+        tablet.sendToQml({
+            method: 'updatePurchases',
+            canRezCertifiedItems: Entities.canRezCertified || Entities.canRezTmpCertified,
+            referrerURL: parsedJsonMessage.referrerURL
+        });
+    }
 
     function onMessage(message) {
 
@@ -163,12 +173,7 @@
                     data: Settings.getValue("inspectionMode", false)
                 }));
             } else if (parsedJsonMessage.type === "PURCHASES") {
-                tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
-                tablet.sendToQml({
-                    method: 'updatePurchases',
-                    canRezCertifiedItems: Entities.canRezCertified || Entities.canRezTmpCertified,
-                    referrerURL: parsedJsonMessage.referrerURL
-                });
+                goToPurchases();
             }
         }
     }
@@ -181,7 +186,7 @@
         }
         tablet.removeButton(marketplaceButton);
         tablet.screenChanged.disconnect(onScreenChanged);
-        ContextOverlay.contextOverlayClicked.disconnect(contextOverlayClicked);
+        ContextOverlay.contextOverlayClicked.disconnect(setCertificateInfo);
         tablet.webEventReceived.disconnect(onMessage);
         Entities.canWriteAssetsChanged.disconnect(onCanWriteAssetsChanged);
     });
@@ -233,11 +238,7 @@
                 //tablet.popFromStack();
                 break;
             case 'checkout_goToPurchases':
-                tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
-                tablet.sendToQml({
-                    method: 'updatePurchases',
-                    referrerURL: MARKETPLACE_URL_INITIAL
-                });
+                goToPurchases()
                 break;
             case 'checkout_continueShopping':
                 tablet.gotoWebScreen(MARKETPLACE_URL + '/items/' + message.itemId, MARKETPLACES_INJECT_SCRIPT_URL);
@@ -282,8 +283,16 @@
             case 'purchases_openGoTo':
                 tablet.loadQMLSource("TabletAddressDialog.qml");
                 break;
+            case 'purchases_itemCertificateClicked':
+                tablet.loadQMLSource("../commerce/inspectionCertificate/InspectionCertificate.qml");
+                setCertificateInfo("", message.itemMarketplaceId, true);
+                break;
             case 'inspectionCertificate_closeClicked':
-                tablet.gotoHomeScreen();
+                if (message.closeGoesToPurchases) {
+                    goToPurchases();
+                } else {
+                    tablet.gotoHomeScreen();
+                }
                 break;
             case 'inspectionCertificate_showInMarketplaceClicked':
                 tablet.gotoWebScreen(MARKETPLACE_URL + '/items/' + message.itemId, MARKETPLACES_INJECT_SCRIPT_URL);

@@ -143,7 +143,7 @@ Item {
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
-                    sendToPurchases({method: 'purchases_itemCertificateClicked', itemId: root.itemId});
+                    sendToPurchases({method: 'purchases_itemCertificateClicked', itemMarketplaceId: root.itemId});
                 }
                 onEntered: {
                     certificateIcon.color = hifi.colors.black;
@@ -175,21 +175,21 @@ Item {
                 width: paintedWidth;
                 text: {
                         if (root.status === "pending") {
-                            "PENDING...";
+                            "PENDING..."
                         } else if (root.status === "invalidated") {
-                            "INVALIDATED";
+                            "INVALIDATED"
                         } else if (root.ownedItemCount > 1) {
-                            "(#" + root.itemEdition + ") You own " + root.ownedItemCount + " others";
+                            "(#" + root.itemEdition + ") You own " + root.ownedItemCount + " others"
                         }
                     }
                 size: 18;
                 color: {
                         if (root.status === "pending") {
-                            hifi.colors.blueHighlight;
+                            hifi.colors.blueHighlight
                         } else if (root.status === "invalidated") {
-                            hifi.colors.redAccent;
+                            hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
-                            hifi.colors.baseGray;
+                            hifi.colors.baseGray
                         }
                     }
                 verticalAlignment: Text.AlignTop;
@@ -199,11 +199,11 @@ Item {
                 id: statusIcon;
                 text: {
                         if (root.status === "pending") {
-                            hifi.glyphs.question;
+                            hifi.glyphs.question
                         } else if (root.status === "invalidated") {
-                            hifi.glyphs.question;
+                            hifi.glyphs.question
                         } else {
-                            "";
+                            ""
                         }
                     }
                 // Size
@@ -216,11 +216,11 @@ Item {
                 // Style
                 color: {
                         if (root.status === "pending") {
-                            hifi.colors.blueHighlight;
+                            hifi.colors.blueHighlight
                         } else if (root.status === "invalidated") {
-                            hifi.colors.redAccent;
+                            hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
-                            hifi.colors.baseGray;
+                            hifi.colors.baseGray
                         }
                     }
                 verticalAlignment: Text.AlignTop;

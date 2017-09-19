@@ -494,6 +494,8 @@ Rectangle {
                     onSendToPurchases: {
                         if (msg.method === 'purchases_itemInfoClicked') {
                             sendToScript({method: 'purchases_itemInfoClicked', itemId: itemId});
+                        } else if (msg.method === 'purchases_itemCertificateClicked') {
+                            sendToScript(msg);
                         } else if (msg.method === "showInvalidatedLightbox") {
                             lightboxPopup.titleText = "Item Invalidated";
                             lightboxPopup.bodyText = 'Your item is marked "invalidated" because this item has been suspended ' +

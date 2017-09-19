@@ -30,6 +30,7 @@ Rectangle {
     property string itemOwner: "--";
     property string itemEdition: "--";
     property string dateOfPurchase: "";
+    property bool closeGoesToPurchases: false;
     // Style
     color: hifi.colors.faintGray;
     Hifi.QmlCommerce {
@@ -261,7 +262,7 @@ Rectangle {
             height: 50;
             text: "close";
             onClicked: {
-                sendToScript({method: 'inspectionCertificate_closeClicked'});
+                sendToScript({method: 'inspectionCertificate_closeClicked', closeGoesToPurchases: root.closeGoesToPurchases});
             }
         }   
 
@@ -302,6 +303,7 @@ Rectangle {
         switch (message.method) {
             case 'inspectionCertificate_setMarketplaceId':
                 root.marketplaceId = message.marketplaceId;
+                root.closeGoesToPurchases = message.closeGoesToPurchases;
             break;
             case 'inspectionCertificate_setItemInfo':
                 root.itemName = message.itemName;
