@@ -58,9 +58,23 @@
 
     var onMarketplaceScreen = false;
 
+    var debugCheckout = true;
     function showMarketplace() {
-        UserActivityLogger.openedMarketplace();
-        tablet.gotoWebScreen(MARKETPLACE_URL_INITIAL, MARKETPLACES_INJECT_SCRIPT_URL);
+        if (!debugCheckout) {
+            UserActivityLogger.openedMarketplace();
+            tablet.gotoWebScreen(MARKETPLACE_URL_INITIAL, MARKETPLACES_INJECT_SCRIPT_URL);
+        } else {
+            tablet.pushOntoStack(MARKETPLACE_CHECKOUT_QML_PATH);
+            tablet.sendToQml({
+                method: 'updateCheckoutQML', params: {
+                    itemId: '0d90d21c-ce7a-4990-ad18-e9d2cf991027',
+                    itemName: 'Test Flaregun',
+                    itemAuthor: 'hifiDave',
+                    itemPrice: 17,
+                    itemHref: 'http://mpassets.highfidelity.com/0d90d21c-ce7a-4990-ad18-e9d2cf991027-v1/flaregun.json'
+                }
+            });
+        }
     }
 
     var tablet = Tablet.getTablet("com.highfidelity.interface.tablet.system");
