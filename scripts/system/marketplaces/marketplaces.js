@@ -71,7 +71,7 @@
                     itemName: 'Test Flaregun',
                     itemAuthor: 'hifiDave',
                     itemPrice: 17,
-                    itemHref: 'http://mpassets.highfidelity.com/0d90d21c-ce7a-4990-ad18-e9d2cf991027-v1/flaregun.json'
+                    itemHref: 'http://mpassets.highfidelity.com/0d90d21c-ce7a-4990-ad18-e9d2cf991027-v1/flaregun.json',
                 }
             });
         }
@@ -251,6 +251,7 @@
                 // I don't think this is trivial to do since we also want to inject some JS into the DOM.
                 //tablet.popFromStack();
                 break;
+            case 'header_goToPurchases':
             case 'checkout_goToPurchases':
                 goToPurchases(MARKETPLACE_URL_INITIAL);
                 break;

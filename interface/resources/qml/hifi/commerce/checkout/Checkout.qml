@@ -30,11 +30,12 @@ Rectangle {
     property bool purchasesReceived: false;
     property bool balanceReceived: false;
     property bool securityImageResultReceived: false;
-    property string itemId: "";
-    property string itemHref: "";
-    property double balanceAfterPurchase: 0;
+    property string itemId;
+    property string itemPreviewImageUrl;
+    property string itemHref;
+    property double balanceAfterPurchase;
     property bool alreadyOwned: false;
-    property int itemPriceFull: 0;
+    property int itemPrice: 0;
     property bool itemIsJson: true;
     property bool shouldBuyWithControlledFailure: false;
     // Style
@@ -108,8 +109,7 @@ Rectangle {
                 console.log("Failed to get balance", result.data.message);
             } else {
                 root.balanceReceived = true;
-                hfcBalanceText.text = result.data.balance + " HFC";
-                balanceAfterPurchase = result.data.balance - root.itemPriceFull;
+                root.balanceAfterPurchase = result.data.balance - root.itemPrice;
                 root.setBuyText();
             }
         }
@@ -146,6 +146,8 @@ Rectangle {
             onSendToParent: {
                 if (msg.method === 'needsLogIn' && root.activeView !== "needsLogIn") {
                     root.activeView = "needsLogIn";
+                } else {
+                    sendToScript(msg);
                 }
             }
         }
@@ -251,7 +253,7 @@ Rectangle {
             HifiControlsUit.Button {
                 id: cancelButton;
                 color: hifi.buttons.black;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: hifi.colorSchemes.light;
                 anchors.top: parent.top;
                 anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
@@ -269,7 +271,7 @@ Rectangle {
             HifiControlsUit.Button {
                 id: setUpButton;
                 color: hifi.buttons.blue;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: hifi.colorSchemes.light;
                 anchors.top: parent.top;
                 anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
@@ -297,265 +299,123 @@ Rectangle {
         anchors.top: titleBarContainer.bottom;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
-        anchors.right: parent.right;
+        anchors.right: parent.right;        
 
-        //
-        // ITEM DESCRIPTION START
-        //
-        Item {
-            id: itemDescriptionContainer;
-            // Anchors
-            anchors.left: parent.left;
-            anchors.leftMargin: 32;
-            anchors.right: parent.right;
-            anchors.rightMargin: 32;
+        RalewayRegular {
+            id: confirmPurchaseText;
             anchors.top: parent.top;
-            anchors.bottom: checkoutActionButtonsContainer.top;
+            anchors.topMargin: 30;
+            anchors.left: parent.left;
+            anchors.leftMargin: 16;
+            width: paintedWidth;
+            height: paintedHeight;
+            text: "Confirm Purchase:";
+            color: hifi.colors.baseGray;
+            size: 28;
+        }
+        
+        HifiControlsUit.Separator {
+            id: separator;
+            colorScheme: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.top: confirmPurchaseText.bottom;
+            anchors.topMargin: 16;
+        }
 
-            // HFC Balance text
-            Item {
-                id: hfcBalanceContainer;
+        Item {
+            id: itemContainer;
+            anchors.top: separator.bottom;
+            anchors.topMargin: 24;
+            anchors.left: parent.left;
+            anchors.leftMargin: 16;
+            anchors.right: parent.right;
+            anchors.rightMargin: 16;
+            height: 120;
+
+            Image {
+                id: itemPreviewImage;
+                source: root.itemPreviewImageUrl;
+                anchors.left: parent.left;
+                anchors.top: parent.top;
+                anchors.bottom: parent.bottom;
+                width: height;
+                fillMode: Image.PreserveAspectCrop;
+            }
+
+            RalewaySemiBold {
+                id: itemNameText;
+                // Text size
+                size: 26;
                 // Anchors
                 anchors.top: parent.top;
-                anchors.topMargin: 30;
-                anchors.left: parent.left;
-                anchors.leftMargin: 16;
-                anchors.right: parent.right;
-                anchors.rightMargin: 16;
-                height: childrenRect.height;
-
-                RalewaySemiBold {
-                    id: hfcBalanceTextLabel;
-                    text: "Balance:";
-                    // Anchors
-                    anchors.top: parent.top;
-                    anchors.left: parent.left;
-                    width: paintedWidth;
-                    height: paintedHeight;
-                    // Text size
-                    size: 30;
-                    // Style
-                    color: hifi.colors.black;
-                    // Alignment
-                    horizontalAlignment: Text.AlignLeft;
-                    verticalAlignment: Text.AlignVCenter;
-                }
-                RalewayRegular {
-                    id: hfcBalanceText;
-                    text: "-- HFC";
-                    // Text size
-                    size: hfcBalanceTextLabel.size;
-                    // Anchors
-                    anchors.top: parent.top;
-                    anchors.left: hfcBalanceTextLabel.right;
-                    anchors.leftMargin: 16;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: 16;
-                    height: paintedHeight;
-                    // Style
-                    color: hifi.colors.black;
-                    // Alignment
-                    horizontalAlignment: Text.AlignRight;
-                    verticalAlignment: Text.AlignVCenter;
-                }
-            }
-
-            // Item Name text
-            Item {
-                id: itemNameContainer;
-                // Anchors
-                anchors.top: hfcBalanceContainer.bottom;
-                anchors.topMargin: 32;
-                anchors.left: parent.left;
-                anchors.leftMargin: 16;
-                anchors.right: parent.right;
-                anchors.rightMargin: 16;
-                height: childrenRect.height;
-
-                RalewaySemiBold {
-                    id: itemNameTextLabel;
-                    text: "Item:";
-                    // Anchors
-                    anchors.top: parent.top;
-                    anchors.left: parent.left;
-                    width: paintedWidth;
-                    height: paintedHeight;
-                    // Text size
-                    size: 20;
-                    // Style
-                    color: hifi.colors.black;
-                    // Alignment
-                    horizontalAlignment: Text.AlignLeft;
-                    verticalAlignment: Text.AlignVCenter;
-                }
-                RalewayRegular {
-                    id: itemNameText;
-                    // Text size
-                    size: itemNameTextLabel.size;
-                    // Anchors
-                    anchors.top: parent.top;
-                    anchors.left: itemNameTextLabel.right;
-                    anchors.leftMargin: 16;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: 16;
-                    height: paintedHeight;
-                    // Style
-                    color: hifi.colors.black;
-                    elide: Text.ElideRight;
-                    // Alignment
-                    horizontalAlignment: Text.AlignRight;
-                    verticalAlignment: Text.AlignVCenter;
-                }
-            }
-
-
-            // Item Author text
-            Item {
-                id: itemAuthorContainer;
-                // Anchors
-                anchors.top: itemNameContainer.bottom;
-                anchors.topMargin: 4;
-                anchors.left: parent.left;
-                anchors.leftMargin: 16;
-                anchors.right: parent.right;
-                anchors.rightMargin: 16;
-                height: childrenRect.height;
-
-                RalewaySemiBold {
-                    id: itemAuthorTextLabel;
-                    text: "Author:";
-                    // Anchors
-                    anchors.top: parent.top;
-                    anchors.left: parent.left;
-                    width: paintedWidth;
-                    height: paintedHeight;
-                    // Text size
-                    size: 20;
-                    // Style
-                    color: hifi.colors.black;
-                    // Alignment
-                    horizontalAlignment: Text.AlignLeft;
-                    verticalAlignment: Text.AlignVCenter;
-                }
-                RalewayRegular {
-                    id: itemAuthorText;
-                    // Text size
-                    size: itemAuthorTextLabel.size;
-                    // Anchors
-                    anchors.top: parent.top;
-                    anchors.left: itemAuthorTextLabel.right;
-                    anchors.leftMargin: 16;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: 16;
-                    height: paintedHeight;
-                    // Style
-                    color: hifi.colors.black;
-                    elide: Text.ElideRight;
-                    // Alignment
-                    horizontalAlignment: Text.AlignRight;
-                    verticalAlignment: Text.AlignVCenter;
-                }
+                anchors.left: itemPreviewImage.right;
+                anchors.leftMargin: 12;
+                anchors.right: itemPriceContainer.left;
+                anchors.rightMargin: 8;
+                height: 30;
+                // Style
+                color: hifi.colors.blueAccent;
+                elide: Text.ElideRight;
+                // Alignment
+                horizontalAlignment: Text.AlignLeft;
+                verticalAlignment: Text.AlignTop;
             }
 
             // "Item Price" container
             Item {
                 id: itemPriceContainer;
                 // Anchors
-                anchors.top: itemAuthorContainer.bottom;
-                anchors.topMargin: 32;
-                anchors.left: parent.left;
-                anchors.leftMargin: 16;
+                anchors.top: parent.top;
                 anchors.right: parent.right;
-                anchors.rightMargin: 16;
-                height: childrenRect.height;
+                height: 30;
 
-                RalewaySemiBold {
+                // "HFC" balance label
+                HiFiGlyphs {
                     id: itemPriceTextLabel;
-                    text: "<b>Item Price:</b>";
+                    text: hifi.glyphs.hfc;
+                    // Size
+                    size: 40;
                     // Anchors
+                    anchors.right: itemPriceText.left;
+                    anchors.rightMargin: 4;
                     anchors.top: parent.top;
-                    anchors.left: parent.left;
-                    width: paintedWidth;
+                    anchors.topMargin: -4;
                     height: paintedHeight;
-                    // Text size
-                    size: 30;
                     // Style
-                    color: hifi.colors.black;
+                    color: hifi.colors.blueAccent;
                     // Alignment
-                    horizontalAlignment: Text.AlignLeft;
-                    verticalAlignment: Text.AlignVCenter;
+                    horizontalAlignment: Text.AlignRight;
+                    verticalAlignment: Text.AlignTop;
                 }
-                RalewayRegular {
+                FiraSansSemiBold {
                     id: itemPriceText;
-                    text: "<b>-- HFC</b>";
+                    text: "--";
                     // Text size
-                    size: itemPriceTextLabel.size;
+                    size: 26;
                     // Anchors
                     anchors.top: parent.top;
-                    anchors.left: itemPriceTextLabel.right;
-                    anchors.leftMargin: 16;
                     anchors.right: parent.right;
                     anchors.rightMargin: 16;
-                    height: paintedHeight;
-                    // Style
-                    color: (balanceAfterPurchase >= 0) ? hifi.colors.black : hifi.colors.redHighlight;
-                    // Alignment
-                    horizontalAlignment: Text.AlignRight;
-                    verticalAlignment: Text.AlignVCenter;
-                }
-            }
-
-            // "Balance After Purchase" container
-            Item {
-                id: balanceAfterPurchaseContainer;
-                // Anchors
-                anchors.top: itemPriceContainer.bottom;
-                anchors.topMargin: 16;
-                anchors.left: parent.left;
-                anchors.leftMargin: 16;
-                anchors.right: parent.right;
-                anchors.rightMargin: 16;
-                height: childrenRect.height;
-
-                RalewaySemiBold {
-                    id: balanceAfterPurchaseTextLabel;
-                    text: "Balance After Purchase:";
-                    // Anchors
-                    anchors.top: parent.top;
-                    anchors.left: parent.left;
                     width: paintedWidth;
                     height: paintedHeight;
-                    // Text size
-                    size: 20;
                     // Style
-                    color: hifi.colors.black;
-                    // Alignment
-                    horizontalAlignment: Text.AlignLeft;
-                    verticalAlignment: Text.AlignVCenter;
-                }
-                RalewayRegular {
-                    id: balanceAfterPurchaseText;
-                    text: balanceAfterPurchase + " HFC";
-                    // Text size
-                    size: balanceAfterPurchaseTextLabel.size;
-                    // Anchors
-                    anchors.top: parent.top;
-                    anchors.left: balanceAfterPurchaseTextLabel.right;
-                    anchors.leftMargin: 16;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: 16;
-                    height: paintedHeight;
-                    // Style
-                    color: (balanceAfterPurchase >= 0) ? hifi.colors.black : hifi.colors.redHighlight;
+                    color: hifi.colors.blueAccent;
                     // Alignment
                     horizontalAlignment: Text.AlignRight;
-                    verticalAlignment: Text.AlignVCenter;
+                    verticalAlignment: Text.AlignTop;
                 }
             }
         }
-        //
-        // ITEM DESCRIPTION END
-        //
+        
+        HifiControlsUit.Separator {
+            id: separator2;
+            colorScheme: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.top: itemContainer.bottom;
+            anchors.topMargin: itemContainer.anchors.topMargin;
+        }
 
 
         //
@@ -565,49 +425,87 @@ Rectangle {
             id: checkoutActionButtonsContainer;
             // Size
             width: root.width;
-            height: 200;
             // Anchors
+            anchors.top: separator2.bottom;
+            anchors.topMargin: 16;
             anchors.left: parent.left;
+            anchors.leftMargin: 16;
+            anchors.right: parent.right;
+            anchors.rightMargin: 16;
             anchors.bottom: parent.bottom;
             anchors.bottomMargin: 8;
 
-            // "Cancel" button
-            HifiControlsUit.Button {
-                id: cancelPurchaseButton;
-                color: hifi.buttons.black;
-                colorScheme: hifi.colorSchemes.dark;
+            Rectangle {
+                id: buyTextContainer;
+                visible: buyText.text !== "";
                 anchors.top: parent.top;
-                anchors.topMargin: 3;
-                height: 40;
                 anchors.left: parent.left;
-                anchors.leftMargin: 20;
-                width: parent.width/2 - anchors.leftMargin*2;
-                text: "Cancel"
-                onClicked: {
-                    sendToScript({method: 'checkout_cancelClicked', params: itemId});
+                anchors.right: parent.right;
+                height: buyText.height + 30;
+                radius: 4;
+                border.width: 2;
+
+                HiFiGlyphs {
+                    id: buyGlyph;
+                    // Size
+                    size: 46;
+                    // Anchors
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 4;
+                    anchors.top: parent.top;
+                    anchors.topMargin: 8;
+                    anchors.bottom: parent.bottom;
+                    width: paintedWidth;
+                    // Style
+                    color: hifi.colors.baseGray;
+                    // Alignment
+                    horizontalAlignment: Text.AlignHCenter;
+                    verticalAlignment: Text.AlignTop;
+                }
+
+                RalewaySemiBold {
+                    id: buyText;
+                    // Text size
+                    size: 18;
+                    // Anchors
+                    anchors.left: buyGlyph.right;
+                    anchors.leftMargin: 8;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 12;
+                    anchors.verticalCenter: parent.verticalCenter;
+                    height: paintedHeight;
+                    // Style
+                    color: hifi.colors.black;
+                    wrapMode: Text.WordWrap;
+                    // Alignment
+                    horizontalAlignment: Text.AlignLeft;
+                    verticalAlignment: Text.AlignVCenter;
+
+                    onLinkActivated: {
+                        sendToScript({method: 'checkout_goToPurchases'});
+                    }
                 }
             }
 
             // "Buy" button
             HifiControlsUit.Button {
                 id: buyButton;
-                enabled: (balanceAfterPurchase >= 0 && purchasesReceived && balanceReceived) || !itemIsJson;
+                enabled: (root.balanceAfterPurchase >= 0 && purchasesReceived && balanceReceived) || !itemIsJson;
                 color: hifi.buttons.blue;
-                colorScheme: hifi.colorSchemes.dark;
-                anchors.top: parent.top;
-                anchors.topMargin: 3;
+                colorScheme: hifi.colorSchemes.light;
+                anchors.top: buyTextContainer.visible ? buyTextContainer.bottom : separator2.bottom;
+                anchors.topMargin: buyTextContainer.visible ? 12 : 16;
                 height: 40;
+                anchors.left: parent.left;
                 anchors.right: parent.right;
-                anchors.rightMargin: 20;
-                width: parent.width/2 - anchors.rightMargin*2;
-                text: (itemIsJson ? ((purchasesReceived && balanceReceived) ? (root.alreadyOwned ? "Buy Another" : "Buy"): "--") : "Get Item");
+                text: (itemIsJson ? ((purchasesReceived && balanceReceived) ? "Confirm Purchase" : "--") : "Get Item");
                 onClicked: {
                     if (itemIsJson) {
                         buyButton.enabled = false;
                         if (!shouldBuyWithControlledFailure) {
-                            commerce.buy(itemId, itemPriceFull);
+                            commerce.buy(itemId, itemPrice);
                         } else {
-                            commerce.buy(itemId, itemPriceFull, true);
+                            commerce.buy(itemId, itemPrice, true);
                         }
                     } else {
                         if (urlHandler.canHandleUrl(itemHref)) {
@@ -617,42 +515,20 @@ Rectangle {
                 }
             }
 
-            // "Purchases" button
+            // "Cancel" button
             HifiControlsUit.Button {
-                id: goToPurchasesButton;
-                color: hifi.buttons.black;
-                colorScheme: hifi.colorSchemes.dark;
+                id: cancelPurchaseButton;
+                color: hifi.buttons.noneBorderlessGray;
+                colorScheme: hifi.colorSchemes.light;
                 anchors.top: buyButton.bottom;
-                anchors.topMargin: 20;
-                anchors.bottomMargin: 7;
+                anchors.topMargin: 16;
                 height: 40;
                 anchors.left: parent.left;
-                anchors.leftMargin: 20;
-                width: parent.width - anchors.leftMargin*2;
-                text: "View Purchases"
-                onClicked: {
-                    sendToScript({method: 'checkout_goToPurchases'});
-                }
-            }
-
-            RalewayRegular {
-                id: buyText;
-                // Text size
-                size: 20;
-                // Anchors
-                anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 10;
-                height: paintedHeight;
-                anchors.left: parent.left;
-                anchors.leftMargin: 10;
                 anchors.right: parent.right;
-                anchors.rightMargin: 10;
-                // Style
-                color: hifi.colors.black;
-                wrapMode: Text.WordWrap;
-                // Alignment
-                horizontalAlignment: Text.AlignHCenter;
-                verticalAlignment: Text.AlignVCenter;
+                text: "Cancel"
+                onClicked: {
+                    sendToScript({method: 'checkout_cancelClicked', params: itemId});
+                }
             }
         }
         //
@@ -676,7 +552,7 @@ Rectangle {
 
         RalewayRegular {
             id: completeText;
-            text: "<b>Purchase Complete!</b><br><br>You bought <b>" + (itemNameText.text) + "</b> by <b>" + (itemAuthorText.text) + "</b>";
+            text: "<b>Purchase Complete!</b>";
             // Text size
             size: 24;
             // Anchors
@@ -708,7 +584,7 @@ Rectangle {
             HifiControlsUit.Button {
                 id: purchasesButton;
                 color: hifi.buttons.black;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: hifi.colorSchemes.light;
                 anchors.top: parent.top;
                 anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
@@ -726,7 +602,7 @@ Rectangle {
             HifiControlsUit.Button {
                 id: rezNowButton;
                 color: hifi.buttons.blue;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: hifi.colorSchemes.light;
                 anchors.top: parent.top;
                 anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
@@ -756,7 +632,7 @@ Rectangle {
             HifiControlsUit.Button {
                 id: continueShoppingButton;
                 color: hifi.buttons.black;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: hifi.colorSchemes.light;
                 anchors.top: parent.top;
                 anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
@@ -836,7 +712,7 @@ Rectangle {
             HifiControlsUit.Button {
                 id: backToMarketplaceButton;
                 color: hifi.buttons.black;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: hifi.colorSchemes.light;
                 anchors.top: parent.top;
                 anchors.topMargin: 3;
                 anchors.bottom: parent.bottom;
@@ -890,10 +766,10 @@ Rectangle {
             case 'updateCheckoutQML':
                 itemId = message.params.itemId;
                 itemNameText.text = message.params.itemName;
-                itemAuthorText.text = message.params.itemAuthor;
-                root.itemPriceFull = message.params.itemPrice;
-                itemPriceText.text = root.itemPriceFull === 0 ? "Free" : "<b>" + root.itemPriceFull + " HFC</b>";
+                root.itemPrice = message.params.itemPrice;
+                itemPriceText.text = root.itemPrice === 0 ? "Free" : root.itemPrice;
                 itemHref = message.params.itemHref;
+                itemPreviewImageUrl = "https://hifi-metaverse.s3-us-west-1.amazonaws.com/marketplace/previews/" + itemId + "/thumbnail/hifi-mp-" + itemId + ".jpg";
                 if (itemHref.indexOf('.json') === -1) {
                     root.itemIsJson = false;
                 }
@@ -919,15 +795,25 @@ Rectangle {
             if (root.purchasesReceived && root.balanceReceived) {
                 if (root.balanceAfterPurchase < 0) {
                     if (root.alreadyOwned) {
-                        buyText.text = "You do not have enough HFC to purchase this item again. Go to your <b>Purchases</b> to view the copy you own.";
+                        buyText.text = "Your Wallet does not have sufficient funds to purchase this item again.<br>" +
+                        '<font color="' + hifi.colors.blueAccent + '"><a href="#">View the copy you own in My Purchases</a></font>';
                     } else {
-                        buyText.text = "You do not have enough HFC to purchase this item.";
+                        buyText.text = "Your Wallet does not have sufficient funds to purchase this item.";
                     }
+                    buyTextContainer.color = "#FFC3CD";
+                    buyTextContainer.border.color = "#F3808F";
+                    buyGlyph.text = hifi.glyphs.error;
+                    buyGlyph.size = 54;
                 } else {
                     if (root.alreadyOwned) {
-                        buyText.text = "<b>You already own this item.</b> If you buy it again, you'll be able to use multiple copies of it at once.";
+                        buyText.text = 'You already own this item.<br>Purchasing it will buy another copy.<br><font color="'
+                        + hifi.colors.blueAccent + '"><a href="#">View this item in My Purchases</a></font>';
+                        buyTextContainer.color = "#FFD6AD";
+                        buyTextContainer.border.color = "#FAC07D";
+                        buyGlyph.text = hifi.glyphs.alert;
+                        buyGlyph.size = 46;
                     } else {
-                        buyText.text = "This item will be added to your <b>Purchases</b>, which can be accessed from <b>Marketplace</b>.";
+                        buyText.text = "";
                     }
                 }
             } else {
@@ -935,6 +821,10 @@ Rectangle {
             }
         } else {
             buyText.text = "This Marketplace item isn't an entity. It <b>will not</b> be added to your <b>Purchases</b>.";
+            buyTextContainer.color = "#FFD6AD";
+            buyTextContainer.border.color = "#FAC07D";
+            buyGlyph.text = hifi.glyphs.alert;
+            buyGlyph.size = 46;
         }
     }
 

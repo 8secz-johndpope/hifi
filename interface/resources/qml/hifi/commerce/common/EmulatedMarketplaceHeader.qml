@@ -114,7 +114,7 @@ Rectangle {
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
-                    
+                    sendToParent({method: 'header_goToPurchases'});
                 }
                 onEntered: myPurchasesText.color = hifi.colors.blueAccent;
                 onExited: myPurchasesText.color = hifi.colors.blueHighlight;
