@@ -279,6 +279,9 @@
             case 'purchases_setIsFirstUse':
                 Settings.setValue("isFirstUseOfPurchases", false);
                 break;
+            case 'purchases_openGoTo':
+                tablet.loadQMLSource("TabletAddressDialog.qml");
+                break;
             case 'inspectionCertificate_closeClicked':
                 tablet.gotoHomeScreen();
                 break;

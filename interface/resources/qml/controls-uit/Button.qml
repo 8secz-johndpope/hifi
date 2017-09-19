@@ -30,8 +30,10 @@ Original.Button {
 
             border.width: (control.color === hifi.buttons.none ||
             (control.color === hifi.buttons.noneBorderless && control.hovered) ||
-            (control.color === hifi.buttons.noneBorderlessWhite && control.hovered)) ? 1 : 0;
-            border.color: control.color === hifi.buttons.noneBorderless ? hifi.colors.blueHighlight : hifi.colors.white;
+            (control.color === hifi.buttons.noneBorderlessWhite && control.hovered) ||
+            (control.color === hifi.buttons.noneBorderlessGray && control.hovered)) ? 1 : 0;
+            border.color: control.color === hifi.buttons.noneBorderless ? hifi.colors.blueHighlight :
+            (control.color === hifi.buttons.noneBorderlessGray ? hifi.colors.baseGray : hifi.colors.white);
 
             gradient: Gradient {
                 GradientStop {

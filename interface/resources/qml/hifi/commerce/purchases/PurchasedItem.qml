@@ -73,7 +73,7 @@ Item {
             anchors.topMargin: 4;
             anchors.left: itemPreviewImage.right;
             anchors.leftMargin: 8;
-            anchors.right: parent.right;
+            anchors.right: buttonContainer.left;
             anchors.rightMargin: 8;
             height: paintedHeight;
             // Text size

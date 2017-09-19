@@ -96,6 +96,85 @@ Rectangle {
         }
     }
 
+    Rectangle {
+        id: lightboxPopup;
+        visible: false;
+        anchors.fill: parent;
+        color: Qt.rgba(0, 0, 0, 0.5);
+        z: 999;
+
+        // This object is always used in a popup.
+        // This MouseArea is used to prevent a user from being
+        //     able to click on a button/mouseArea underneath the popup.
+        MouseArea {
+            anchors.fill: parent;
+            propagateComposedEvents: false;
+        }
+
+        Rectangle {
+            id: lightbox_noRezPermission;
+            anchors.centerIn: parent;
+            width: parent.width - 100;
+            height: 400;
+            color: "white";
+
+            RalewayRegular {
+                text: "You don't have permission to rez certified items in this domain.<br><br>" +
+                "Use the <b>GO TO app</b> to visit another domain or <b>go to your own sandbox.</b>";
+                anchors.top: parent.top;
+                anchors.topMargin: 40;
+                anchors.left: parent.left;
+                anchors.leftMargin: 40;
+                anchors.right: parent.right;
+                anchors.rightMargin: 40;
+                anchors.bottom: buttons.top;
+                color: hifi.colors.baseGray;
+                size: 20;
+                verticalAlignment: Text.AlignTop;
+                wrapMode: Text.WordWrap;
+            }
+
+            Item {
+                id: buttons;
+                anchors.bottom: parent.bottom;
+                anchors.bottomMargin: 20;
+                anchors.left: parent.left;
+                anchors.right: parent.right;
+                height: 40;
+
+                // "Close" button
+                HifiControlsUit.Button {
+                    color: hifi.buttons.noneBorderlessGray;
+                    colorScheme: hifi.colorSchemes.light;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 10;
+                    width: parent.width/2 - anchors.leftMargin*2;
+                    text: "Close"
+                    onClicked: {
+                        lightboxPopup.visible = false;
+                    }
+                }
+
+                // "OPEN GO TO" button
+                HifiControlsUit.Button {
+                    color: hifi.buttons.noneBorderless;
+                    colorScheme: hifi.colorSchemes.light;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    anchors.right: parent.right;
+                    anchors.rightMargin: 10;
+                    width: parent.width/2 - anchors.rightMargin*2;
+                    text: "OPEN GO TO"
+                    onClicked: {
+                        sendToScript({method: 'purchases_openGoTo'});
+                    }
+                }
+            }
+        }
+    }
+
     //
     // TITLE BAR START
     //
@@ -322,6 +401,7 @@ Rectangle {
 
             HifiControlsUit.TextField {
                 id: filterBar;
+                hasRoundedBorder: true;
                 property int previousLength: 0;
                 anchors.left: myPurchasesText.right;
                 anchors.leftMargin: 16;
@@ -446,7 +526,7 @@ Rectangle {
                 }
 
                 onClicked: {
-                    
+                    lightboxPopup.visible = true;
                 }
             }
         }
@@ -457,7 +537,7 @@ Rectangle {
             clip: true;
             model: filteredPurchasesModel;
             // Anchors
-            anchors.top: cantRezCertified.bottom;
+            anchors.top: root.canRezCertifiedItems ? separator.bottom : cantRezCertified.bottom;
             anchors.topMargin: 12;
             anchors.left: parent.left;
             anchors.bottom: parent.bottom;
@@ -563,7 +643,7 @@ Rectangle {
             case 'updatePurchases':
                 referrerURL = message.referrerURL;
                 titleBarContainer.referrerURL = message.referrerURL;
-                //root.canRezCertifiedItems = message.canRezCertifiedItems;
+                root.canRezCertifiedItems = message.canRezCertifiedItems;
             break;
             case 'purchases_getIsFirstUseResult':
                 if (message.isFirstUseOfPurchases && root.activeView !== "firstUseTutorial") {

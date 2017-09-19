@@ -212,11 +212,12 @@ Item {
         readonly property int none: 4
         readonly property int noneBorderless: 5
         readonly property int noneBorderlessWhite: 6
-        readonly property var textColor: [ colors.darkGray, colors.white, colors.white, colors.white, colors.white, colors.blueAccent, colors.white ]
-        readonly property var colorStart: [ colors.white, colors.primaryHighlight, "#d42043", "#343434", Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0) ]
-        readonly property var colorFinish: [ colors.lightGrayText, colors.blueAccent, "#94132e", colors.black, Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0) ]
-        readonly property var hoveredColor: [ colorStart[white], colorStart[blue], colorStart[red], colorFinish[black], colorStart[none], colorStart[noneBorderless], colorStart[noneBorderlessWhite] ]
-        readonly property var pressedColor: [ colorFinish[white], colorFinish[blue], colorFinish[red], colorStart[black], colorStart[none], colorStart[noneBorderless], colorStart[noneBorderlessWhite] ]
+        readonly property int noneBorderlessGray: 7
+        readonly property var textColor: [ colors.darkGray, colors.white, colors.white, colors.white, colors.white, colors.blueAccent, colors.white, colors.darkGray ]
+        readonly property var colorStart: [ colors.white, colors.primaryHighlight, "#d42043", "#343434", Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0) ]
+        readonly property var colorFinish: [ colors.lightGrayText, colors.blueAccent, "#94132e", colors.black, Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0), Qt.rgba(0, 0, 0, 0) ]
+        readonly property var hoveredColor: [ colorStart[white], colorStart[blue], colorStart[red], colorFinish[black], colorStart[none], colorStart[noneBorderless], colorStart[noneBorderlessWhite], colorStart[noneBorderlessGray] ]
+        readonly property var pressedColor: [ colorFinish[white], colorFinish[blue], colorFinish[red], colorStart[black], colorStart[none], colorStart[noneBorderless], colorStart[noneBorderlessWhite], colorStart[noneBorderlessGray] ]
         readonly property var disabledColorStart: [ colorStart[white], colors.baseGrayHighlight]
         readonly property var disabledColorFinish: [ colorFinish[white], colors.baseGrayShadow]
         readonly property var disabledTextColor: [ colors.lightGrayText, colors.baseGrayShadow]
