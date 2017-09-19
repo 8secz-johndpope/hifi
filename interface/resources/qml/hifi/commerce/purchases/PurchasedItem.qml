@@ -208,6 +208,33 @@ Item {
             }
         }
 
+        Rectangle {
+            id: rezzedNotifContainer;
+            z: 998;
+            visible: false;
+            color: hifi.colors.blueHighlight;
+            anchors.fill: buttonContainer;
+            MouseArea {
+                anchors.fill: parent;
+                propagateComposedEvents: false;
+            }
+
+            RalewayBold {
+                anchors.fill: parent;
+                text: "REZZED";
+                size: 18;
+                color: hifi.colors.white;
+                verticalAlignment: Text.AlignVCenter;
+                horizontalAlignment: Text.AlignHCenter;
+            }
+
+                Timer {
+                    id: rezzedNotifContainerTimer;
+                    interval: 2000;
+                    onTriggered: rezzedNotifContainer.visible = false
+                }
+        }
+
         Button {
             id: buttonContainer;
             property int color: hifi.buttons.red;
@@ -223,6 +250,8 @@ Item {
                 if (urlHandler.canHandleUrl(root.itemHref)) {
                     urlHandler.handleUrl(root.itemHref);
                 }
+                rezzedNotifContainer.visible = true;
+                rezzedNotifContainerTimer.start();
             }
 
             style: ButtonStyle {
