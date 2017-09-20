@@ -87,7 +87,7 @@ Item {
         // Title Bar text
         RalewayRegular {
             id: titleBarText;
-            text: "Wallet Setup - Step " + root.activeView.split("_")[1] + " of 4";
+            text: "Wallet Setup" + (securityImageTip.visible ? "" : " - Step " + root.activeView.split("_")[1] + " of 4");
             // Text size
             size: hifi.fontSizes.overlayTitle;
             // Anchors
@@ -346,40 +346,9 @@ Item {
             propagateComposedEvents: false;
         }
 
-        Item {
-            id: holePunch;
-            height: 180;
-            width: 230;
-            anchors.right: parent.right;
-            anchors.top: parent.top;
-            anchors.topMargin: 135;
-        }        
-        Rectangle {
-            id: leftMaskRect;
-            anchors.top: parent.top;
-            anchors.bottom: parent.bottom;
-            anchors.left: parent.left;
-            anchors.right: holePunch.left;
-            color: "black";
-            opacity: 0.9;
-        }
-        Rectangle {
-            id: topMaskRect;
-            anchors.top: parent.top;
-            anchors.bottom: holePunch.top;
-            anchors.left: leftMaskRect.right;
-            anchors.right: parent.right;
-            color: "black";
-            opacity: leftMaskRect.opacity;
-        }
-        Rectangle {
-            id: bottomMaskRect;
-            anchors.top: holePunch.bottom;
-            anchors.bottom: parent.bottom;
-            anchors.left: leftMaskRect.right;
-            anchors.right: parent.right;
-            color: "black";
-            opacity: leftMaskRect.opacity;
+        Image {
+            source: "images/wallet-tip-bg.png";
+            anchors.fill: parent;
         }
 
         RalewayRegular {
@@ -460,6 +429,7 @@ Item {
 
         PassphraseSelection {
             id: passphraseSelection;
+            isShowingTip: securityImageTip.visible;
             anchors.top: passphraseTitleHelper.bottom;
             anchors.topMargin: 30;
             anchors.left: parent.left;
@@ -479,6 +449,7 @@ Item {
         // Navigation Bar
         Item {
             id: passphraseNavBar;
+            visible: !securityImageTip.visible;
             // Size
             width: parent.width;
             height: 50;

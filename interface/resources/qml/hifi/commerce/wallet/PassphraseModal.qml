@@ -151,6 +151,7 @@ Item {
 
         HifiControlsUit.TextField {
             id: passphraseField;
+            colorScheme: hifi.colorSchemes.dark;
             anchors.top: instructionsText.bottom;
             anchors.topMargin: 40;
             anchors.left: instructionsText.left;

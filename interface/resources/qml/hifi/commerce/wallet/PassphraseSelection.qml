@@ -25,6 +25,7 @@ Item {
 
     id: root;
     property bool isChangingPassphrase: false;
+    property bool isShowingTip: false;
 
     // This object is always used in a popup.
     // This MouseArea is used to prevent a user from being
@@ -107,7 +108,7 @@ Item {
         width: 285;
         height: 50;
         echoMode: TextInput.Password;
-        placeholderText: "enter new passphrase";
+        placeholderText: root.isShowingTip ? "" : "enter new passphrase";
 
         onFocusChanged: {
             if (focus) {
@@ -138,7 +139,7 @@ Item {
         anchors.right: passphraseField.right;
         height: 50;
         echoMode: TextInput.Password;
-        placeholderText: "re-enter new passphrase";
+        placeholderText: root.isShowingTip ? "" : "re-enter new passphrase";
 
         onFocusChanged: {
             if (focus) {
@@ -245,6 +246,7 @@ Item {
     // Show passphrase text
     HifiControlsUit.CheckBox {
         id: showPassphrase;
+        visible: !root.isShowingTip;
         colorScheme: hifi.colorSchemes.dark;
         anchors.left: parent.left;
         anchors.leftMargin: 20;
@@ -264,6 +266,7 @@ Item {
 
     // Text below checkbox
     RalewayRegular {
+        visible: !root.isShowingTip;
         text: "Your passphrase is used to encrypt your private keys. Only you have it.<br><br>Please write it down.<br><br><b>If it is lost, you will not be able to recover it.</b>";
         // Text size
         size: 18;
