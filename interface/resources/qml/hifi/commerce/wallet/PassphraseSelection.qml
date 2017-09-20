@@ -227,7 +227,7 @@ Item {
         id: errorText;
         text: "";
         // Text size
-        size: 16;
+        size: 15;
         // Anchors
         anchors.bottom: passphraseField.top;
         anchors.bottomMargin: 4;

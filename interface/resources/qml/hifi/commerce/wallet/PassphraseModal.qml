@@ -138,7 +138,7 @@ Item {
             id: errorText;
             text: "";
             // Text size
-            size: 16;
+            size: 15;
             // Anchors
             anchors.bottom: passphraseField.top;
             anchors.bottomMargin: 4;
@@ -230,7 +230,7 @@ Item {
                     anchors.bottom: parent.bottom;
                     anchors.left: parent.left;
                     anchors.leftMargin: 30;
-                    height: 22;
+                    size: 20;
                     width: height;
                     verticalAlignment: Text.AlignBottom;
                     color: hifi.colors.white;

@@ -58,8 +58,8 @@ Item {
             Item {
                 anchors.fill: parent;
                 Image {
-                    width: parent.width - 8;
-                    height: parent.height - 8;
+                    width: parent.width - 12;
+                    height: parent.height - 12;
                     source: sourcePath;
                     anchors.horizontalCenter: parent.horizontalCenter;
                     anchors.verticalCenter: parent.verticalCenter;

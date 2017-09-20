@@ -210,7 +210,7 @@ Item {
                         anchors.topMargin: 15;
                         width: 118;
                         height: paintedHeight;
-                        color: hifi.colors.blueHighlight;
+                        color: hifi.colors.blueAccent;
                         wrapMode: Text.WordWrap;
                         // Alignment
                         horizontalAlignment: Text.AlignRight;

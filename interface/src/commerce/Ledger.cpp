@@ -151,8 +151,8 @@ void Ledger::historySuccess(QNetworkReply& reply) {
         QDateTime createdAt = QDateTime::fromSecsSinceEpoch(valueObject["created_at"].toInt(), Qt::UTC);
 #endif
         QDateTime localCreatedAt = createdAt.toTimeZone(QTimeZone::systemTimeZone());
-        valueObject["text"] = QString("%1 sent %2 <b>%3 %4</b> on %5 with message \"%6\"").
-            arg(from, to, QString::number(valueObject["quantity"].toInt()), valueObject["asset_title"].toString(), localCreatedAt.toString(Qt::SystemLocaleShortDate), valueObject["message"].toString());
+        valueObject["text"] = QString("%1 sent %2 <b>%3 %4</b> with message \"%5\"").
+            arg(from, to, QString::number(valueObject["quantity"].toInt()), valueObject["asset_title"].toString(), valueObject["message"].toString());
         newHistoryArray.push_back(valueObject);
     }
     // now copy the rest of the json -- this is inefficient

@@ -146,7 +146,7 @@ Item {
             anchors.leftMargin: 16;
             anchors.right: parent.right;
             anchors.rightMargin: 16;
-            height: 280;
+            height: 300;
         
             Connections {
                 onSendSignalToWallet: {
