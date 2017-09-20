@@ -224,16 +224,16 @@ Item {
                 anchors.bottom: parent.bottom;
                 height: 24;
                 // Lock icon
-                Image {
+                HiFiGlyphs {
                     id: lockIcon;
-                    source: "images/lockIcon.png";
+                    text: hifi.glyphs.lock;
                     anchors.bottom: parent.bottom;
                     anchors.left: parent.left;
                     anchors.leftMargin: 30;
                     height: 22;
                     width: height;
-                    mipmap: true;
                     verticalAlignment: Text.AlignBottom;
+                    color: hifi.colors.white;
                 }
                 // "Security image" text below pic
                 RalewayRegular {
