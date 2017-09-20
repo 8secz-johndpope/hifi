@@ -86,11 +86,10 @@ Item {
                     if (msg.method === 'statusResult') {
                         if (msg.status) {
                             // Success submitting new passphrase
-                            root.resetSubmitButton();
                             sendSignalToWallet({method: "walletSecurity_changePassphraseSuccess"});
                         } else {
                             // Error submitting new passphrase
-                            root.resetSubmitButton();
+                            resetSubmitButton();
                             passphraseSelection.setErrorText("Backend error");
                         }
                     } else {

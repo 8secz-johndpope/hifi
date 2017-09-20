@@ -296,6 +296,7 @@ Rectangle {
                 if (msg.method === 'walletSecurity_changePassphrase') {
                     root.activeView = "passphraseChange";
                     passphraseChange.clearPassphraseFields();
+                    passphraseChange.resetSubmitButton();
                 } else if (msg.method === 'walletSecurity_changeSecurityImage') {
                     root.activeView = "securityImageChange";
                 }

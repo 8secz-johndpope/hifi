@@ -289,11 +289,20 @@ Item {
     function validateAndSubmitPassphrase() {
         if (passphraseField.text.length < 3) {
             setErrorText("Passphrase must be at least 3 characters.");
+            passphraseField.error = true;
+            passphraseFieldAgain.error = true;
+            currentPassphraseField.error = true;
             return false;
         } else if (passphraseField.text !== passphraseFieldAgain.text) {
             setErrorText("Passphrases don't match.");
+            passphraseField.error = true;
+            passphraseFieldAgain.error = true;
+            currentPassphraseField.error = true;
             return false;
         } else {
+            passphraseField.error = false;
+            passphraseFieldAgain.error = false;
+            currentPassphraseField.error = false;
             setErrorText("");
             commerce.setPassphrase(passphraseField.text);
             return true;

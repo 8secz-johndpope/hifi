@@ -24,6 +24,7 @@ TextField {
     property string label: ""
     property real controlHeight: height + (textFieldLabel.visible ? textFieldLabel.height + 1 : 0)
     property bool hasRoundedBorder: false
+    property bool error: false;
 
     placeholderText: textField.placeholderText
 
@@ -43,8 +44,8 @@ TextField {
             color: isLightColorScheme
                    ? (textField.activeFocus ? hifi.colors.white : hifi.colors.textFieldLightBackground)
                    : (textField.activeFocus ? hifi.colors.black : hifi.colors.baseGrayShadow)
-            border.color: textField.activeFocus ? hifi.colors.primaryHighlight : hifi.colors.lightGray
-            border.width: textField.activeFocus || hasRoundedBorder ? 1 : 0
+            border.color: textField.error ? hifi.colors.redHighlight : (textField.activeFocus ? hifi.colors.primaryHighlight : hifi.colors.lightGray)
+            border.width: textField.activeFocus || hasRoundedBorder || textField.error ? 1 : 0
             radius: isSearchField ? textField.height / 2 : (hasRoundedBorder ? 4 : 0)
 
             HiFiGlyphs {
