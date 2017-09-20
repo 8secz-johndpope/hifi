@@ -79,13 +79,12 @@ void Ledger::keysQuery(const QString& endpoint, const QString& success, const QS
     send(endpoint, success, fail, QNetworkAccessManager::PostOperation, request);
 }
 
-void Ledger::buy(const QString& hfc_key, int cost, const QString& asset_id, const QString& inventory_key, const QString& buyerUsername, const bool controlled_failure) {
+void Ledger::buy(const QString& hfc_key, int cost, const QString& asset_id, const QString& inventory_key, const bool controlled_failure) {
     QJsonObject transaction;
     transaction["hfc_key"] = hfc_key;
     transaction["cost"] = cost;
     transaction["asset_id"] = asset_id;
     transaction["inventory_key"] = inventory_key;
-    transaction["inventory_buyer_username"] = buyerUsername;
     QJsonDocument transactionDoc{ transaction };
     auto transactionString = transactionDoc.toJson(QJsonDocument::Compact);
     signedSend("transaction", transactionString, hfc_key, "buy", "buySuccess", "buyFailure", controlled_failure);

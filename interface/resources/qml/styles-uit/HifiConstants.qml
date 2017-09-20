@@ -178,7 +178,7 @@ Item {
         readonly property real tableHeading: dimensions.largeScreen ? 12 : 10
         readonly property real tableHeadingIcon: dimensions.largeScreen ? 60 : 33
         readonly property real tableText: dimensions.largeScreen ? 15 : 12
-        readonly property real buttonLabel: dimensions.largeScreen ? 13 : 9
+        readonly property real buttonLabel: dimensions.largeScreen ? 14 : 9
         readonly property real iconButton: dimensions.largeScreen ? 13 : 9
         readonly property real listItem: dimensions.largeScreen ? 15 : 11
         readonly property real tabularData: dimensions.largeScreen ? 15 : 11

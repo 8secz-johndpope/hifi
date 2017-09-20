@@ -18,7 +18,7 @@ Item {
     readonly property var bottomColor: [ hifi.colors.baseGrayHighlight, hifi.colors.lightGray50 ];
 
     // Size
-    height: 2;
+    height: colorScheme === 0 ? 2 : 1;
     Rectangle {
         // Size
         width: parent.width;
@@ -31,6 +31,7 @@ Item {
         color: topColor[colorScheme];
     }
     Rectangle {
+        visible: colorScheme === 0;
         // Size
         width: parent.width;
         height: 1;

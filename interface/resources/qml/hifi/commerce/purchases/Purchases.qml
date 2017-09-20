@@ -620,7 +620,6 @@ Rectangle {
                 referrerURL = message.referrerURL;
                 titleBarContainer.referrerURL = message.referrerURL;
                 root.canRezCertifiedItems = message.canRezCertifiedItems;
-
             break;
             case 'purchases_getIsFirstUseResult':
                 if (message.isFirstUseOfPurchases && root.activeView !== "firstUseTutorial") {

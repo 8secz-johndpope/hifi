@@ -58,7 +58,7 @@
 
     var onMarketplaceScreen = false;
 
-    var debugCheckout = true;
+    var debugCheckout = false;
     function showMarketplace() {
         if (!debugCheckout) {
             UserActivityLogger.openedMarketplace();
@@ -72,7 +72,8 @@
                     itemAuthor: 'hifiDave',
                     itemPrice: 17,
                     itemHref: 'http://mpassets.highfidelity.com/0d90d21c-ce7a-4990-ad18-e9d2cf991027-v1/flaregun.json',
-                }
+                },
+                canRezCertifiedItems: Entities.canRezCertified || Entities.canRezTmpCertified
             });
         }
     }
@@ -179,7 +180,11 @@
             var parsedJsonMessage = JSON.parse(message);
             if (parsedJsonMessage.type === "CHECKOUT") {
                 tablet.pushOntoStack(MARKETPLACE_CHECKOUT_QML_PATH);
-                tablet.sendToQml({ method: 'updateCheckoutQML', params: parsedJsonMessage });
+                tablet.sendToQml({
+                    method: 'updateCheckoutQML',
+                    params: parsedJsonMessage,
+                    canRezCertifiedItems: Entities.canRezCertified || Entities.canRezTmpCertified
+                });
             } else if (parsedJsonMessage.type === "REQUEST_SETTING") {
                 tablet.emitScriptEvent(JSON.stringify({
                     type: "marketplaces",
@@ -255,6 +260,7 @@
             case 'checkout_goToPurchases':
                 goToPurchases(MARKETPLACE_URL_INITIAL);
                 break;
+            case 'checkout_itemLinkClicked':
             case 'checkout_continueShopping':
                 tablet.gotoWebScreen(MARKETPLACE_URL + '/items/' + message.itemId, MARKETPLACES_INJECT_SCRIPT_URL);
                 //tablet.popFromStack();
