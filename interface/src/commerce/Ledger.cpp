@@ -116,7 +116,7 @@ QString nameFromKey(const QString& key, const QStringList& publicKeys) {
         return "<b>Marketplace</b>";
     }
     if (publicKeys.contains(key)) {
-        return "You";
+        return "<b>You</b>";
     }
     return "<b>Someone</b>";
 }
