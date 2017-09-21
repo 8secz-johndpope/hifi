@@ -594,7 +594,7 @@ Rectangle {
         RalewaySemiBold {
             id: completeText2;
             text: "The item " + '<font color="' + hifi.colors.blueAccent + '"><a href="#">' + itemNameText.text + '</a></font>' +
-            " has been added to your Purchases and a receipt has been added to your Wallet.";
+            " has been added to your Purchases and a receipt will appear in your Wallet's transaction history.";
             // Text size
             size: 20;
             // Anchors
