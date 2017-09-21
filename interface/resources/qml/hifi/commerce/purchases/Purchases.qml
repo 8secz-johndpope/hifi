@@ -350,6 +350,8 @@ Rectangle {
 
             HifiControlsUit.TextField {
                 id: filterBar;
+                colorScheme: hifi.colorSchemes.faintGray;
+                hasClearButton: true;
                 hasRoundedBorder: true;
                 anchors.left: myPurchasesText.right;
                 anchors.leftMargin: 16;

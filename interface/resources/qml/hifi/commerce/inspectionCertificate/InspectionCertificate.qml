@@ -43,7 +43,7 @@ Rectangle {
     }
 
     // Title text
-    RalewayRegular {
+    RalewayLight {
         id: titleBarText;
         text: "Certificate";
         // Text size
@@ -89,7 +89,7 @@ Rectangle {
             id: itemNameHeader;
             text: "ITEM NAME";
             // Text size
-            size: 20;
+            size: 16;
             // Anchors
             anchors.top: parent.top;
             anchors.left: parent.left;
@@ -112,7 +112,7 @@ Rectangle {
             anchors.right: itemNameHeader.right;
             height: paintedHeight;
             // Style
-            color: hifi.colors.blueHighlight;
+            color: hifi.colors.blueAccent;
             elide: Text.ElideRight;
             MouseArea {
                 anchors.fill: parent;
@@ -120,8 +120,8 @@ Rectangle {
                 onClicked: {
                     sendToScript({method: 'inspectionCertificate_showInMarketplaceClicked', itemId: root.marketplaceId});
                 }
-                onEntered: itemName.color = hifi.colors.blueAccent;
-                onExited: itemName.color = hifi.colors.blueHighlight;
+                onEntered: itemName.color = hifi.colors.blueHighlight;
+                onExited: itemName.color = hifi.colors.blueAccent;
             }
         }
 
@@ -129,7 +129,7 @@ Rectangle {
             id: ownedByHeader;
             text: "OWNER";
             // Text size
-            size: 18;
+            size: 16;
             // Anchors
             anchors.top: itemName.bottom;
             anchors.topMargin: 20;
@@ -161,7 +161,7 @@ Rectangle {
             id: editionHeader;
             text: "EDITION";
             // Text size
-            size: 18;
+            size: 16;
             // Anchors
             anchors.top: ownedBy.bottom;
             anchors.topMargin: 20;
@@ -193,7 +193,7 @@ Rectangle {
             text: "DATE OF PURCHASE";
             visible: root.dateOfPurchase !== "";
             // Text size
-            size: 18;
+            size: 16;
             // Anchors
             anchors.top: ownedBy.bottom;
             anchors.topMargin: 20;

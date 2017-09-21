@@ -138,6 +138,7 @@ Item {
         id: colorSchemes
         readonly property int light: 0
         readonly property int dark: 1
+        readonly property int faintGray: 2
     }
 
     Item {
