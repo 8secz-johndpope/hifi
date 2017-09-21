@@ -23,11 +23,15 @@ import "../../../controls" as HifiControls
 
 Rectangle {
     property string titleText;
+    property string bodyImageSource;
     property string bodyText;
     property string button1text;
     property string button1method;
     property string button2text;
     property string button2method;
+
+    readonly property string securityPicBodyText: "When you see your Security Pic, your actions and data are securely making use of your " +
+        "Wallet's private keys.<br><br>You can change your Security Pic in your Wallet.";
 
     id: root;
     visible: false;
@@ -44,10 +48,9 @@ Rectangle {
     }
 
     Rectangle {
-        id: lightbox_noRezPermission;
         anchors.centerIn: parent;
         width: parent.width - 100;
-        height: 400;
+        height: childrenRect.height + 40;
         color: "white";
 
         RalewaySemiBold {
@@ -66,16 +69,31 @@ Rectangle {
             wrapMode: Text.WordWrap;
         }
 
-        RalewayRegular {
-            id: bodyText;
-            text: root.bodyText;
+        Image {
+            id: bodyImage;
+            visible: root.bodyImageSource;
+            source: root.bodyImageSource ? root.bodyImageSource : ""; 
             anchors.top: root.titleText ? titleText.bottom : parent.top;
             anchors.topMargin: root.titleText ? 20 : 40;
             anchors.left: parent.left;
             anchors.leftMargin: 40;
             anchors.right: parent.right;
             anchors.rightMargin: 40;
-            anchors.bottom: buttons.top;
+            height: 140;
+            fillMode: Image.PreserveAspectFit;
+            mipmap: true;
+        }
+
+        RalewayRegular {
+            id: bodyText;
+            text: root.bodyText;
+            anchors.top: root.bodyImageSource ? bodyImage.bottom : (root.titleText ? titleText.bottom : parent.top);
+            anchors.topMargin: root.bodyImageSource ? 20 : (root.titleText ? 20 : 40);
+            anchors.left: parent.left;
+            anchors.leftMargin: 40;
+            anchors.right: parent.right;
+            anchors.rightMargin: 40;
+            height: paintedHeight;
             color: hifi.colors.baseGray;
             size: 20;
             verticalAlignment: Text.AlignTop;
@@ -84,11 +102,11 @@ Rectangle {
 
         Item {
             id: buttons;
-            anchors.bottom: parent.bottom;
-            anchors.bottomMargin: 20;
+            anchors.top: bodyText.bottom;
+            anchors.topMargin: 20;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 40;
+            height: 60;
 
             // Button 1
             HifiControlsUit.Button {
@@ -96,6 +114,7 @@ Rectangle {
                 colorScheme: hifi.colorSchemes.light;
                 anchors.top: parent.top;
                 anchors.bottom: parent.bottom;
+                anchors.bottomMargin: 20;
                 anchors.left: parent.left;
                 anchors.leftMargin: 10;
                 width: root.button2text ? parent.width/2 - anchors.leftMargin*2 : parent.width - anchors.leftMargin * 2;
@@ -112,6 +131,7 @@ Rectangle {
                 colorScheme: hifi.colorSchemes.light;
                 anchors.top: parent.top;
                 anchors.bottom: parent.bottom;
+                anchors.bottomMargin: 20;
                 anchors.right: parent.right;
                 anchors.rightMargin: 10;
                 width: parent.width/2 - anchors.rightMargin*2;

@@ -161,7 +161,6 @@ void Ledger::historySuccess(QNetworkReply& reply) {
                 coloredQuantityAndAssetTitle +
                 QString("</a></font>\"");
         }
-        qDebug() << "ZRF:" << coloredQuantityAndAssetTitle;
         // turns out on my machine, toLocalTime convert to some weird timezone, yet the
         // systemTimeZone is correct.  To avoid a strange bug with other's systems too, lets
         // be explicit

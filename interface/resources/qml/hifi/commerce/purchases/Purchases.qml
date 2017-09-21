@@ -132,6 +132,15 @@ Rectangle {
             onSendToParent: {
                 if (msg.method === 'needsLogIn' && root.activeView !== "needsLogIn") {
                     root.activeView = "needsLogIn";
+                } else if (msg.method === 'showSecurityPicLightbox') {
+                    lightboxPopup.titleText = "Your Security Pic";
+                    lightboxPopup.bodyImageSource = msg.securityImageSource;
+                    lightboxPopup.bodyText = lightboxPopup.securityPicBodyText;
+                    lightboxPopup.button1text = "CLOSE";
+                    lightboxPopup.button1method = "root.visible = false;"
+                    lightboxPopup.button2text = "GO TO WALLET";
+                    lightboxPopup.button2method = "sendToParent({method: 'purchases_openWallet'});";
+                    lightboxPopup.visible = true;
                 } else {
                     sendToScript(msg);
                 }
@@ -513,7 +522,7 @@ Rectangle {
                 anchors.rightMargin: 24;
                 height: paintedHeight;
                 // Style
-                color: hifi.colors.faintGray;
+                color: hifi.colors.baseGray;
                 wrapMode: Text.WordWrap;
                 // Alignment
                 horizontalAlignment: Text.AlignHCenter;
@@ -598,7 +607,7 @@ Rectangle {
             case 'updatePurchases':
                 referrerURL = message.referrerURL;
                 titleBarContainer.referrerURL = message.referrerURL;
-                //root.canRezCertifiedItems = message.canRezCertifiedItems;
+                root.canRezCertifiedItems = message.canRezCertifiedItems;
             break;
             case 'purchases_getIsFirstUseResult':
                 if (message.isFirstUseOfPurchases && root.activeView !== "firstUseTutorial") {

@@ -18,6 +18,7 @@ import QtQuick.Controls 1.4
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
 import "../../../controls" as HifiControls
+import "../common" as HifiCommerceCommon
 
 // references XXX from root context
 
@@ -66,6 +67,8 @@ Rectangle {
                 root.activeView = "walletSetup";
             } else if (exists && root.activeView === "initialize") {
                 commerce.getWalletAuthenticatedStatus();
+                titleBarSecurityImage.source = "";
+                titleBarSecurityImage.source = "image://security/securityImage";
             }
         }
 
@@ -88,6 +91,11 @@ Rectangle {
         }
     }
 
+    HifiCommerceCommon.CommerceLightbox {
+        id: lightboxPopup;
+        visible: false;
+        anchors.fill: parent;
+    }
 
     //
     // TITLE BAR START
@@ -132,6 +140,33 @@ Rectangle {
             color: hifi.colors.white;
             // Alignment
             verticalAlignment: Text.AlignVCenter;
+        }
+
+        Image {
+            id: titleBarSecurityImage;
+            source: "";
+            visible: titleBarSecurityImage.source !== "" && !securityImageChange.visible;
+            anchors.right: parent.right;
+            anchors.rightMargin: 6;
+            anchors.top: parent.top;
+            anchors.topMargin: 6;
+            anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 6;
+            width: height;
+            mipmap: true;
+
+            MouseArea {
+                enabled: titleBarSecurityImage.visible;
+                anchors.fill: parent;
+                onClicked: {
+                    lightboxPopup.titleText = "Your Security Pic";
+                    lightboxPopup.bodyImageSource = titleBarSecurityImage.source;
+                    lightboxPopup.bodyText = lightboxPopup.securityPicBodyText;
+                    lightboxPopup.button1text = "CLOSE";
+                    lightboxPopup.button1method = "root.visible = false;"
+                    lightboxPopup.visible = true;
+                }
+            }
         }
     }
     //

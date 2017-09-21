@@ -46,10 +46,18 @@ Rectangle {
                 // unsure how to handle a failure here. We definitely cannot proceed.
             }
         }
+
+        onSecurityImageResult: {
+            if (exists) {
+                securityImage.source = "";
+                securityImage.source = "image://security/securityImage";
+            }
+        }
     }
 
     Component.onCompleted: {
         commerce.getLoginStatus();
+        commerce.getSecurityImage();
     }
 
     Connections {
@@ -86,8 +94,8 @@ Rectangle {
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
-        anchors.right: parent.right;
-        anchors.rightMargin: 12;
+        anchors.right: securityImage.left;
+        anchors.rightMargin: 6;
 
         Rectangle {
             id: myPurchasesLink;
@@ -155,6 +163,28 @@ Rectangle {
                 }
                 onEntered: usernameText.color = hifi.colors.baseGrayShadow;
                 onExited: usernameText.color = hifi.colors.baseGray;
+            }
+        }
+    }
+
+    Image {
+        id: securityImage;
+        source: "";
+        visible: securityImage.source !== "";
+        anchors.right: parent.right;
+        anchors.rightMargin: 6;
+        anchors.top: parent.top;
+        anchors.topMargin: 6;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 16;
+        width: height;
+        mipmap: true;
+
+        MouseArea {
+            enabled: securityImage.visible;
+            anchors.fill: parent;
+            onClicked: {
+                sendToParent({method: "showSecurityPicLightbox", securityImageSource: securityImage.source});
             }
         }
     }

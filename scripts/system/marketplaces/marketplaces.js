@@ -247,6 +247,8 @@
     var isHmdPreviewDisabled = true;
     function fromQml(message) {
         switch (message.method) {
+            case 'purchases_openWallet':
+            case 'checkout_openWallet':
             case 'checkout_setUpClicked':
                 tablet.pushOntoStack(MARKETPLACE_WALLET_QML_PATH);
                 break;

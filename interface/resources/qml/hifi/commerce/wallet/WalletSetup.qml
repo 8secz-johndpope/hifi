@@ -18,6 +18,7 @@ import QtQuick.Controls 1.4
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
 import "../../../controls" as HifiControls
+import "../common" as HifiCommerceCommon
 
 // references XXX from root context
 
@@ -41,6 +42,9 @@ Item {
             if (!exists && root.lastPage === "step_2") {
                 // ERROR! Invalid security image.
                 root.activeView = "step_2";
+            } else {
+                titleBarSecurityImage.source = "";
+                titleBarSecurityImage.source = "image://security/securityImage";
             }
         }
 
@@ -57,6 +61,11 @@ Item {
         }
     }
 
+    HifiCommerceCommon.CommerceLightbox {
+        id: lightboxPopup;
+        visible: false;
+        anchors.fill: parent;
+    }
 
     //
     // TITLE BAR START
@@ -64,11 +73,11 @@ Item {
     Item {
         id: titleBarContainer;
         // Size
-        width: parent.width;
         height: 50;
         // Anchors
         anchors.left: parent.left;
         anchors.top: parent.top;
+        anchors.right: parent.right;
 
         // Wallet icon
         HiFiGlyphs {
@@ -101,6 +110,33 @@ Item {
             // Alignment
             horizontalAlignment: Text.AlignHLeft;
             verticalAlignment: Text.AlignVCenter;
+        }
+
+        Image {
+            id: titleBarSecurityImage;
+            source: "";
+            visible: !securityImageTip.visible && titleBarSecurityImage.source !== "";
+            anchors.right: parent.right;
+            anchors.rightMargin: 6;
+            anchors.top: parent.top;
+            anchors.topMargin: 6;
+            anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 6;
+            width: height;
+            mipmap: true;
+
+            MouseArea {
+                enabled: titleBarSecurityImage.visible;
+                anchors.fill: parent;
+                onClicked: {
+                    lightboxPopup.titleText = "Your Security Pic";
+                    lightboxPopup.bodyImageSource = titleBarSecurityImage.source;
+                    lightboxPopup.bodyText = lightboxPopup.securityPicBodyText;
+                    lightboxPopup.button1text = "CLOSE";
+                    lightboxPopup.button1method = "root.visible = false;"
+                    lightboxPopup.visible = true;
+                }
+            }
         }
     }
     //

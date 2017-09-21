@@ -17,6 +17,7 @@ import QtQuick.Controls 1.4
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
 import "../../../controls" as HifiControls
+import "../common" as HifiCommerceCommon
 
 // references XXX from root context
 
@@ -38,6 +39,8 @@ Item {
         id: commerce;
 
         onSecurityImageResult: {
+            titleBarSecurityImage.source = "";
+            titleBarSecurityImage.source = "image://security/securityImage";
             passphraseModalSecurityImage.source = "";
             passphraseModalSecurityImage.source = "image://security/securityImage";
         }
@@ -73,6 +76,12 @@ Item {
         }
     }
 
+    HifiCommerceCommon.CommerceLightbox {
+        id: lightboxPopup;
+        visible: false;
+        anchors.fill: parent;
+    }
+
     Item {
         id: titleBar;
         anchors.top: parent.top;
@@ -105,6 +114,34 @@ Item {
             size: 20;
             color: hifi.colors.white;
             verticalAlignment: Text.AlignVCenter;
+        }
+
+        Image {
+            id: titleBarSecurityImage;
+            source: "";
+            visible: titleBarSecurityImage.source !== "";
+            anchors.right: parent.right;
+            anchors.rightMargin: 6;
+            anchors.top: parent.top;
+            anchors.topMargin: 6;
+            anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 6;
+            width: height;
+            fillMode: Image.PreserveAspectFit;
+            mipmap: true;
+
+            MouseArea {
+                enabled: titleBarSecurityImage.visible;
+                anchors.fill: parent;
+                onClicked: {
+                    lightboxPopup.titleText = "Your Security Pic";
+                    lightboxPopup.bodyImageSource = titleBarSecurityImage.source;
+                    lightboxPopup.bodyText = lightboxPopup.securityPicBodyText;
+                    lightboxPopup.button1text = "CLOSE";
+                    lightboxPopup.button1method = "root.visible = false;"
+                    lightboxPopup.visible = true;
+                }
+            }
         }
     }
 

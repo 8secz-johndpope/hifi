@@ -164,6 +164,15 @@ Rectangle {
             onSendToParent: {
                 if (msg.method === 'needsLogIn' && root.activeView !== "needsLogIn") {
                     root.activeView = "needsLogIn";
+                } else if (msg.method === 'showSecurityPicLightbox') {
+                    lightboxPopup.titleText = "Your Security Pic";
+                    lightboxPopup.bodyImageSource = msg.securityImageSource;
+                    lightboxPopup.bodyText = lightboxPopup.securityPicBodyText;
+                    lightboxPopup.button1text = "CLOSE";
+                    lightboxPopup.button1method = "root.visible = false;"
+                    lightboxPopup.button2text = "GO TO WALLET";
+                    lightboxPopup.button2method = "sendToParent({method: 'checkout_openWallet'});";
+                    lightboxPopup.visible = true;
                 } else {
                     sendToScript(msg);
                 }
