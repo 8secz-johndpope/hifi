@@ -188,7 +188,6 @@ Rectangle {
         id: initialize;
         visible: root.activeView === "initialize";
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -243,7 +242,6 @@ Rectangle {
         id: notSetUp;
         visible: root.activeView === "notSetUp";
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -327,7 +325,6 @@ Rectangle {
         id: checkoutContents;
         visible: root.activeView === "checkoutMain";
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -400,6 +397,7 @@ Rectangle {
                 anchors.top: parent.top;
                 anchors.right: parent.right;
                 height: 30;
+                width: childrenRect.width;
 
                 // "HFC" balance label
                 HiFiGlyphs {
@@ -412,6 +410,7 @@ Rectangle {
                     anchors.rightMargin: 4;
                     anchors.top: parent.top;
                     anchors.topMargin: -4;
+                    width: paintedWidth;
                     height: paintedHeight;
                     // Style
                     color: hifi.colors.blueAccent;
@@ -577,7 +576,6 @@ Rectangle {
         id: checkoutSuccess;
         visible: root.activeView === "checkoutSuccess";
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: root.bottom;
         anchors.left: parent.left;
         anchors.leftMargin: 16;
@@ -797,7 +795,6 @@ Rectangle {
         id: checkoutFailure;
         visible: root.activeView === "checkoutFailure";
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: root.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
