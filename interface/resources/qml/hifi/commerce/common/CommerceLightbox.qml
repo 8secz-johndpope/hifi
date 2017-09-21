@@ -50,18 +50,18 @@ Rectangle {
     Rectangle {
         anchors.centerIn: parent;
         width: parent.width - 100;
-        height: childrenRect.height + 40;
+        height: childrenRect.height + 30;
         color: "white";
 
         RalewaySemiBold {
             id: titleText;
             text: root.titleText;
             anchors.top: parent.top;
-            anchors.topMargin: 40;
+            anchors.topMargin: 30;
             anchors.left: parent.left;
-            anchors.leftMargin: 40;
+            anchors.leftMargin: 30;
             anchors.right: parent.right;
-            anchors.rightMargin: 40;
+            anchors.rightMargin: 30;
             height: paintedHeight;
             color: hifi.colors.baseGray;
             size: 24;
@@ -74,11 +74,11 @@ Rectangle {
             visible: root.bodyImageSource;
             source: root.bodyImageSource ? root.bodyImageSource : ""; 
             anchors.top: root.titleText ? titleText.bottom : parent.top;
-            anchors.topMargin: root.titleText ? 20 : 40;
+            anchors.topMargin: root.titleText ? 20 : 30;
             anchors.left: parent.left;
-            anchors.leftMargin: 40;
+            anchors.leftMargin: 30;
             anchors.right: parent.right;
-            anchors.rightMargin: 40;
+            anchors.rightMargin: 30;
             height: 140;
             fillMode: Image.PreserveAspectFit;
             mipmap: true;
@@ -88,11 +88,11 @@ Rectangle {
             id: bodyText;
             text: root.bodyText;
             anchors.top: root.bodyImageSource ? bodyImage.bottom : (root.titleText ? titleText.bottom : parent.top);
-            anchors.topMargin: root.bodyImageSource ? 20 : (root.titleText ? 20 : 40);
+            anchors.topMargin: root.bodyImageSource ? 20 : (root.titleText ? 20 : 30);
             anchors.left: parent.left;
-            anchors.leftMargin: 40;
+            anchors.leftMargin: 30;
             anchors.right: parent.right;
-            anchors.rightMargin: 40;
+            anchors.rightMargin: 30;
             height: paintedHeight;
             color: hifi.colors.baseGray;
             size: 20;
@@ -103,10 +103,10 @@ Rectangle {
         Item {
             id: buttons;
             anchors.top: bodyText.bottom;
-            anchors.topMargin: 20;
+            anchors.topMargin: 30;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 60;
+            height: 70;
 
             // Button 1
             HifiControlsUit.Button {

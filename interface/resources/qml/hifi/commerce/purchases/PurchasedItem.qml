@@ -178,7 +178,7 @@ Item {
                         } else if (root.status === "invalidated") {
                             "INVALIDATED"
                         } else if (root.ownedItemCount > 1) {
-                            "(#" + root.itemEdition + ") You own " + root.ownedItemCount + " others"
+                            "<font color='#6a6a6a'>(#" + root.itemEdition + ")</font> <u>You own " + root.ownedItemCount + " others</u>"
                         } else {
                             ""
                         }
@@ -190,7 +190,7 @@ Item {
                         } else if (root.status === "invalidated") {
                             hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
-                            hifi.colors.baseGray
+                            hifi.colors.blueAccent
                         } else {
                             hifi.colors.baseGray
                         }
@@ -223,7 +223,7 @@ Item {
                         } else if (root.status === "invalidated") {
                             hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
-                            hifi.colors.baseGray
+                            hifi.colors.blueAccent
                         } else {
                             hifi.colors.baseGray
                         }
@@ -251,8 +251,8 @@ Item {
                         statusText.color = hifi.colors.redAccent;
                         statusIcon.color = hifi.colors.redAccent;
                     } else if (root.ownedItemCount > 1) {
-                        statusText.color = hifi.colors.black;
-                        statusIcon.color = hifi.colors.black;
+                        statusText.color = hifi.colors.blueHighlight;
+                        statusIcon.color = hifi.colors.blueHighlight;
                     }
                 }
                 onExited: {
@@ -263,8 +263,8 @@ Item {
                         statusText.color = hifi.colors.redHighlight;
                         statusIcon.color = hifi.colors.redHighlight;
                     } else if (root.ownedItemCount > 1) {
-                        statusText.color = hifi.colors.baseGray;
-                        statusIcon.color = hifi.colors.baseGray;
+                        statusText.color = hifi.colors.blueAccent;
+                        statusIcon.color = hifi.colors.blueAccent;
                     }
                 }
             }

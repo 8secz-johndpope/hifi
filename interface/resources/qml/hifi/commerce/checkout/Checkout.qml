@@ -683,7 +683,7 @@ Rectangle {
             onLinkActivated: {
                 lightboxPopup.titleText = "Rez Permission Required";
                 lightboxPopup.bodyText = "You don't have permission to rez certified items in this domain.<br><br>" +
-                    "Use the <b>GO TO app</b> to visit another domain or <b>go to your own sandbox.</b>";
+                    "Use the <b>GOTO app</b> to visit another domain or <b>go to your own sandbox.</b>";
                 lightboxPopup.button1text = "CLOSE";
                 lightboxPopup.button1method = "root.visible = false;"
                 lightboxPopup.button2text = "OPEN GOTO";
