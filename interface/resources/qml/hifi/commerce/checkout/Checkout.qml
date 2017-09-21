@@ -152,6 +152,7 @@ Rectangle {
     //
     HifiCommerceCommon.EmulatedMarketplaceHeader {
         id: titleBarContainer;
+        z: 998;
         visible: !needsLogIn.visible;
         // Size
         width: parent.width;
@@ -187,6 +188,7 @@ Rectangle {
         id: initialize;
         visible: root.activeView === "initialize";
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -241,6 +243,7 @@ Rectangle {
         id: notSetUp;
         visible: root.activeView === "notSetUp";
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -324,6 +327,7 @@ Rectangle {
         id: checkoutContents;
         visible: root.activeView === "checkoutMain";
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -573,6 +577,7 @@ Rectangle {
         id: checkoutSuccess;
         visible: root.activeView === "checkoutSuccess";
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: root.bottom;
         anchors.left: parent.left;
         anchors.leftMargin: 16;
@@ -616,7 +621,7 @@ Rectangle {
         
         Rectangle {
             id: rezzedNotifContainer;
-            z: 998;
+            z: 997;
             visible: false;
             color: hifi.colors.blueHighlight;
             anchors.fill: rezNowButton;
@@ -792,6 +797,7 @@ Rectangle {
         id: checkoutFailure;
         visible: root.activeView === "checkoutFailure";
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: root.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;

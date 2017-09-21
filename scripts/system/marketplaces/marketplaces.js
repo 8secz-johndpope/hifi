@@ -320,6 +320,9 @@
             case 'inspectionCertificate_showInMarketplaceClicked':
                 tablet.gotoWebScreen(MARKETPLACE_URL + '/items/' + message.itemId, MARKETPLACES_INJECT_SCRIPT_URL);
                 break;
+            case 'header_myItemsClicked':
+                tablet.gotoWebScreen(MARKETPLACE_URL + '?view=mine', MARKETPLACES_INJECT_SCRIPT_URL);
+                break;
             default:
                 print('Unrecognized message from Checkout.qml or Purchases.qml: ' + JSON.stringify(message));
         }

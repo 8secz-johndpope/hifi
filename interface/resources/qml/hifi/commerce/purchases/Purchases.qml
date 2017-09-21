@@ -120,10 +120,10 @@ Rectangle {
     //
     HifiCommerceCommon.EmulatedMarketplaceHeader {
         id: titleBarContainer;
+        z: 998;
         visible: !needsLogIn.visible;
         // Size
         width: parent.width;
-        height: 70;
         // Anchors
         anchors.left: parent.left;
         anchors.top: parent.top;
@@ -155,6 +155,7 @@ Rectangle {
         id: initialize;
         visible: root.activeView === "initialize";
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -205,6 +206,7 @@ Rectangle {
         id: firstUseTutorial;
         visible: root.activeView === "firstUseTutorial";
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -230,6 +232,7 @@ Rectangle {
         id: notSetUp;
         visible: root.activeView === "notSetUp";
         anchors.top: titleBarContainer.bottom;
+        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -316,7 +319,7 @@ Rectangle {
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: 8;
+        anchors.topMargin: 8 - titleBarContainer.additionalDropdownHeight;
         anchors.bottom: parent.bottom;
 
         //
