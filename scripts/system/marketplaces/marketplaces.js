@@ -57,6 +57,7 @@
     Window.messageBoxClosed.connect(onMessageBoxClosed);
 
     var onMarketplaceScreen = false;
+    var onCommerceScreen = false;
 
     var debugCheckout = false;
     function showMarketplace() {
@@ -92,7 +93,7 @@
     }
 
     function onClick() {
-        if (onMarketplaceScreen) {
+        if (onMarketplaceScreen || onCommerceScreen) {
             // for toolbar-mode: go back to home screen, this will close the window.
             tablet.gotoHomeScreen();
         } else {
@@ -104,10 +105,11 @@
 
     function onScreenChanged(type, url) {
         onMarketplaceScreen = type === "Web" && url === MARKETPLACE_URL_INITIAL;
-        wireEventBridge(type === "QML" && (url === MARKETPLACE_CHECKOUT_QML_PATH || url === MARKETPLACE_PURCHASES_QML_PATH || url.indexOf(MARKETPLACE_INSPECTIONCERTIFICATE_QML_PATH) !== -1));
+        onCommerceScreen = type === "QML" && (url === MARKETPLACE_CHECKOUT_QML_PATH || url === MARKETPLACE_PURCHASES_QML_PATH || url.indexOf(MARKETPLACE_INSPECTIONCERTIFICATE_QML_PATH) !== -1);
+        wireEventBridge(onCommerceScreen);
 
         // for toolbar mode: change button to active when window is first openend, false otherwise.
-        marketplaceButton.editProperties({ isActive: onMarketplaceScreen });
+        marketplaceButton.editProperties({ isActive: onMarketplaceScreen || onCommerceScreen });
         if (type === "Web" && url.indexOf(MARKETPLACE_URL) !== -1) {
             ContextOverlay.isInMarketplaceInspectionMode = true;
         } else {
@@ -200,7 +202,7 @@
     tablet.webEventReceived.connect(onMessage);
 
     Script.scriptEnding.connect(function () {
-        if (onMarketplaceScreen) {
+        if (onMarketplaceScreen || onCommerceScreen) {
             tablet.gotoHomeScreen();
         }
         tablet.removeButton(marketplaceButton);
