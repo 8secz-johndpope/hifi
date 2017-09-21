@@ -17,6 +17,7 @@
 #include "Wallet.h"
 #include "Ledger.h"
 #include "CommerceLogging.h"
+#include <NetworkingConstants.h>
 
 // inventory answers {status: 'success', data: {assets: [{id: "guid", title: "name", preview: "url"}....]}}
 // balance answers {status: 'success', data: {balance: integer}}
@@ -113,14 +114,15 @@ void Ledger::inventory(const QStringList& keys) {
 
 QString nameFromKey(const QString& key, const QStringList& publicKeys) {
     if (key.isNull() || key.isEmpty()) {
-        return "<b>Marketplace</b>";
+        return "Marketplace";
     }
     if (publicKeys.contains(key)) {
-        return "<b>You</b>";
+        return "You";
     }
-    return "<b>Someone</b>";
+    return "Someone";
 }
 
+static const QString MARKETPLACE_ITEMS_BASE_URL = NetworkingConstants::METAVERSE_SERVER_URL.toString() + "/marketplace/items/";
 void Ledger::historySuccess(QNetworkReply& reply) {
     // here we send a historyResult with some extra stuff in it
     // Namely, the styled text we'd like to show.  The issue is the
@@ -138,10 +140,28 @@ void Ledger::historySuccess(QNetworkReply& reply) {
     QJsonArray newHistoryArray;
 
     // TODO: do this with 0 copies if possible
-    for(auto it = historyArray.begin(); it != historyArray.end(); it++) {
+    for (auto it = historyArray.begin(); it != historyArray.end(); it++) {
         auto valueObject = (*it).toObject();
         QString from = nameFromKey(valueObject["sender_key"].toString(), keys);
         QString to = nameFromKey(valueObject["recipient_key"].toString(), keys);
+        bool isHfc = valueObject["asset_title"].toString() == "HFC";
+        bool iAmReceiving = to == "You";
+        QString coloredQuantityAndAssetTitle = QString::number(valueObject["quantity"].toInt()) + " " + valueObject["asset_title"].toString();
+        if (isHfc) {
+            if (iAmReceiving) {
+                coloredQuantityAndAssetTitle = QString("<font color='#1FC6A6'>") + coloredQuantityAndAssetTitle + QString("</font>");
+            } else {
+                coloredQuantityAndAssetTitle = QString("<font color='#EA4C5F'>") + coloredQuantityAndAssetTitle + QString("</font>");
+            }
+        } else {
+            coloredQuantityAndAssetTitle = QString("\"<font color='#0093C5'><a href='") +
+                MARKETPLACE_ITEMS_BASE_URL +
+                valueObject["asset_id"].toString() +
+                QString("'>") +
+                coloredQuantityAndAssetTitle +
+                QString("</a></font>\"");
+        }
+        qDebug() << "ZRF:" << coloredQuantityAndAssetTitle;
         // turns out on my machine, toLocalTime convert to some weird timezone, yet the
         // systemTimeZone is correct.  To avoid a strange bug with other's systems too, lets
         // be explicit
@@ -151,8 +171,8 @@ void Ledger::historySuccess(QNetworkReply& reply) {
         QDateTime createdAt = QDateTime::fromSecsSinceEpoch(valueObject["created_at"].toInt(), Qt::UTC);
 #endif
         QDateTime localCreatedAt = createdAt.toTimeZone(QTimeZone::systemTimeZone());
-        valueObject["text"] = QString("%1 sent %2 <b>%3 %4</b> with message \"%5\"").
-            arg(from, to, QString::number(valueObject["quantity"].toInt()), valueObject["asset_title"].toString(), valueObject["message"].toString());
+        valueObject["text"] = QString("%1 sent %2 %3 with message \"%4\"").
+            arg(from, to, coloredQuantityAndAssetTitle, valueObject["message"].toString());
         newHistoryArray.push_back(valueObject);
     }
     // now copy the rest of the json -- this is inefficient

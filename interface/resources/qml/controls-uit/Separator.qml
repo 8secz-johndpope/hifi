@@ -14,8 +14,8 @@ import "../styles-uit"
 Item {
     property int colorScheme: 0;
     
-    readonly property var topColor: [ hifi.colors.baseGrayShadow, hifi.colors.lightGray50 ];
-    readonly property var bottomColor: [ hifi.colors.baseGrayHighlight, hifi.colors.lightGray50 ];
+    readonly property var topColor: [ hifi.colors.baseGrayShadow, hifi.colors.faintGray ];
+    readonly property var bottomColor: [ hifi.colors.baseGrayHighlight, hifi.colors.faintGray ];
 
     // Size
     height: colorScheme === 0 ? 2 : 1;
@@ -26,7 +26,6 @@ Item {
         // Anchors
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: height;
         // Style
         color: topColor[colorScheme];
     }
@@ -38,6 +37,7 @@ Item {
         // Anchors
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
+        anchors.bottomMargin: -height;
         // Style
         color: bottomColor[colorScheme];
     }

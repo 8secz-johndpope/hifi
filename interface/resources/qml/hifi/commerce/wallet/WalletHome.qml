@@ -13,6 +13,7 @@
 
 import Hifi 1.0 as Hifi
 import QtQuick 2.5
+import QtGraphicalEffects 1.0
 import QtQuick.Controls 2.2
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
@@ -141,7 +142,17 @@ Item {
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
         height: 440;
-        color: hifi.colors.faintGray;
+        
+    
+        LinearGradient {
+            anchors.fill: parent;
+            start: Qt.point(0, 0);
+            end: Qt.point(0, height);
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: hifi.colors.white }
+                GradientStop { position: 1.0; color: hifi.colors.faintGray }
+            }
+        }
 
         RalewaySemiBold {
             id: recentActivityText;
@@ -157,7 +168,7 @@ Item {
             // Text size
             size: 22;
             // Style
-            color: hifi.colors.baseGray;
+            color: hifi.colors.baseGrayHighlight;
         }
         ListModel {
             id: transactionHistoryModel;
@@ -167,7 +178,6 @@ Item {
             anchors.topMargin: 26;
             anchors.bottom: parent.bottom;
             anchors.left: parent.left;
-            anchors.leftMargin: 24;
             anchors.right: parent.right;
             anchors.rightMargin: 24;
             
@@ -184,7 +194,7 @@ Item {
                 }
                 anchors.centerIn: parent;
                 width: parent.width - 12;
-                height: parent.height - 12;
+                height: parent.height;
                 visible: transactionHistoryModel.count !== 0;
                 clip: true;
                 model: transactionHistoryModel;
@@ -226,7 +236,7 @@ Item {
                         anchors.leftMargin: 20;
                         anchors.right: parent.right;
                         height: paintedHeight;
-                        color: "black";
+                        color: hifi.colors.baseGrayHighlight;
                         wrapMode: Text.WordWrap;
 
                         onLinkActivated: {

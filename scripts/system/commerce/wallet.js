@@ -54,6 +54,7 @@
     //   -Called when a message is received from SpectatorCamera.qml. The "message" argument is what is sent from the QML
     //    in the format "{method, params}", like json-rpc. See also sendToQml().
     var isHmdPreviewDisabled = true;
+    var MARKETPLACES_INJECT_SCRIPT_URL = Script.resolvePath("../html/js/marketplacesInject.js");
     function fromQml(message) {
         switch (message.method) {
             case 'passphrasePopup_cancelClicked':
