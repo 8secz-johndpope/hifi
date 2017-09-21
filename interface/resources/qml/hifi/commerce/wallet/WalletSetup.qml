@@ -678,7 +678,7 @@ Item {
                         instructions01Container.visible = false;
                         instructions02Container.visible = true;
                         keysReadyPageFinishButton.visible = true;
-                        sendSignalToWallet({method: 'walletSetup_openInstructions'});
+                        Qt.openUrlExternally("https://www.highfidelity.com/");
                     }
                 }
             }

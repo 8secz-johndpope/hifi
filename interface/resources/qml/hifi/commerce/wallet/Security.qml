@@ -292,7 +292,7 @@ Item {
                 height: 40;
 
                 onClicked: {
-                    Window.copyToClipboard(keyFilePath);
+                    Qt.openUrlExternally("https://www.highfidelity.com/");
                 }
             }
         }
