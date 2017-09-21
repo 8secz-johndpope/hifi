@@ -186,7 +186,7 @@ Item {
                 size: 18;
                 color: {
                         if (root.status === "pending") {
-                            hifi.colors.blueHighlight
+                            hifi.colors.blueAccent
                         } else if (root.status === "invalidated") {
                             hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
@@ -219,7 +219,7 @@ Item {
                 // Style
                 color: {
                         if (root.status === "pending") {
-                            hifi.colors.blueHighlight
+                            hifi.colors.blueAccent
                         } else if (root.status === "invalidated") {
                             hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
@@ -245,8 +245,8 @@ Item {
                 }
                 onEntered: {
                     if (root.status === "pending") {
-                        statusText.color = hifi.colors.blueAccent;
-                        statusIcon.color = hifi.colors.blueAccent;
+                        statusText.color = hifi.colors.blueHighlight;
+                        statusIcon.color = hifi.colors.blueHighlight;
                     } else if (root.status === "invalidated") {
                         statusText.color = hifi.colors.redAccent;
                         statusIcon.color = hifi.colors.redAccent;
@@ -257,8 +257,8 @@ Item {
                 }
                 onExited: {
                     if (root.status === "pending") {
-                        statusText.color = hifi.colors.blueHighlight;
-                        statusIcon.color = hifi.colors.blueHighlight;
+                        statusText.color = hifi.colors.blueAccent;
+                        statusIcon.color = hifi.colors.blueAccent;
                     } else if (root.status === "invalidated") {
                         statusText.color = hifi.colors.redHighlight;
                         statusIcon.color = hifi.colors.redHighlight;
@@ -306,7 +306,7 @@ Item {
             anchors.bottom: parent.bottom;
             anchors.right: parent.right;
             width: height;
-            enabled: root.canRezCertifiedItems && root.status !== "pending" && root.status !== "invalidated";
+            enabled: root.canRezCertifiedItems && root.status !== "invalidated";
             
             onClicked: {
                 if (urlHandler.canHandleUrl(root.itemHref)) {
