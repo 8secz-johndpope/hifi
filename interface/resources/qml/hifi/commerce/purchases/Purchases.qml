@@ -409,7 +409,8 @@ Rectangle {
             }
 
             RalewayRegular {
-                text: "You don't have permission to rez certified items in this domain.";
+                text: "You don't have permission to rez certified items in this domain. " +
+                '<b><font color="' + hifi.colors.blueAccent + '"><a href="#">Learn More</a></font></b>';
                 // Text size
                 size: 18;
                 // Anchors
@@ -417,8 +418,8 @@ Rectangle {
                 anchors.topMargin: 4;
                 anchors.left: lightningIcon.right;
                 anchors.leftMargin: 8;
-                anchors.right: helpButton.left;
-                anchors.rightMargin: 16;
+                anchors.right: parent.right;
+                anchors.rightMargin: 8;
                 anchors.bottom: parent.bottom;
                 anchors.bottomMargin: 4;
                 // Style
@@ -426,31 +427,9 @@ Rectangle {
                 wrapMode: Text.WordWrap;
                 // Alignment
                 verticalAlignment: Text.AlignVCenter;
-            }
-            
-            HifiControlsUit.Button {
-                id: helpButton;
-                color: hifi.buttons.red;
-                colorScheme: hifi.colorSchemes.light;
-                anchors.top: parent.top;
-                anchors.topMargin: 12;
-                anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 8;
-                anchors.right: parent.right;
-                anchors.rightMargin: 12;
-                width: height;
-                HiFiGlyphs {
-                    text: hifi.glyphs.question;
-                    // Size
-                    size: parent.height*1.3;
-                    // Anchors
-                    anchors.fill: parent;
-                    // Style
-                    horizontalAlignment: Text.AlignHCenter;
-                    color: hifi.colors.faintGray;
-                }
-
-                onClicked: {
+                
+                onLinkActivated: {
+                    lightboxPopup.titleText = "Rez Permission Required";
                     lightboxPopup.bodyText = "You don't have permission to rez certified items in this domain.<br><br>" +
                         "Use the <b>GO TO app</b> to visit another domain or <b>go to your own sandbox.</b>";
                     lightboxPopup.button1text = "CLOSE";
@@ -619,7 +598,7 @@ Rectangle {
             case 'updatePurchases':
                 referrerURL = message.referrerURL;
                 titleBarContainer.referrerURL = message.referrerURL;
-                root.canRezCertifiedItems = message.canRezCertifiedItems;
+                //root.canRezCertifiedItems = message.canRezCertifiedItems;
             break;
             case 'purchases_getIsFirstUseResult':
                 if (message.isFirstUseOfPurchases && root.activeView !== "firstUseTutorial") {

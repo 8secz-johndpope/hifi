@@ -393,7 +393,7 @@ Rectangle {
                     id: itemPriceTextLabel;
                     text: hifi.glyphs.hfc;
                     // Size
-                    size: 40;
+                    size: 36;
                     // Anchors
                     anchors.right: itemPriceText.left;
                     anchors.rightMargin: 4;
@@ -672,6 +672,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter;
             verticalAlignment: Text.AlignVCenter;
             onLinkActivated: {
+                lightboxPopup.titleText = "Rez Permission Required";
                 lightboxPopup.bodyText = "You don't have permission to rez certified items in this domain.<br><br>" +
                     "Use the <b>GO TO app</b> to visit another domain or <b>go to your own sandbox.</b>";
                 lightboxPopup.button1text = "CLOSE";

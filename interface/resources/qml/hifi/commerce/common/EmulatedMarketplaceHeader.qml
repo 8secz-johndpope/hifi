@@ -103,7 +103,7 @@ Rectangle {
                 // Text size
                 size: 18;
                 // Style
-                color: hifi.colors.blueHighlight;
+                color: hifi.colors.blueAccent;
                 horizontalAlignment: Text.AlignHCenter;
                 verticalAlignment: Text.AlignVCenter;
                 // Anchors
@@ -116,8 +116,8 @@ Rectangle {
                 onClicked: {
                     sendToParent({method: 'header_goToPurchases'});
                 }
-                onEntered: myPurchasesText.color = hifi.colors.blueAccent;
-                onExited: myPurchasesText.color = hifi.colors.blueHighlight;
+                onEntered: myPurchasesText.color = hifi.colors.blueHighlight;
+                onExited: myPurchasesText.color = hifi.colors.blueAccent;
             }
         }
 

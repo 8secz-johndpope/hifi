@@ -60,7 +60,7 @@ Rectangle {
             anchors.right: parent.right;
             anchors.rightMargin: 40;
             height: paintedHeight;
-            color: hifi.colors.blueHighlight;
+            color: hifi.colors.baseGray;
             size: 24;
             verticalAlignment: Text.AlignTop;
             wrapMode: Text.WordWrap;
