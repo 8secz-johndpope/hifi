@@ -191,7 +191,10 @@
                 tablet.emitScriptEvent(JSON.stringify({
                     type: "marketplaces",
                     action: "inspectionModeSetting",
-                    data: Settings.getValue("inspectionMode", false)
+                    data: {
+                        inspectionMode: Settings.getValue("inspectionMode", false),
+                        userIsLoggedIn: Account.loggedIn
+                    }
                 }));
             } else if (parsedJsonMessage.type === "PURCHASES") {
                 goToPurchases(parsedJsonMessage.referrerURL);

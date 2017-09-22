@@ -27,6 +27,7 @@
     var isPreparing = false;  // Explicitly track download request status.
 
     var confirmAllPurchases = false; // Set this to "true" to cause Checkout.qml to popup for all items, even if free
+    var userIsLoggedIn = false;
 
     function injectCommonCode(isDirectoryPage) {
 
@@ -90,6 +91,18 @@
         });
     }
 
+    function maybeAddLogInButton() {
+        var resultsElement = document.getElementById('results');
+        var logInElement = document.createElement('div');
+        logInElement.classList.add("row");
+        logInElement.id = "logInDiv";
+        logInElement.style = "height:60px;margin:20px 10px 10px 10px;padding:5px;" +
+            "background-color:#D6F4D8;border-color:#aee9b2;border-width:2px;border-style:solid;border-radius:5px;";
+        logInElement.innerHTML = "This is a test";
+
+        resultsElement.insertBefore(logInElement, resultsElement.firstChild);
+    }
+
     function addPurchasesButton() {
         // Why isn't this an id?! This really shouldn't be a class on the website, but it is.
         var navbarBrandElement = document.getElementsByClassName('navbar-brand')[0];
@@ -151,6 +164,9 @@
 
     function injectHiFiCode() {
         if (confirmAllPurchases) {
+
+            maybeAddLogInButton();
+
             var target = document.getElementById('templated-items');
             // MutationObserver is necessary because the DOM is populated after the page is loaded.
             // We're searching for changes to the element whose ID is '#templated-items' - this is
@@ -173,6 +189,9 @@
 
     function injectHiFiItemPageCode() {
         if (confirmAllPurchases) {
+
+            maybeAddLogInButton();
+
             var href = $('#side-info').find('.btn').first().attr('href');
             $('#side-info').find('.btn').first().attr('href', '#');
 
@@ -451,7 +470,8 @@
 
                 if (parsedJsonMessage.type === "marketplaces") {
                     if (parsedJsonMessage.action === "inspectionModeSetting") {
-                        confirmAllPurchases = !!parsedJsonMessage.data;
+                        confirmAllPurchases = !!parsedJsonMessage.data.inspectionMode;
+                        userIsLoggedIn = !!parsedJsonMessage.data.userIsLoggedIn
                         injectCode();
                     }
                 }
