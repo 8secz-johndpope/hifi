@@ -198,6 +198,8 @@
                 }));
             } else if (parsedJsonMessage.type === "PURCHASES") {
                 goToPurchases(parsedJsonMessage.referrerURL);
+            } else if (parsedJsonMessage.type === "LOGIN") {
+                openLoginWindow();
             }
         }
     }
