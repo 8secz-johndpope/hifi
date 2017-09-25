@@ -146,12 +146,14 @@
             // Why isn't this an id?! This really shouldn't be a class on the website, but it is.
             var navbarBrandElement = document.getElementsByClassName('navbar-brand')[0];
             var purchasesElement = document.createElement('a');
-            purchasesElement.classList.add("btn");
-            purchasesElement.classList.add("btn-default");
+            var dropDownElement = document.getElementById('user-dropdown');
             purchasesElement.id = "purchasesButton";
             purchasesElement.setAttribute('href', "#");
-            purchasesElement.innerHTML = "PURCHASES";
-            purchasesElement.style = "height:100%;margin-top:0;padding:15px 15px;";
+            purchasesElement.innerHTML = "MY PURCHASES";
+            // FRONTEND WEBDEV RANT: The username dropdown should REALLY not be programmed to be on the same
+            //     line as the search bar, overlaid on top of the search bar, floated right, and then relatively bumped up using "top:-50px".
+            purchasesElement.style = "height:100%;margin-top:18px;font-weight:bold;float:right;margin-right:" + (dropDownElement.offsetWidth + 30) +
+                "px;position:relative;z-index:999;";
             navbarBrandElement.parentNode.insertAdjacentElement('beforeend', purchasesElement);
             $('#purchasesButton').on('click', function () {
                 EventBridge.emitWebEvent(JSON.stringify({
