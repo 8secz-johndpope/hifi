@@ -190,9 +190,9 @@
             } else if (parsedJsonMessage.type === "REQUEST_SETTING") {
                 tablet.emitScriptEvent(JSON.stringify({
                     type: "marketplaces",
-                    action: "inspectionModeSetting",
+                    action: "commerceSetting",
                     data: {
-                        inspectionMode: Settings.getValue("inspectionMode", false),
+                        commerceMode: Settings.getValue("commerce", false),
                         userIsLoggedIn: Account.loggedIn
                     }
                 }));

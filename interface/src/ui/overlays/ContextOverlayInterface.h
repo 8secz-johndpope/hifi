@@ -79,8 +79,6 @@ private:
 
     bool _isInMarketplaceInspectionMode { false };
 
-    Setting::Handle<bool> _settingSwitch { "inspectionMode", false };
-
     void openInspectionCertificate();
     void openMarketplace();
     void enableEntityHighlight(const EntityItemID& entityItemID);
