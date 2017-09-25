@@ -176,6 +176,14 @@
     function injectBuyButtonOnMainPage() {
         var cost;
 
+        // Unbind original mouseenter and mouseleave behavior
+        $('body').off('mouseenter', '#price-or-edit .price');
+        $('body').off('mouseleave', '#price-or-edit .price');
+
+        $('.grid-item').find('#price-or-edit').each(function () {
+            $(this).css({ "margin-top": "0" });
+        });
+
         $('.grid-item').find('#price-or-edit').find('a').each(function() {
             $(this).attr('data-href', $(this).attr('href'));
             $(this).attr('href', '#');
@@ -184,12 +192,34 @@
             $(this).closest('.col-xs-3').prev().attr("class", 'col-xs-6');
             $(this).closest('.col-xs-3').attr("class", 'col-xs-6');
 
+            var priceElement = $(this).find('.price')
+            priceElement.css({
+                "padding": "3px 5px",
+                "height": "40px",
+                "background": "linear-gradient(#00b4ef, #0093C5)",
+                "color": "#FFF",
+                "font-weight": "600",
+                "line-height": "34px"
+            });
+
             if (parseInt(cost) > 0) {
-                var priceElement = $(this).find('.price')
-                priceElement.css({ "width": "auto", "padding": "3px 5px", "height": "26px" });
-                priceElement.html('<span class="glyphicon glyphicon-hfc"></span> ' + cost);
-                priceElement.css({ "min-width": priceElement.width() + 10 });
+                priceElement.css({ "width": "auto" });
+                priceElement.html('<span class="hifi-glyph hifi-glyph-hfc" style="filter:invert(1);background-size:20px;' +
+                    'width:20px;height:20px;position:relative;top:5px;"></span> ' + cost);
+                priceElement.css({ "min-width": priceElement.width() + 30 });
             }
+        });
+
+        // change pricing to GET on button hover
+        $('body').on('mouseenter', '#price-or-edit .price', function () {
+            var $this = $(this);
+            $this.data('initialHtml', $this.html());
+            $this.text('GET');
+        });
+
+        $('body').on('mouseleave', '#price-or-edit .price', function () {
+            var $this = $(this);
+            $this.html($this.data('initialHtml'));
         });
 
 
@@ -239,13 +269,15 @@
             purchaseButton.css({
                 "background": "linear-gradient(#00b4ef, #0093C5)",
                 "color": "#FFF",
-                "font-weight": "600"
+                "font-weight": "600",
+                "padding-bottom": "10px"
             });
 
             var cost = $('.item-cost').text();
 
             if (parseInt(cost) > 0 && $('#side-info').find('#buyItemButton').size() === 0) {
-                purchaseButton.html('PURCHASE <span class="glyphicon glyphicon-hfc"></span> ' + cost);
+                purchaseButton.html('PURCHASE <span class="hifi-glyph hifi-glyph-hfc" style="filter:invert(1);background-size:20px;' + 
+                    'width:20px;height:20px;position:relative;top:5px;"></span> ' + cost);
             }
 
             purchaseButton.on('click', function () {
