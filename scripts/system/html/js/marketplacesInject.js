@@ -232,24 +232,31 @@
 
             maybeAddLogInButton();
 
-            var href = $('#side-info').find('.btn').first().attr('href');
-            $('#side-info').find('.btn').first().attr('href', '#');
+            var purchaseButton = $('#side-info').find('.btn').first();
+
+            var href = purchaseButton.attr('href');
+            purchaseButton.attr('href', '#');
+            purchaseButton.css({
+                "background": "linear-gradient(#00b4ef, #0093C5)",
+                "color": "#FFF",
+                "font-weight": "600"
+            });
 
             var cost = $('.item-cost').text();
 
             if (parseInt(cost) > 0 && $('#side-info').find('#buyItemButton').size() === 0) {
-                $('#side-info').find('.btn').first().html('PURCHASE <span class="glyphicon glyphicon-hfc"></span> ' + cost);
-
+                purchaseButton.html('PURCHASE <span class="glyphicon glyphicon-hfc"></span> ' + cost);
             }
 
-            $('#side-info').find('.btn').first().on('click', function () {
+            purchaseButton.on('click', function () {
                 buyButtonClicked(window.location.pathname.split("/")[3],
                     $('#top-center').find('h1').text(),
                     $('#creator').find('.value').text(),
                     cost,
                     href);
             });
-            maybeAddPurchasesButton();        }
+            maybeAddPurchasesButton();
+        }
     }
 
     function updateClaraCode() {
