@@ -136,10 +136,15 @@
         }, 500);
     }
 
+    function onUsernameChanged() {
+        tablet.gotoWebScreen(MARKETPLACE_URL_INITIAL, MARKETPLACES_INJECT_SCRIPT_URL);
+    }
+
     marketplaceButton.clicked.connect(onClick);
     tablet.screenChanged.connect(onScreenChanged);
     Entities.canWriteAssetsChanged.connect(onCanWriteAssetsChanged);
     ContextOverlay.contextOverlayClicked.connect(setCertificateInfo);
+    GlobalServices.myUsernameChanged.connect(onUsernameChanged);
 
     function goToPurchases(referrerURL) {
         tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
@@ -215,6 +220,7 @@
         ContextOverlay.contextOverlayClicked.disconnect(setCertificateInfo);
         tablet.webEventReceived.disconnect(onMessage);
         Entities.canWriteAssetsChanged.disconnect(onCanWriteAssetsChanged);
+        GlobalServices.myUsernameChanged.disconnect(onUsernameChanged);
     });
 
 
