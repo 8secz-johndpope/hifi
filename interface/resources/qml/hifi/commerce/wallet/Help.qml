@@ -12,7 +12,7 @@
 //
 
 import Hifi 1.0 as Hifi
-import QtQuick 2.5
+import QtQuick 2.7
 import QtQuick.Controls 2.2
 import "../../../styles-uit"
 import "../../../controls-uit" as HifiControlsUit
@@ -24,9 +24,18 @@ Item {
     HifiConstants { id: hifi; }
 
     id: root;
+    property string keyFilePath;
 
     Hifi.QmlCommerce {
         id: commerce;
+
+        onKeyFilePathIfExistsResult: {
+            keyFilePath = path;
+        }
+    }
+
+    Component.onCompleted: {
+        commerce.getKeyFilePathIfExists();
     }
 
     RalewaySemiBold {
@@ -79,27 +88,33 @@ Item {
         ListElement {
             isExpanded: false;
             question: "What are private keys?"
-            answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
+            answer: qsTr("A private key is a secret piece of text that is used to decrypt code.<br><br>In High Fidelity, <b>your private keys are used to decrypt the contents of your Wallet and Purchases.</b>");
         }
         ListElement {
             isExpanded: false;
             question: "Where are my private keys stored?"
-            answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
+            answer: qsTr('Your private keys are <b>only stored on your hard drive</b> in High Fidelity Interface\'s AppData directory.<br><br><b><font color="#0093C5"><a href="#privateKeyPath">Tap here to copy the file path of your private keys to your system clipboard.</a></font></b><br><br> You may back up this file by copying it to a USB flash drive, or to a service like Dropbox or Google Drive. Restore your backup by replacing the file in Interface\'s AppData directory with your backed-up copy.');
         }
         ListElement {
             isExpanded: false;
             question: "What happens if I lose my passphrase?"
-            answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
+            answer: qsTr("If you lose your passphrase, you will no longer have access to the contents of your Wallet or My Purchases.<br><br><b>Nobody, not even High Fidelity, can help you recover your passphrase.</b> Please store it securely.");
         }
         ListElement {
             isExpanded: false;
-            question: "Do I get charged money when a transaction fails?"
-            answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
+            question: "What is a 'Security Pic'?"
+            answer: qsTr("Your Security Pic is an encrypted image that you selected during Wallet Setup. <b>It acts as an extra layer of Wallet security.</b> The Pic is stored on your hard drive inside the same file as your private keys.<br><br>When you see your Security Pic, you know that your actions and data are securely making use of your private keys.<br><br><b>If you don't see your Security Pic on a page that is asking you for your Wallet passphrase, someone untrustworthy may be trying to gain access to your Wallet.</b>
+            ");
+        }
+        ListElement {
+            isExpanded: false;
+            question: "Do I get charged money if a transaction fails?"
+            answer: qsTr("<b>No.</b> When a transaction fails, your Wallet will be refunded the cost of the item you attempted to purchase.");
         }
         ListElement {
             isExpanded: false;
             question: "How do I convert HFC to other currencies?"
-            answer: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi iaculis pharetra porttitor."
+            answer: qsTr("We are still building the tools needed to support a vibrant economy in High Fidelity. <b>There is currently no way to convert HFC to other currencies.</b>");
         }
     }
 
@@ -198,12 +213,18 @@ Item {
                     size: 18;
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: parent.left;
-                    anchors.leftMargin: 80;
+                    anchors.leftMargin: 32;
                     anchors.right: parent.right;
-                    anchors.rightMargin: 10;
+                    anchors.rightMargin: 32;
                     wrapMode: Text.WordWrap;
                     height: paintedHeight;
                     color: hifi.colors.white;
+
+                    onLinkActivated: {
+                        if (link === "#privateKeyPath") {
+                            Window.copyToClipboard(root.keyFilePath);
+                        }
+                    }
                 }
             }
 
