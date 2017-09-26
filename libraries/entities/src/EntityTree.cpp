@@ -1149,7 +1149,8 @@ int EntityTree::processEditPacketData(ReceivedMessage& message, const unsigned c
                         failedAdd = true;
                         qCDebug(entities) << "User without 'rez rights' [" << senderNode->getUUID()
                             << "] attempted to add an entity ID:" << entityItemID;
-                    } else if (!properties.getCertificateID().isNull() && !senderNode->getCanRezCertified() && !senderNode->getCanRezTmpCertified()) {
+                    // FIXME after Cert ID property integrated        
+                    } else if (/*!properties.getCertificateID().isNull() && */!senderNode->getCanRezCertified() && !senderNode->getCanRezTmpCertified()) {
                         qCDebug(entities) << "User without 'certified rez rights' [" << senderNode->getUUID()
                             << "] attempted to add a certified entity with ID:" << entityItemID;
                     } else {
