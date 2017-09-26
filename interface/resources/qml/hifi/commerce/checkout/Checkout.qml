@@ -84,20 +84,10 @@ Rectangle {
         }
 
         onWalletAuthenticatedStatusResult: {
-            if (!isAuthenticated && !passphraseModal.visible) {
-                passphraseModal.visible = true;
+            if (!isAuthenticated && root.activeView !== "passphraseModal") {
+                root.activeView = "passphraseModal";
             } else if (isAuthenticated) {
-                if (!root.debugCheckoutSuccess) {
-                    root.activeView = "checkoutMain";
-                } else {
-                    root.activeView = "checkoutSuccess";
-                }
-                if (!balanceReceived) {
-                    commerce.balance();
-                }
-                if (!purchasesReceived) {
-                    commerce.inventory();
-                }
+                authSuccessStep();
             }
         }
 
@@ -224,13 +214,18 @@ Rectangle {
 
     HifiWallet.PassphraseModal {
         id: passphraseModal;
-        visible: false;
+        visible: root.activeView === "passphraseModal";
         anchors.fill: parent;
         titleBarText: "Checkout";
+        titleBarIcon: hifi.glyphs.wallet;
 
         Connections {
             onSendSignalToParent: {
-                sendToScript(msg);
+                if (msg.method === "authSuccess") {
+                    authSuccessStep();
+                } else {
+                    sendToScript(msg);
+                }
             }
         }
     }
@@ -512,7 +507,7 @@ Rectangle {
                     verticalAlignment: Text.AlignVCenter;
 
                     onLinkActivated: {
-                        sendToScript({method: 'checkout_goToPurchases'});
+                        sendToScript({method: 'checkout_goToPurchases', filterText: itemNameText.text});
                     }
                 }
             }
@@ -735,7 +730,7 @@ Rectangle {
             horizontalAlignment: Text.AlignLeft;
             verticalAlignment: Text.AlignVCenter;
             onLinkActivated: {
-                sendToScript({method: 'checkout_goToPurchases'});
+                sendToScript({method: 'purchases_openWallet'});
             }
         }
 
@@ -963,6 +958,20 @@ Rectangle {
             buyTextContainer.border.color = "#FAC07D";
             buyGlyph.text = hifi.glyphs.alert;
             buyGlyph.size = 46;
+        }
+    }
+
+    function authSuccessStep() {
+        if (!root.debugCheckoutSuccess) {
+            root.activeView = "checkoutMain";
+        } else {
+            root.activeView = "checkoutSuccess";
+        }
+        if (!balanceReceived) {
+            commerce.balance();
+        }
+        if (!purchasesReceived) {
+            commerce.inventory();
         }
     }
 

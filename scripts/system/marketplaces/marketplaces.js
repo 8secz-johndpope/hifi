@@ -137,7 +137,9 @@
     }
 
     function onUsernameChanged() {
-        tablet.gotoWebScreen(MARKETPLACE_URL_INITIAL, MARKETPLACES_INJECT_SCRIPT_URL);
+        if (onMarketplaceScreen) {
+            tablet.gotoWebScreen(MARKETPLACE_URL_INITIAL, MARKETPLACES_INJECT_SCRIPT_URL);
+        }
     }
 
     marketplaceButton.clicked.connect(onClick);
@@ -146,12 +148,13 @@
     ContextOverlay.contextOverlayClicked.connect(setCertificateInfo);
     GlobalServices.myUsernameChanged.connect(onUsernameChanged);
 
-    function goToPurchases(referrerURL) {
+    function goToPurchases(referrerURL, filterText) {
         tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
         tablet.sendToQml({
             method: 'updatePurchases',
             canRezCertifiedItems: Entities.canRezCertified || Entities.canRezTmpCertified,
-            referrerURL: referrerURL
+            referrerURL: referrerURL,
+            filterText: filterText
         });
     }
 
@@ -273,7 +276,7 @@
                 break;
             case 'header_goToPurchases':
             case 'checkout_goToPurchases':
-                goToPurchases(MARKETPLACE_URL_INITIAL);
+                goToPurchases(MARKETPLACE_URL_INITIAL, message.filterText);
                 break;
             case 'checkout_itemLinkClicked':
             case 'checkout_continueShopping':

@@ -69,16 +69,12 @@ Rectangle {
                 root.activeView = "notSetUp";
             } else if (exists && root.activeView === "initialize") {
                 commerce.getWalletAuthenticatedStatus();
-            } else if (exists) {
-                // just set the source again (to be sure the change was noticed)
-                securityImage.source = "";
-                securityImage.source = "image://security/securityImage";
             }
         }
 
         onWalletAuthenticatedStatusResult: {
-            if (!isAuthenticated && !passphraseModal.visible) {
-                passphraseModal.visible = true;
+            if (!isAuthenticated && root.activeView !== "passphraseModal") {
+                root.activeView = "passphraseModal";
             } else if (isAuthenticated) {
                 sendToScript({method: 'purchases_getIsFirstUse'});
             }
@@ -191,13 +187,19 @@ Rectangle {
 
     HifiWallet.PassphraseModal {
         id: passphraseModal;
-        visible: false;
+        visible: root.activeView === "passphraseModal";
         anchors.fill: parent;
         titleBarText: "Purchases";
+        titleBarIcon: hifi.glyphs.wallet;
 
         Connections {
             onSendSignalToParent: {
-                sendToScript(msg);
+                if (msg.method === "authSuccess") {
+                    root.activeView = "initialize";
+                    sendToScript({method: 'purchases_getIsFirstUse'});
+                } else {
+                    sendToScript(msg);
+                }
             }
         }
     }
@@ -613,6 +615,7 @@ Rectangle {
                 referrerURL = message.referrerURL;
                 titleBarContainer.referrerURL = message.referrerURL;
                 root.canRezCertifiedItems = message.canRezCertifiedItems;
+                filterBar.text = message.filterText ? message.filterText : "";
             break;
             case 'purchases_getIsFirstUseResult':
                 if (message.isFirstUseOfPurchases && root.activeView !== "firstUseTutorial") {

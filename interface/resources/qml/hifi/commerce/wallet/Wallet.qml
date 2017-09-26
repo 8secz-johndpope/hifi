@@ -73,8 +73,8 @@ Rectangle {
         }
 
         onWalletAuthenticatedStatusResult: {
-            if (!isAuthenticated && passphraseModal && !passphraseModal.visible) {
-                passphraseModal.visible = true;
+            if (!isAuthenticated && passphraseModal && root.activeView !== "passphraseModal") {
+                root.activeView = "passphraseModal";
             } else if (isAuthenticated) {
                 root.activeView = "walletHome";
             }
@@ -83,12 +83,6 @@ Rectangle {
 
     SecurityImageModel {
         id: securityImageModel;
-    }
-
-    onActiveViewChanged: {
-        if (root.activeView === "walletSetup") {
-            passphraseModal.visible = false;
-        }
     }
 
     HifiCommerceCommon.CommerceLightbox {
@@ -282,14 +276,18 @@ Rectangle {
 
     PassphraseModal {
         id: passphraseModal;
-        visible: false;
+        visible: root.activeView === "passphraseModal";
         anchors.fill: parent;
         titleBarText: "Wallet";
         titleBarIcon: hifi.glyphs.wallet;
 
         Connections {
             onSendSignalToParent: {
-                sendToScript(msg);
+                if (msg.method === "authSuccess") {
+                    root.activeView = "walletHome";
+                } else {
+                    sendToScript(msg);
+                }
             }
         }
     }

@@ -88,8 +88,7 @@ Item {
         ListElement {
             isExpanded: false;
             question: "What are private keys?"
-            answer: qsTr("A private key is a secret piece of text that is used to decrypt code.<br><br>
-            In High Fidelity, <b>your private keys are used to decrypt the contents of your Wallet and Purchases.</b>");
+            answer: qsTr("A private key is a secret piece of text that is used to decrypt code.<br><br>In High Fidelity, <b>your private keys are used to decrypt the contents of your Wallet and Purchases.</b>");
         }
         ListElement {
             isExpanded: false;

@@ -50,7 +50,7 @@ Item {
             if (!isAuthenticated) {
                 errorText.text = "Authentication failed - please try again.";
             } else {
-                root.visible = false;
+                sendSignalToParent({method: 'authSuccess'});;
             }
         }
     }
