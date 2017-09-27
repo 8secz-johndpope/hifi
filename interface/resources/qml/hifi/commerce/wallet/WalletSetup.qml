@@ -628,9 +628,9 @@ Item {
                     height: 24;
                     width: height;
                     HiFiGlyphs {
-                        text: hifi.glyphs.question;
+                        text: hifi.glyphs.folderLg;
                         // Size
-                        size: parent.height*1.3;
+                        size: parent.height;
                         // Anchors
                         anchors.fill: parent;
                         // Style
