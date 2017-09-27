@@ -107,6 +107,16 @@ Item {
         }
         ListElement {
             isExpanded: false;
+            question: "My HFC balance isn't what I expect it to be. Why?"
+            answer: qsTr('High Fidelity transactions are backed by a <b>blockchain</b>, which can take some time to update. The status of transactions usually updates within 90 seconds.<br><br><b><font color="#0093C5"><a href="#blockchain">Tap here to learn more about the blockchain.</a></font></b>');
+        }
+        ListElement {
+            isExpanded: false;
+            question: "My friend purchased my item from the Marketplace, but I still haven't received the money from the sale. Why not?"
+            answer: qsTr('High Fidelity transactions are backed by a <b>blockchain</b>, which can take some time to update. The status of transactions usually updates within 90 seconds, at which point you will receive your money.<br><br><b><font color="#0093C5"><a href="#blockchain">Tap here to learn more about the blockchain.</a></font></b>');
+        }
+        ListElement {
+            isExpanded: false;
             question: "Do I get charged money if a transaction fails?"
             answer: qsTr("<b>No.</b> Your HFC balance only changes after a transaction is confirmed.");
         }
@@ -222,6 +232,8 @@ Item {
                     onLinkActivated: {
                         if (link === "#privateKeyPath") {
                             Window.copyToClipboard(root.keyFilePath);
+                        } else if (link === "#blockchain") {
+                            Qt.openUrlExternally("https://www.highfidelity.com/");
                         }
                     }
                 }
