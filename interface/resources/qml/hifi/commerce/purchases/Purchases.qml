@@ -58,6 +58,7 @@ Rectangle {
         onKeyFilePathIfExistsResult: {
             if (path === "" && root.activeView !== "notSetUp") {
                 root.activeView = "notSetUp";
+                notSetUpTimer.start();
             } else if (path !== "" && root.activeView === "initialize") {
                 commerce.getSecurityImage();
             }
@@ -67,6 +68,7 @@ Rectangle {
             securityImageResultReceived = true;
             if (!exists && root.activeView !== "notSetUp") { // "If security image is not set up"
                 root.activeView = "notSetUp";
+                notSetUpTimer.start();
             } else if (exists && root.activeView === "initialize") {
                 commerce.getWalletAuthenticatedStatus();
             }
@@ -108,6 +110,14 @@ Rectangle {
             }
 
             root.pendingInventoryReply = false;
+        }
+    }
+
+    Timer {
+        id: notSetUpTimer;
+        interval: 200;
+        onTriggered: {
+            sendToScript({method: 'checkout_walletNotSetUp'});
         }
     }
 
@@ -238,90 +248,6 @@ Rectangle {
             }
         }
     }
-
-    //
-    // "WALLET NOT SET UP" START
-    //
-    Item {
-        id: notSetUp;
-        visible: root.activeView === "notSetUp";
-        anchors.top: titleBarContainer.bottom;
-        anchors.topMargin: -titleBarContainer.additionalDropdownHeight;
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-
-        RalewayRegular {
-            id: notSetUpText;
-            text: "<b>Your wallet isn't set up.</b><br><br>Set up your Wallet (no credit card necessary) to claim your <b>free HFC</b> " +
-            "and get items from the Marketplace.";
-            // Text size
-            size: 24;
-            // Anchors
-            anchors.top: parent.top;
-            anchors.bottom: notSetUpActionButtonsContainer.top;
-            anchors.left: parent.left;
-            anchors.leftMargin: 16;
-            anchors.right: parent.right;
-            anchors.rightMargin: 16;
-            // Style
-            color: hifi.colors.faintGray;
-            wrapMode: Text.WordWrap;
-            // Alignment
-            horizontalAlignment: Text.AlignHCenter;
-            verticalAlignment: Text.AlignVCenter;
-        }
-
-        Item {
-            id: notSetUpActionButtonsContainer;
-            // Size
-            width: root.width;
-            height: 70;
-            // Anchors
-            anchors.left: parent.left;
-            anchors.bottom: parent.bottom;
-            anchors.bottomMargin: 24;
-
-            // "Cancel" button
-            HifiControlsUit.Button {
-                id: cancelButton;
-                color: hifi.buttons.black;
-                colorScheme: hifi.colorSchemes.dark;
-                anchors.top: parent.top;
-                anchors.topMargin: 3;
-                anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 3;
-                anchors.left: parent.left;
-                anchors.leftMargin: 20;
-                width: parent.width/2 - anchors.leftMargin*2;
-                text: "Cancel"
-                onClicked: {
-                    sendToScript({method: 'purchases_backClicked', referrerURL: referrerURL});
-                }
-            }
-
-            // "Set Up" button
-            HifiControlsUit.Button {
-                id: setUpButton;
-                color: hifi.buttons.blue;
-                colorScheme: hifi.colorSchemes.dark;
-                anchors.top: parent.top;
-                anchors.topMargin: 3;
-                anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 3;
-                anchors.right: parent.right;
-                anchors.rightMargin: 20;
-                width: parent.width/2 - anchors.rightMargin*2;
-                text: "Set Up Wallet"
-                onClicked: {
-                    sendToScript({method: 'checkout_setUpClicked'});
-                }
-            }
-        }
-    }
-    //
-    // "WALLET NOT SET UP" END
-    //
 
     //
     // PURCHASES CONTENTS START

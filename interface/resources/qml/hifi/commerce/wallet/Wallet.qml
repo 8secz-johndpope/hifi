@@ -38,19 +38,20 @@ Rectangle {
     Hifi.QmlCommerce {
         id: commerce;
 
-        onAccountResult: {
-            if (result.status === "success") {
-                commerce.getKeyFilePathIfExists();
-            } else {
-                // unsure how to handle a failure here. We definitely cannot proceed.
-            }
-        }
         onLoginStatusResult: {
             if (!isLoggedIn && root.activeView !== "needsLogIn") {
                 root.activeView = "needsLogIn";
             } else if (isLoggedIn) {
                 root.activeView = "initialize";
                 commerce.account();
+            }
+        }
+
+        onAccountResult: {
+            if (result.status === "success") {
+                commerce.getKeyFilePathIfExists();
+            } else {
+                // unsure how to handle a failure here. We definitely cannot proceed.
             }
         }
 
@@ -176,8 +177,12 @@ Rectangle {
         Connections {
             onSendSignalToWallet: {
                 if (msg.method === 'walletSetup_finished') {
-                    root.activeView = "initialize";
-                    commerce.getLoginStatus();
+                    if (msg.referrer === '') {
+                        root.activeView = "initialize";
+                        commerce.getLoginStatus();
+                    } else if (msg.referrer === 'purchases') {
+                        sendToScript({method: 'goToPurchases'});
+                    }
                 } else if (msg.method === 'walletSetup_raiseKeyboard') {
                     root.keyboardRaised = true;
                 } else if (msg.method === 'walletSetup_lowerKeyboard') {
@@ -708,6 +713,9 @@ Rectangle {
     //
     function fromScript(message) {
         switch (message.method) {
+            case 'updateWalletReferrer':
+                walletSetup.referrer = message.referrer;
+            break;
             default:
                 console.log('Unrecognized message from wallet.js:', JSON.stringify(message));
         }

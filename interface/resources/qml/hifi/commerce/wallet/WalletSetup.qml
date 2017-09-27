@@ -29,6 +29,7 @@ Item {
     property string activeView: "step_1";
     property string lastPage;
     property bool hasShownSecurityImageTip: false;
+    property string referrer;
 
     Image {
         anchors.fill: parent;
@@ -726,7 +727,7 @@ Item {
                 text: "Finish";
                 onClicked: {
                     root.visible = false;
-                    sendSignalToWallet({method: 'walletSetup_finished'});
+                    sendSignalToWallet({method: 'walletSetup_finished', referrer: root.referrer ? root.referrer : ""});
                 }
             }
         }

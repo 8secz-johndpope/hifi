@@ -25,6 +25,7 @@
     //   -WALLET_QML_SOURCE: The path to the Wallet QML
     //   -onWalletScreen: true/false depending on whether we're looking at the app.
     var WALLET_QML_SOURCE = Script.resourcesPath() + "qml/hifi/commerce/wallet/Wallet.qml";
+    var MARKETPLACE_PURCHASES_QML_PATH = Script.resourcesPath() + "qml/hifi/commerce/purchases/Purchases.qml";
     var onWalletScreen = false;
     function onButtonClicked() {
         if (!tablet) {
@@ -82,6 +83,9 @@
                 break;
             case 'transactionHistory_linkClicked':
                 tablet.gotoWebScreen(message.marketplaceLink, MARKETPLACES_INJECT_SCRIPT_URL);
+                break;
+            case 'goToPurchases':
+                tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
                 break;
             default:
                 print('Unrecognized message from QML:', JSON.stringify(message));

@@ -103,10 +103,21 @@
         }
     }
 
+    var referrerURL; // Used for updating Purchases QML
+    var filterText; // Used for updating Purchases QML
     function onScreenChanged(type, url) {
         onMarketplaceScreen = type === "Web" && url === MARKETPLACE_URL_INITIAL;
         onCommerceScreen = type === "QML" && (url === MARKETPLACE_CHECKOUT_QML_PATH || url === MARKETPLACE_PURCHASES_QML_PATH || url.indexOf(MARKETPLACE_INSPECTIONCERTIFICATE_QML_PATH) !== -1);
         wireEventBridge(onCommerceScreen);
+
+        if (url === MARKETPLACE_PURCHASES_QML_PATH) {
+            tablet.sendToQml({
+                method: 'updatePurchases',
+                canRezCertifiedItems: Entities.canRezCertified || Entities.canRezTmpCertified,
+                referrerURL: referrerURL,
+                filterText: filterText
+            });
+        }
 
         // for toolbar mode: change button to active when window is first openend, false otherwise.
         marketplaceButton.editProperties({ isActive: onMarketplaceScreen || onCommerceScreen });
@@ -148,16 +159,6 @@
     ContextOverlay.contextOverlayClicked.connect(setCertificateInfo);
     GlobalServices.myUsernameChanged.connect(onUsernameChanged);
 
-    function goToPurchases(referrerURL, filterText) {
-        tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
-        tablet.sendToQml({
-            method: 'updatePurchases',
-            canRezCertifiedItems: Entities.canRezCertified || Entities.canRezTmpCertified,
-            referrerURL: referrerURL,
-            filterText: filterText
-        });
-    }
-
     function onMessage(message) {
 
         if (message === GOTO_DIRECTORY) {
@@ -189,6 +190,7 @@
         } else {
             var parsedJsonMessage = JSON.parse(message);
             if (parsedJsonMessage.type === "CHECKOUT") {
+                wireEventBridge(true);
                 tablet.pushOntoStack(MARKETPLACE_CHECKOUT_QML_PATH);
                 tablet.sendToQml({
                     method: 'updateCheckoutQML',
@@ -205,7 +207,9 @@
                     }
                 }));
             } else if (parsedJsonMessage.type === "PURCHASES") {
-                goToPurchases(parsedJsonMessage.referrerURL);
+                referrerURL = parsedJsonMessage.referrerURL;
+                filterText = "";
+                tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
             } else if (parsedJsonMessage.type === "LOGIN") {
                 openLoginWindow();
             }
@@ -268,6 +272,15 @@
             case 'checkout_setUpClicked':
                 tablet.pushOntoStack(MARKETPLACE_WALLET_QML_PATH);
                 break;
+            case 'purchases_walletNotSetUp':
+            case 'checkout_walletNotSetUp':
+                wireEventBridge(true);
+                tablet.sendToQml({
+                    method: 'updateWalletReferrer',
+                    referrer: "purchases"
+                });
+                tablet.pushOntoStack(MARKETPLACE_WALLET_QML_PATH);
+                break;
             case 'checkout_cancelClicked':
                 tablet.gotoWebScreen(MARKETPLACE_URL + '/items/' + message.params, MARKETPLACES_INJECT_SCRIPT_URL);
                 // TODO: Make Marketplace a QML app that's a WebView wrapper so we can use the app stack.
@@ -276,7 +289,9 @@
                 break;
             case 'header_goToPurchases':
             case 'checkout_goToPurchases':
-                goToPurchases(MARKETPLACE_URL_INITIAL, message.filterText);
+                referrerURL = MARKETPLACE_URL_INITIAL;
+                filterText = message.filterText;
+                tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
                 break;
             case 'checkout_itemLinkClicked':
             case 'checkout_continueShopping':
@@ -328,7 +343,9 @@
                 break;
             case 'inspectionCertificate_closeClicked':
                 if (message.closeGoesToPurchases) {
-                    goToPurchases(MARKETPLACE_URL_INITIAL);
+                    referrerURL = MARKETPLACE_URL_INITIAL;
+                    filterText = "";
+                    tablet.pushOntoStack(MARKETPLACE_PURCHASES_QML_PATH);
                 } else {
                     tablet.gotoHomeScreen();
                 }
