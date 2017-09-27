@@ -88,6 +88,18 @@ Rectangle {
             } else {
                 purchasesModel.clear();
                 purchasesModel.append(result.data.assets);
+
+                if (previousPurchasesModel.count !== 0) {
+                    checkIfAnyItemStatusChanged();
+                } else {
+                    // Fill statusChanged default value
+                    // Not doing this results in the default being true...
+                    for (var i = 0; i < purchasesModel.count; i++) {
+                        purchasesModel.setProperty(i, "statusChanged", false);
+                    }
+                }
+                previousPurchasesModel.append(result.data.assets);
+
                 buildFilteredPurchasesModel();
 
                 if (root.pendingInventoryReply) {
@@ -391,6 +403,9 @@ Rectangle {
             id: purchasesModel;
         }
         ListModel {
+            id: previousPurchasesModel;
+        }
+        ListModel {
             id: filteredPurchasesModel;
         }
 
@@ -474,6 +489,8 @@ Rectangle {
                 itemId: id;
                 itemPreviewImageUrl: preview;
                 itemHref: root_file_url;
+                purchaseStatus: status;
+                purchaseStatusChanged: statusChanged;
                 anchors.topMargin: 12;
                 anchors.bottomMargin: 12;
 
@@ -591,7 +608,31 @@ Rectangle {
         filteredPurchasesModel.clear();
         for (var i = 0; i < purchasesModel.count; i++) {
             if (purchasesModel.get(i).title.toLowerCase().indexOf(filterBar.text.toLowerCase()) !== -1) {
-                filteredPurchasesModel.append(purchasesModel.get(i));
+                if (purchasesModel.get(i).status !== "confirmed") {
+                    filteredPurchasesModel.insert(0, purchasesModel.get(i));
+                } else {
+                    filteredPurchasesModel.append(purchasesModel.get(i));
+                }
+            }
+        }
+    }
+
+    function checkIfAnyItemStatusChanged() {
+        var currentPurchasesModelId, currentPurchasesModelEdition, currentPurchasesModelStatus;
+        var previousPurchasesModelStatus;
+        for (var i = 0; i < purchasesModel.count; i++) {
+            currentPurchasesModelId = purchasesModel.get(i).id;
+            currentPurchasesModelEdition = purchasesModel.get(i).edition_number;
+            currentPurchasesModelStatus = purchasesModel.get(i).status;
+
+            for (var j = 0; j < previousPurchasesModel.count; j++) {
+                previousPurchasesModelStatus = previousPurchasesModel.get(j).status;
+                if (currentPurchasesModelId === previousPurchasesModel.get(j).id &&
+                    currentPurchasesModelEdition === previousPurchasesModel.get(j).edition_number &&
+                    currentPurchasesModelStatus !== previousPurchasesModelStatus) {
+                    
+                    purchasesModel.setProperty(i, "statusChanged", true);
+                }
             }
         }
     }

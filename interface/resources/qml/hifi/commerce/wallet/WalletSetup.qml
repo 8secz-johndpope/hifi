@@ -639,7 +639,7 @@ Item {
                     }
 
                     onClicked: {
-                        Window.copyToClipboard(keyFilePath.text);
+                        Qt.openUrlExternally("file:///" + keyFilePath.text.substring(0, keyFilePath.text.lastIndexOf('/')));
                     }
                 }
                 RalewayRegular {

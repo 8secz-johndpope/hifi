@@ -409,9 +409,6 @@ Rectangle {
                     height: paintedHeight;
                     // Style
                     color: hifi.colors.blueAccent;
-                    // Alignment
-                    horizontalAlignment: Text.AlignRight;
-                    verticalAlignment: Text.AlignTop;
                 }
                 FiraSansSemiBold {
                     id: itemPriceText;
@@ -426,9 +423,6 @@ Rectangle {
                     height: paintedHeight;
                     // Style
                     color: hifi.colors.blueAccent;
-                    // Alignment
-                    horizontalAlignment: Text.AlignRight;
-                    verticalAlignment: Text.AlignTop;
                 }
             }
         }

@@ -93,27 +93,27 @@ Item {
         ListElement {
             isExpanded: false;
             question: "Where are my private keys stored?"
-            answer: qsTr('Your private keys are <b>only stored on your hard drive</b> in High Fidelity Interface\'s AppData directory.<br><br><b><font color="#0093C5"><a href="#privateKeyPath">Tap here to copy the file path of your private keys to your system clipboard.</a></font></b><br><br> You may backup this file by copying it to a USB flash drive, or to a service like Dropbox or Google Drive. Restore your backup by replacing the file in Interface\'s AppData directory with your backed-up copy.');
+            answer: qsTr('Your private keys are <b>only stored on your hard drive</b> in High Fidelity Interface\'s AppData directory.<br><br><b><font color="#0093C5"><a href="#privateKeyPath">Tap here to open the file path of your hifikey in your file explorer.</a></font></b><br><br> You may backup this file by copying it to a USB flash drive, or to a service like Dropbox or Google Drive. Restore your backup by replacing the file in Interface\'s AppData directory with your backed-up copy.');
         }
         ListElement {
             isExpanded: false;
             question: "What happens if I lose my passphrase?"
-            answer: qsTr("If you lose your passphrase, you will no longer have access to the contents of your Wallet or My Purchases.<br><br><b>Nobody can help you recover your passphrase, including High Fidelity.</b> Please store it securely.");
+            answer: qsTr("If you lose your passphrase, you will no longer have access to the contents of your Wallet or My Purchases.<br><br><b>Nobody can help you recover your passphrase, including High Fidelity.</b> Please write it down and store it securely.");
         }
         ListElement {
             isExpanded: false;
             question: "What is a 'Security Pic'?"
-            answer: qsTr("Your Security Pic is an encrypted image that you selected during Wallet Setup. <b>It acts as an extra layer of Wallet security.</b> The Pic is stored on your hard drive inside the same file as your private keys.<br><br>When you see your Security Pic, you know that your actions and data are securely making use of your private keys.<br><br><b>If you don't see your Security Pic on a page that is asking you for your Wallet passphrase, someone untrustworthy may be trying to gain access to your Wallet.</b>");
+            answer: qsTr("Your Security Pic is an encrypted image that you selected during Wallet Setup. <b>It acts as an extra layer of Wallet security.</b><br><br>When you see your Security Pic, you know that your actions and data are securely making use of your private keys.<br><br><b>If you don't see your Security Pic on a page that is asking you for your Wallet passphrase, someone untrustworthy may be trying to gain access to your Wallet.</b><br><br>The Pic is stored on your hard drive inside the same file as your private keys.");
         }
         ListElement {
             isExpanded: false;
             question: "My HFC balance isn't what I expect it to be. Why?"
-            answer: qsTr('High Fidelity transactions are backed by a <b>blockchain</b>, which can take some time to update. The status of transactions usually updates within 90 seconds.<br><br><b><font color="#0093C5"><a href="#blockchain">Tap here to learn more about the blockchain.</a></font></b>');
+            answer: qsTr('High Fidelity Coin (HFC) transactions are backed by a <b>blockchain</b>, which takes time to update. The status of a transaction usually updates within 90 seconds.<br><br><b><font color="#0093C5"><a href="#blockchain">Tap here to learn more about the blockchain.</a></font></b>');
         }
         ListElement {
             isExpanded: false;
             question: "My friend purchased my item from the Marketplace, but I still haven't received the money from the sale. Why not?"
-            answer: qsTr('High Fidelity transactions are backed by a <b>blockchain</b>, which can take some time to update. The status of transactions usually updates within 90 seconds, at which point you will receive your money.<br><br><b><font color="#0093C5"><a href="#blockchain">Tap here to learn more about the blockchain.</a></font></b>');
+            answer: qsTr('High Fidelity Coin (HFC) transactions are backed by a <b>blockchain</b>, which takes time to update. The status of a transaction usually updates within 90 seconds, at which point you will receive your money.<br><br><b><font color="#0093C5"><a href="#blockchain">Tap here to learn more about the blockchain.</a></font></b>');
         }
         ListElement {
             isExpanded: false;
@@ -231,7 +231,7 @@ Item {
 
                     onLinkActivated: {
                         if (link === "#privateKeyPath") {
-                            Window.copyToClipboard(root.keyFilePath);
+                            Qt.openUrlExternally("file:///" + root.keyFilePath.substring(0, root.keyFilePath.lastIndexOf('/')));
                         } else if (link === "#blockchain") {
                             Qt.openUrlExternally("https://www.highfidelity.com/");
                         }

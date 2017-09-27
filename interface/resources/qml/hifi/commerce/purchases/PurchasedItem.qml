@@ -27,7 +27,8 @@ Item {
     HifiConstants { id: hifi; }
 
     id: root;
-    property string status;
+    property string purchaseStatus;
+    property bool purchaseStatusChanged;
     property bool canRezCertifiedItems: false;
     property string itemName;
     property string itemId;
@@ -38,6 +39,23 @@ Item {
 
     height: 110;
     width: parent.width;
+
+    onPurchaseStatusChangedChanged: {
+        if (root.purchaseStatusChanged === true && root.purchaseStatus === "confirmed") {
+            statusText.text = "CONFIRMED!";
+            statusText.color = hifi.colors.blueAccent;
+            confirmedTimer.start();
+            root.purchaseStatusChanged = false;
+        }
+    }
+
+    Timer {
+        id: confirmedTimer;
+        interval: 3000;
+        onTriggered: {
+            root.purchaseStatus = "";
+        }
+    }
 
     Rectangle {
         id: mainContainer;
@@ -158,7 +176,7 @@ Item {
         Item {
             id: statusContainer;
 
-            visible: root.status || root.ownedItemCount > 1;
+            visible: root.purchaseStatus || root.ownedItemCount > 1;
             anchors.left: itemName.left;
             anchors.top: certificateContainer.bottom;
             anchors.topMargin: 8;
@@ -173,9 +191,9 @@ Item {
                 anchors.bottom: parent.bottom;
                 width: paintedWidth;
                 text: {
-                        if (root.status === "pending") {
+                        if (root.purchaseStatus === "pending") {
                             "PENDING..."
-                        } else if (root.status === "invalidated") {
+                        } else if (root.purchaseStatus === "invalidated") {
                             "INVALIDATED"
                         } else if (root.ownedItemCount > 1) {
                             "<font color='#6a6a6a'>(#" + root.itemEdition + ")</font> <u>You own " + root.ownedItemCount + " others</u>"
@@ -185,9 +203,9 @@ Item {
                     }
                 size: 18;
                 color: {
-                        if (root.status === "pending") {
+                        if (root.purchaseStatus === "pending") {
                             hifi.colors.blueAccent
-                        } else if (root.status === "invalidated") {
+                        } else if (root.purchaseStatus === "invalidated") {
                             hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
                             hifi.colors.blueAccent
@@ -201,9 +219,9 @@ Item {
             HiFiGlyphs {
                 id: statusIcon;
                 text: {
-                        if (root.status === "pending") {
+                        if (root.purchaseStatus === "pending") {
                             hifi.glyphs.question
-                        } else if (root.status === "invalidated") {
+                        } else if (root.purchaseStatus === "invalidated") {
                             hifi.glyphs.question
                         } else {
                             ""
@@ -218,9 +236,9 @@ Item {
                 anchors.bottom: parent.bottom;
                 // Style
                 color: {
-                        if (root.status === "pending") {
+                        if (root.purchaseStatus === "pending") {
                             hifi.colors.blueAccent
-                        } else if (root.status === "invalidated") {
+                        } else if (root.purchaseStatus === "invalidated") {
                             hifi.colors.redAccent
                         } else if (root.ownedItemCount > 1) {
                             hifi.colors.blueAccent
@@ -235,19 +253,19 @@ Item {
                 anchors.fill: parent;
                 hoverEnabled: enabled;
                 onClicked: {
-                    if (root.status === "pending") {
+                    if (root.purchaseStatus === "pending") {
                         sendToPurchases({method: 'showPendingLightbox'});
-                    } else if (root.status === "invalidated") {
+                    } else if (root.purchaseStatus === "invalidated") {
                         sendToPurchases({method: 'showInvalidatedLightbox'});
                     } else if (root.ownedItemCount > 1) {
                         sendToPurchases({method: 'setFilterText', filterText: root.itemName});
                     }
                 }
                 onEntered: {
-                    if (root.status === "pending") {
+                    if (root.purchaseStatus === "pending") {
                         statusText.color = hifi.colors.blueHighlight;
                         statusIcon.color = hifi.colors.blueHighlight;
-                    } else if (root.status === "invalidated") {
+                    } else if (root.purchaseStatus === "invalidated") {
                         statusText.color = hifi.colors.redAccent;
                         statusIcon.color = hifi.colors.redAccent;
                     } else if (root.ownedItemCount > 1) {
@@ -256,10 +274,10 @@ Item {
                     }
                 }
                 onExited: {
-                    if (root.status === "pending") {
+                    if (root.purchaseStatus === "pending") {
                         statusText.color = hifi.colors.blueAccent;
                         statusIcon.color = hifi.colors.blueAccent;
-                    } else if (root.status === "invalidated") {
+                    } else if (root.purchaseStatus === "invalidated") {
                         statusText.color = hifi.colors.redHighlight;
                         statusIcon.color = hifi.colors.redHighlight;
                     } else if (root.ownedItemCount > 1) {
@@ -306,7 +324,7 @@ Item {
             anchors.bottom: parent.bottom;
             anchors.right: parent.right;
             width: height;
-            enabled: root.canRezCertifiedItems && root.status !== "invalidated";
+            enabled: root.canRezCertifiedItems && root.purchaseStatus !== "invalidated";
             
             onClicked: {
                 if (urlHandler.canHandleUrl(root.itemHref)) {
