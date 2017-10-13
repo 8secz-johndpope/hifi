@@ -53,6 +53,7 @@ AvatarMixer::AvatarMixer(ReceivedMessage& message) :
     packetReceiver.registerListener(PacketType::NodeIgnoreRequest, this, "handleNodeIgnoreRequestPacket");
     packetReceiver.registerListener(PacketType::RadiusIgnoreRequest, this, "handleRadiusIgnoreRequestPacket");
     packetReceiver.registerListener(PacketType::RequestsDomainListData, this, "handleRequestsDomainListDataPacket");
+    packetReceiver.registerListener(PacketType::ChallengeOwnership, this, "handleChallengeOwnershipDataPacket");
 
     packetReceiver.registerListenerForTypes({
         PacketType::ReplicatedAvatarIdentity,
@@ -580,6 +581,8 @@ void AvatarMixer::handleAvatarIdentityPacket(QSharedPointer<ReceivedMessage> mes
         AvatarMixerClientData* nodeData = dynamic_cast<AvatarMixerClientData*>(senderNode->getLinkedData());
         if (nodeData != nullptr) {
             AvatarData& avatar = nodeData->getAvatar();
+
+            avatar.setIsServerData(true);
 
             // parse the identity packet and update the change timestamp if appropriate
             bool identityChanged = false;

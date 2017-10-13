@@ -750,6 +750,9 @@ void Wallet::handleChallengeOwnershipPacket(QSharedPointer<ReceivedMessage> pack
             decryptedTextPacket->write(certID);
             decryptedTextPacket->write(decryptedTextByteArray);
 
+            // Write our avatar's session UUID so that the Avatar Mixer can perform owner verification
+            decryptedTextPacket->write(nodeList->getSessionUUID().toByteArray());
+
             qCDebug(commerce) << "Sending ChallengeOwnership Packet containing decrypted text" << decryptedTextByteArray << "for CertID" << certID;
 
             nodeList->sendPacket(std::move(decryptedTextPacket), *sendingNode);

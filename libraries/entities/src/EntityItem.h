@@ -328,9 +328,6 @@ public:
     void setEntityInstanceNumber(const quint32&);
     QString getCertificateID() const;
     void setCertificateID(const QString& value);
-    QByteArray getStaticCertificateJSON() const;
-    QByteArray getStaticCertificateHash() const;
-    bool verifyStaticCertificateProperties();
 #ifdef DEBUG_CERT
     QString computeCertificateID();
 #endif

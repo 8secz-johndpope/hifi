@@ -240,6 +240,10 @@ public:
 
     static QString getBackgroundModeString(BackgroundMode mode);
 
+    QByteArray getStaticCertificateJSON() const;
+    QByteArray getStaticCertificateHash() const;
+    bool verifyStaticCertificateProperties();
+
 
 public:
     float getMaxDimension() const { return glm::compMax(_dimensions); }

@@ -667,10 +667,15 @@ public:
 
     bool getIsReplicated() const { return _isReplicated; }
 
+    bool getIsServerData() const { return _isServerData; }
+    void setIsServerData(bool isServer) { _isServerData = isServer; }
+
 signals:
     void displayNameChanged();
     void lookAtSnappingChanged(bool enabled);
     void sessionUUIDChanged();
+
+    void killChallengeOwnershipTimeoutTimer(const QString& certID);
 
 public slots:
     void sendAvatarDataPacket();
@@ -713,6 +718,8 @@ protected:
     // isReplicated will be true on downstream Avatar Mixers and their clients, but false on the upstream "master"
     // Audio Mixer that the replicated avatar is connected to.
     bool _isReplicated{ false };
+
+    bool _isServerData{ false };
 
     glm::vec3 _handPosition;
     virtual const QString& getSessionDisplayNameForTransport() const { return _sessionDisplayName; }
@@ -874,12 +881,23 @@ protected:
         f(index);
     }
 
+    mutable QReadWriteLock _entityCertificateIDMapLock;
+    QHash<QString, QUuid> _entityCertificateIDMap;
+
+    mutable QReadWriteLock _certNonceMapLock;
+    QHash<QString, QUuid> _certNonceMap;
+
+    Q_INVOKABLE void startChallengeOwnershipTimer(const QUuid& entityItemID);
+
 private:
     friend void avatarStateFromFrame(const QByteArray& frameData, AvatarData* _avatar);
     static QUrl _defaultFullAvatarModelUrl;
     // privatize the copy constructor and assignment operator so they cannot be called
     AvatarData(const AvatarData&);
     AvatarData& operator= (const AvatarData&);
+
+    QByteArray computeEncryptedNonce(const QString& certID, const QString ownerKey);
+    bool verifyDecryptedNonce(const QString& certID, const QString& decryptedNonce);
 };
 Q_DECLARE_METATYPE(AvatarData*)
 
