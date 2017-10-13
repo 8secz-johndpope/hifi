@@ -16,6 +16,11 @@
 #include <cstring>
 #include <stdint.h>
 
+#include <openssl/err.h>
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#include <openssl/x509.h>
+
 #include <QtCore/QDataStream>
 #include <QtCore/QThread>
 #include <QtCore/QUuid>
@@ -2308,6 +2313,93 @@ void AvatarData::insertDetachedEntityID(const QUuid entityID) {
     });
 }
 
+void AvatarData::startChallengeOwnershipTimer(const QUuid& entityItemID) {
+    QTimer* _challengeOwnershipTimeoutTimer = new QTimer(this);
+    connect(this, &AvatarData::killChallengeOwnershipTimeoutTimer, this, [=](const QString& certID) {
+        QReadLocker locker(&_entityCertificateIDMapLock);
+        QUuid id = _entityCertificateIDMap.value(certID);
+        if (entityItemID == id && _challengeOwnershipTimeoutTimer) {
+            _challengeOwnershipTimeoutTimer->stop();
+            _challengeOwnershipTimeoutTimer->deleteLater();
+        }
+    });
+    connect(_challengeOwnershipTimeoutTimer, &QTimer::timeout, this, [=]() {
+        qCDebug(avatars) << "Ownership challenge timed out, deleting entity" << entityItemID;
+        deleteEntity(entityItemID, true);
+        if (_challengeOwnershipTimeoutTimer) {
+            _challengeOwnershipTimeoutTimer->stop();
+            _challengeOwnershipTimeoutTimer->deleteLater();
+        }
+    });
+    _challengeOwnershipTimeoutTimer->setSingleShot(true);
+    _challengeOwnershipTimeoutTimer->start(5000);
+}
+
+
+QByteArray AvatarData::computeEncryptedNonce(const QString& certID, const QString ownerKey) {
+    QUuid nonce = QUuid::createUuid();
+    const auto text = reinterpret_cast<const unsigned char*>(qPrintable(nonce.toString()));
+    const unsigned int textLength = nonce.toString().length();
+
+    QString ownerKeyWithHeaders = ("-----BEGIN RSA PUBLIC KEY-----\n" + ownerKey + "\n-----END RSA PUBLIC KEY-----");
+    BIO* bio = BIO_new_mem_buf((void*)ownerKeyWithHeaders.toUtf8().constData(), -1);
+    BIO_set_flags(bio, BIO_FLAGS_BASE64_NO_NL); // NO NEWLINE
+    RSA* rsa = PEM_read_bio_RSAPublicKey(bio, NULL, NULL, NULL);
+
+    if (rsa) {
+        QByteArray encryptedText(RSA_size(rsa), 0);
+        const int encryptStatus = RSA_public_encrypt(textLength, text, reinterpret_cast<unsigned char*>(encryptedText.data()), rsa, RSA_PKCS1_OAEP_PADDING);
+        RSA_free(rsa);
+        if (encryptStatus == -1) {
+            qCWarning(avatars) << "Unable to compute encrypted nonce for" << certID;
+            return "";
+        }
+
+        QWriteLocker locker(&_certNonceMapLock);
+        _certNonceMap.insert(certID, nonce);
+
+        return encryptedText;
+    } else {
+        return "";
+    }
+}
+
+bool AvatarData::verifyDecryptedNonce(const QString& certID, const QString& decryptedNonce) {
+    QReadLocker certIdMapLocker(&_entityCertificateIDMapLock);
+    QUuid id = _entityCertificateIDMap.value(certID);
+
+    QWriteLocker locker(&_certNonceMapLock);
+    QString actualNonce = _certNonceMap.take(certID).toString();
+
+    bool verificationSuccess = (actualNonce == decryptedNonce);
+    if (!verificationSuccess) {
+        if (!id.isNull()) {
+            qCDebug(avatars) << "Ownership challenge for Cert ID" << certID << "failed; deleting entity" << id
+                << "\nActual nonce:" << actualNonce << "\nDecrypted nonce:" << decryptedNonce;
+            deleteEntity(id, true);
+        }
+    } else {
+        qCDebug(avatars) << "Ownership challenge for Cert ID" << certID << "succeeded; keeping entity" << id;
+    }
+
+    return verificationSuccess;
+}
+
+void AvatarData::processChallengeOwnershipPacket(ReceivedMessage& message, const SharedNodePointer& sourceNode) {
+    int certIDByteArraySize;
+    int decryptedTextByteArraySize;
+
+    message.readPrimitive(&certIDByteArraySize);
+    message.readPrimitive(&decryptedTextByteArraySize);
+
+    QString certID(message.read(certIDByteArraySize));
+    QString decryptedText(message.read(decryptedTextByteArraySize));
+
+    emit killChallengeOwnershipTimeoutTimer(certID);
+
+    verifyDecryptedNonce(certID, decryptedText);
+}
+
 void AvatarData::setAvatarEntityData(const AvatarEntityMap& avatarEntityData) {
     if (avatarEntityData.size() > MAX_NUM_AVATAR_ENTITIES) {
         // the data is suspect
@@ -2318,9 +2410,75 @@ void AvatarData::setAvatarEntityData(const AvatarEntityMap& avatarEntityData) {
         if (_avatarEntityData != avatarEntityData) {
             // keep track of entities that were attached to this avatar but no longer are
             AvatarEntityIDs previousAvatarEntityIDs = QSet<QUuid>::fromList(_avatarEntityData.keys());
-
             _avatarEntityData = avatarEntityData;
             setAvatarEntityDataChanged(true);
+
+            if (getIsServerData()) {
+                foreach(auto entityID, _avatarEntityData) {
+                    if (!previousAvatarEntityIDs.contains(entityID)) {
+                        // New Avatar Entity
+                        // ZRF FIXME!!!
+                        //if (!newEntity->verifyStaticCertificateProperties()) {
+                        if (false) {
+                            _avatarEntityData.remove(entityID);
+                        } else {
+                            QNetworkAccessManager& networkAccessManager = NetworkAccessManager::getInstance();
+                            QNetworkRequest networkRequest;
+                            networkRequest.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+                            networkRequest.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+                            QUrl requestURL = NetworkingConstants::METAVERSE_SERVER_URL;
+                            requestURL.setPath("/api/v1/commerce/proof_of_purchase_status/transfer");
+                            QJsonObject request;
+                            QString certID = properties.getCertificateID();
+                            request["certificate_id"] = certID;
+                            networkRequest.setUrl(requestURL);
+
+                            QNetworkReply* networkReply = NULL;
+                            networkReply = networkAccessManager.put(networkRequest, QJsonDocument(request).toJson());
+
+                            connect(networkReply, &QNetworkReply::finished, [=]() {
+                                QJsonObject jsonObject = QJsonDocument::fromJson(networkReply->readAll()).object();
+                                jsonObject = jsonObject["data"].toObject();
+
+                                if (networkReply->error() == QNetworkReply::NoError) {
+                                    // 1. Encrypt a nonce with the owner's public key
+                                    QByteArray encryptedText = computeEncryptedNonce(certID, jsonObject["transfer_recipient_key"].toString());
+
+                                    if (encryptedText == "") {
+                                        qCDebug(avatars) << "CRITICAL ERROR: Couldn't compute encrypted nonce. Deleting entity...";
+                                        deleteEntity(entityID, true);
+                                    } else {
+                                        // 2. Send the encrypted text to the rezzing avatar's node
+                                        QByteArray certIDByteArray = certID.toUtf8();
+                                        int certIDByteArraySize = certIDByteArray.size();
+                                        auto challengeOwnershipPacket = NLPacket::create(PacketType::ChallengeOwnership,
+                                            certIDByteArraySize + encryptedText.length() + 2 * sizeof(int),
+                                            true);
+                                        challengeOwnershipPacket->writePrimitive(certIDByteArraySize);
+                                        challengeOwnershipPacket->writePrimitive(encryptedText.length());
+                                        challengeOwnershipPacket->write(certIDByteArray);
+                                        challengeOwnershipPacket->write(encryptedText);
+                                        DependencyManager::get<NodeList>()->sendPacket(std::move(challengeOwnershipPacket), *senderNode);
+
+                                        // 3. Kickoff a 10-second timeout timer that deletes the entity if we don't get an ownership response in time
+                                        if (thread() != QThread::currentThread()) {
+                                            QMetaObject::invokeMethod(this, "startChallengeOwnershipTimer", Q_ARG(const QUuid&, entityID));
+                                            return;
+                                        } else {
+                                            startChallengeOwnershipTimer(entityID);
+                                        }
+                                    }
+                                } else {
+                                    qCDebug(avatars) << "Call to proof_of_purchase_status endpoint failed; deleting entity" << entityID;
+                                    deleteEntity(entityID, true);
+                                }
+
+                                networkReply->deleteLater();
+                            });
+                        }
+                    }
+                }
+            }
 
             foreach (auto entityID, previousAvatarEntityIDs) {
                 if (!_avatarEntityData.contains(entityID)) {
