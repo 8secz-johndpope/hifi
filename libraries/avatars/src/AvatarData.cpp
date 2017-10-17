@@ -20,6 +20,8 @@
 #include <openssl/rsa.h>
 #include <openssl/pem.h>
 #include <openssl/x509.h>
+#include <NetworkingConstants.h>
+#include <EntityItemProperties.h>
 
 #include <QtCore/QDataStream>
 #include <QtCore/QThread>
@@ -1426,7 +1428,7 @@ QUrl AvatarData::cannonicalSkeletonModelURL(const QUrl& emptyURL) const {
 }
 
 void AvatarData::processAvatarIdentity(const QByteArray& identityData, bool& identityChanged,
-                                       bool& displayNameChanged, bool& skeletonModelUrlChanged) {
+                                       bool& displayNameChanged, bool& skeletonModelUrlChanged, SharedNodePointer sendingNode) {
 
     QDataStream packetStream(identityData);
 
@@ -1492,7 +1494,7 @@ void AvatarData::processAvatarIdentity(const QByteArray& identityData, bool& ide
         });
         
         if (avatarEntityDataChanged) {
-            setAvatarEntityData(identity.avatarEntityData);
+            setAvatarEntityData(identity.avatarEntityData, sendingNode);
             identityChanged = true;
         }
 
@@ -2325,7 +2327,7 @@ void AvatarData::startChallengeOwnershipTimer(const QUuid& entityItemID) {
     });
     connect(_challengeOwnershipTimeoutTimer, &QTimer::timeout, this, [=]() {
         qCDebug(avatars) << "Ownership challenge timed out, deleting entity" << entityItemID;
-        deleteEntity(entityItemID, true);
+        //deleteEntity(entityItemID, true);
         if (_challengeOwnershipTimeoutTimer) {
             _challengeOwnershipTimeoutTimer->stop();
             _challengeOwnershipTimeoutTimer->deleteLater();
@@ -2376,7 +2378,7 @@ bool AvatarData::verifyDecryptedNonce(const QString& certID, const QString& decr
         if (!id.isNull()) {
             qCDebug(avatars) << "Ownership challenge for Cert ID" << certID << "failed; deleting entity" << id
                 << "\nActual nonce:" << actualNonce << "\nDecrypted nonce:" << decryptedNonce;
-            deleteEntity(id, true);
+            //deleteEntity(id, true);
         }
     } else {
         qCDebug(avatars) << "Ownership challenge for Cert ID" << certID << "succeeded; keeping entity" << id;
@@ -2400,12 +2402,15 @@ void AvatarData::processChallengeOwnershipPacket(ReceivedMessage& message, const
     verifyDecryptedNonce(certID, decryptedText);
 }
 
-void AvatarData::setAvatarEntityData(const AvatarEntityMap& avatarEntityData) {
+void AvatarData::setAvatarEntityData(const AvatarEntityMap& avatarEntityData, SharedNodePointer senderNode) {
     if (avatarEntityData.size() > MAX_NUM_AVATAR_ENTITIES) {
         // the data is suspect
         qCDebug(avatars) << "discard suspect AvatarEntityData with size =" << avatarEntityData.size();
         return;
     }
+
+    EntityItemProperties properties;
+
     _avatarEntitiesLock.withWriteLock([&] {
         if (_avatarEntityData != avatarEntityData) {
             // keep track of entities that were attached to this avatar but no longer are
@@ -2446,7 +2451,7 @@ void AvatarData::setAvatarEntityData(const AvatarEntityMap& avatarEntityData) {
 
                                     if (encryptedText == "") {
                                         qCDebug(avatars) << "CRITICAL ERROR: Couldn't compute encrypted nonce. Deleting entity...";
-                                        deleteEntity(entityID, true);
+                                        //deleteEntity(entityID, true);
                                     } else {
                                         // 2. Send the encrypted text to the rezzing avatar's node
                                         QByteArray certIDByteArray = certID.toUtf8();
@@ -2470,7 +2475,7 @@ void AvatarData::setAvatarEntityData(const AvatarEntityMap& avatarEntityData) {
                                     }
                                 } else {
                                     qCDebug(avatars) << "Call to proof_of_purchase_status endpoint failed; deleting entity" << entityID;
-                                    deleteEntity(entityID, true);
+                                    //deleteEntity(entityID, true);
                                 }
 
                                 networkReply->deleteLater();

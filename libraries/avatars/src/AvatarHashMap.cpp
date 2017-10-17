@@ -157,7 +157,7 @@ void AvatarHashMap::processAvatarIdentityPacket(QSharedPointer<ReceivedMessage> 
         bool displayNameChanged = false;
         bool skeletonModelUrlChanged = false;
         // In this case, the "sendingNode" is the Avatar Mixer.
-        avatar->processAvatarIdentity(message->getMessage(), identityChanged, displayNameChanged, skeletonModelUrlChanged);
+        avatar->processAvatarIdentity(message->getMessage(), identityChanged, displayNameChanged, skeletonModelUrlChanged, sendingNode);
     }
 }
 

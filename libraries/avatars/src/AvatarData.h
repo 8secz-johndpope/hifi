@@ -569,7 +569,7 @@ public:
     // identityChanged returns true if identity has changed, false otherwise.
     // identityChanged returns true if identity has changed, false otherwise. Similarly for displayNameChanged and skeletonModelUrlChange.
     void processAvatarIdentity(const QByteArray& identityData, bool& identityChanged,
-                               bool& displayNameChanged, bool& skeletonModelUrlChanged);
+                               bool& displayNameChanged, bool& skeletonModelUrlChanged, SharedNodePointer sendingNode);
 
     QByteArray identityByteArray(bool setIsReplicated = false) const;
 
@@ -616,7 +616,7 @@ public:
     glm::vec3 getGlobalBoundingBoxCorner() const { return _globalPosition + _globalBoundingBoxOffset - _globalBoundingBoxDimensions; }
 
     Q_INVOKABLE AvatarEntityMap getAvatarEntityData() const;
-    Q_INVOKABLE void setAvatarEntityData(const AvatarEntityMap& avatarEntityData);
+    Q_INVOKABLE void setAvatarEntityData(const AvatarEntityMap& avatarEntityData, SharedNodePointer senderNode);
     void setAvatarEntityDataChanged(bool value) { _avatarEntityDataChanged = value; }
     void insertDetachedEntityID(const QUuid entityID);
     AvatarEntityIDs getAndClearRecentlyDetachedIDs();
@@ -669,6 +669,8 @@ public:
 
     bool getIsServerData() const { return _isServerData; }
     void setIsServerData(bool isServer) { _isServerData = isServer; }
+
+    void processChallengeOwnershipPacket(ReceivedMessage& message, const SharedNodePointer& sourceNode);
 
 signals:
     void displayNameChanged();

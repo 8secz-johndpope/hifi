@@ -588,7 +588,7 @@ void AvatarMixer::handleAvatarIdentityPacket(QSharedPointer<ReceivedMessage> mes
             bool identityChanged = false;
             bool displayNameChanged = false;
             bool skeletonModelUrlChanged = false;
-            avatar.processAvatarIdentity(message->getMessage(), identityChanged, displayNameChanged, skeletonModelUrlChanged);
+            avatar.processAvatarIdentity(message->getMessage(), identityChanged, displayNameChanged, skeletonModelUrlChanged, senderNode);
 
             if (identityChanged) {
                 QMutexLocker nodeDataLocker(&nodeData->getMutex());
