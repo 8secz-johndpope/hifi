@@ -183,8 +183,8 @@ public:
     }
 
     QHash<QString, EntityItemID> getEntityCertificateIDMap() const {
-        QReadLocker locker(&_entityCertificateIDMapLock);
-        return _entityCertificateIDMap;
+        QReadLocker locker(&_permanentEntityCertificateIDMapLock);
+        return _permanentEntityCertificateIDMap;
     }
 
     void forgetEntitiesDeletedBefore(quint64 sinceTime);
@@ -323,8 +323,11 @@ protected:
     mutable QReadWriteLock _entityMapLock;
     QHash<EntityItemID, EntityItemPointer> _entityMap;
 
-    mutable QReadWriteLock _entityCertificateIDMapLock;
-    QHash<QString, EntityItemID> _entityCertificateIDMap;
+    mutable QReadWriteLock _tempEntityCertificateIDMapLock;
+    QHash<QString, EntityItemID> _tempEntityCertificateIDMap;
+
+    mutable QReadWriteLock _permanentEntityCertificateIDMapLock;
+    QHash<QString, EntityItemID> _permanentEntityCertificateIDMap;
 
     mutable QReadWriteLock _certNonceMapLock;
     QHash<QString, QUuid> _certNonceMap;

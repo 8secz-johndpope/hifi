@@ -244,24 +244,13 @@ void EntityTree::postAddEntity(EntityItemPointer entity) {
     if (getIsServer()) {
         QString certID(entity->getCertificateID());
         EntityItemID entityItemID = entity->getEntityItemID();
-        EntityItemID existingEntityItemID;
 
         {
-            QWriteLocker locker(&_entityCertificateIDMapLock);
-            existingEntityItemID = _entityCertificateIDMap.value(certID);
+            QWriteLocker locker(&_tempEntityCertificateIDMapLock);
             if (!certID.isEmpty()) {
-                _entityCertificateIDMap.insert(certID, entityItemID);
-                qCDebug(entities) << "Certificate ID" << certID << "belongs to" << entityItemID;
+                _tempEntityCertificateIDMap.insert(certID, entityItemID);
+                qCDebug(entities) << "Certificate ID" << certID << "MAY belong to" << entityItemID;
             }
-        }
-
-        // Delete an already-existing entity from the tree if it has the same
-        //     CertificateID as the entity we're trying to add.
-        if (!existingEntityItemID.isNull()) {
-            qCDebug(entities) << "Certificate ID" << certID << "already exists on entity with ID"
-                << existingEntityItemID << ". Deleting existing entity.";
-            deleteEntity(existingEntityItemID, true);
-            return;
         }
     }
     
@@ -681,10 +670,14 @@ void EntityTree::processRemovedEntities(const DeleteEntityOperator& theOperator)
 
         if (getIsServer()) {
             {
-                QWriteLocker entityCertificateIDMapLocker(&_entityCertificateIDMapLock);
+                QWriteLocker permanentEntityCertificateIDMapLocker(&_permanentEntityCertificateIDMapLock);
+                QWriteLocker tempEntityCertificateIDMapLocker(&_tempEntityCertificateIDMapLock);
                 QString certID = theEntity->getCertificateID();
-                if (theEntity->getEntityItemID() == _entityCertificateIDMap.value(certID)) {
-                    _entityCertificateIDMap.remove(certID);
+                if (theEntity->getEntityItemID() == _permanentEntityCertificateIDMap.value(certID)) {
+                    _permanentEntityCertificateIDMap.remove(certID);
+                }
+                if (theEntity->getEntityItemID() == _tempEntityCertificateIDMap.value(certID)) {
+                    _tempEntityCertificateIDMap.remove(certID);
                 }
             }
 
@@ -1138,8 +1131,8 @@ bool EntityTree::isScriptInWhitelist(const QString& scriptProperty) {
 void EntityTree::startChallengeOwnershipTimer(const EntityItemID& entityItemID) {
     QTimer* _challengeOwnershipTimeoutTimer = new QTimer(this);
     connect(this, &EntityTree::killChallengeOwnershipTimeoutTimer, this, [=](const QString& certID) {
-        QReadLocker locker(&_entityCertificateIDMapLock);
-        EntityItemID id = _entityCertificateIDMap.value(certID);
+        QReadLocker locker(&_tempEntityCertificateIDMapLock);
+        EntityItemID id = _tempEntityCertificateIDMap.take(certID);
         if (entityItemID == id && _challengeOwnershipTimeoutTimer) {
             _challengeOwnershipTimeoutTimer->stop();
             _challengeOwnershipTimeoutTimer->deleteLater();
@@ -1210,8 +1203,8 @@ bool EntityTree::verifyDecryptedNonce(const QString& certID, const QString& decr
 
     EntityItemID id;
     {
-        QReadLocker certIdMapLocker(&_entityCertificateIDMapLock);
-        id = _entityCertificateIDMap.value(certID);
+        QReadLocker certIdMapLocker(&_tempEntityCertificateIDMapLock);
+        id = _tempEntityCertificateIDMap.value(certID);
     }
 
     QString actualNonce;
@@ -1226,9 +1219,28 @@ bool EntityTree::verifyDecryptedNonce(const QString& certID, const QString& decr
             qCDebug(entities) << "Ownership challenge for Cert ID" << certID << "failed; deleting entity" << id
                 << "\nActual nonce:" << actualNonce << "\nDecrypted nonce:" << decryptedNonce;
                 deleteEntity(id, true);
+        } else {
+            qCDebug(entities) << "Verification failed AND ID was NULL! No action taken...";
         }
     } else {
-        qCDebug(entities) << "Ownership challenge for Cert ID" << certID << "succeeded; keeping entity" << id;
+        EntityItemID existingEntityItemID;
+
+        {
+            QWriteLocker locker(&_permanentEntityCertificateIDMapLock);
+            existingEntityItemID = _permanentEntityCertificateIDMap.value(certID);
+            if (!certID.isEmpty()) {
+                _permanentEntityCertificateIDMap.insert(certID, id);
+                qCDebug(entities) << "Ownership challenge for Cert ID" << certID << "succeeded. This Cert ID now belongs to Entity" << id;
+            }
+        }
+
+        // Delete an already-existing entity from the tree if it has the same
+        //     CertificateID as the entity we just confirmed as legit
+        if (!existingEntityItemID.isNull()) {
+            qCDebug(entities) << "Certificate ID" << certID << "already exists on entity with ID"
+                << existingEntityItemID << ". Deleting existing entity.";
+            deleteEntity(existingEntityItemID, true);
+        }
     }
 
     return verificationSuccess;

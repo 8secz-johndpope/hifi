@@ -452,7 +452,7 @@ void EntityServer::startDynamicDomainVerification() {
     QHash<QString, EntityItemID> localMap(tree->getEntityCertificateIDMap());
 
     QHashIterator<QString, EntityItemID> i(localMap);
-    qCDebug(entities) << localMap.size() << "entities in _entityCertificateIDMap";
+    qCDebug(entities) << localMap.size() << "entities in _permanentEntityCertificateIDMap";
     while (i.hasNext()) {
         i.next();
 
