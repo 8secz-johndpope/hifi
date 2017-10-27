@@ -324,7 +324,7 @@ protected:
     QHash<EntityItemID, EntityItemPointer> _entityMap;
 
     mutable QReadWriteLock _tempEntityCertificateIDMapLock;
-    QHash<QString, EntityItemID> _tempEntityCertificateIDMap;
+    QHash<QString, QList<QPair<EntityItemID, QUuid>>> _tempEntityCertificateIDMap;
 
     mutable QReadWriteLock _permanentEntityCertificateIDMapLock;
     QHash<QString, EntityItemID> _permanentEntityCertificateIDMap;

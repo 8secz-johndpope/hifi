@@ -248,7 +248,10 @@ void EntityTree::postAddEntity(EntityItemPointer entity) {
         {
             QWriteLocker locker(&_tempEntityCertificateIDMapLock);
             if (!certID.isEmpty()) {
-                _tempEntityCertificateIDMap.insert(certID, entityItemID);
+                QList<QPair<EntityItemID, QUuid>> localList = _tempEntityCertificateIDMap.take(certID);
+                QPair<EntityItemID, QUuid> localPair(entityItemID, QUuid::createUuid());
+                localList.append(localPair);
+                _tempEntityCertificateIDMap.insert(certID, localList);
                 qCDebug(entities) << "Certificate ID" << certID << "MAY belong to" << entityItemID;
             }
         }
@@ -673,11 +676,14 @@ void EntityTree::processRemovedEntities(const DeleteEntityOperator& theOperator)
                 QWriteLocker permanentEntityCertificateIDMapLocker(&_permanentEntityCertificateIDMapLock);
                 QWriteLocker tempEntityCertificateIDMapLocker(&_tempEntityCertificateIDMapLock);
                 QString certID = theEntity->getCertificateID();
-                if (theEntity->getEntityItemID() == _permanentEntityCertificateIDMap.value(certID)) {
+                EntityItemID entityItemID = theEntity->getEntityItemID();
+                if (entityItemID == _permanentEntityCertificateIDMap.value(certID)) {
                     _permanentEntityCertificateIDMap.remove(certID);
                 }
-                if (theEntity->getEntityItemID() == _tempEntityCertificateIDMap.value(certID)) {
-                    _tempEntityCertificateIDMap.remove(certID);
+                if (_tempEntityCertificateIDMap.value(certID).contains(entityItemID)) {
+                    QList<EntityItemID> localList = _tempEntityCertificateIDMap.take(certID);
+                    localList.removeAll(entityItemID);
+                    _tempEntityCertificateIDMap.insert(certID, localList);
                 }
             }
 
@@ -1132,11 +1138,16 @@ void EntityTree::startChallengeOwnershipTimer(const EntityItemID& entityItemID) 
     QTimer* _challengeOwnershipTimeoutTimer = new QTimer(this);
     connect(this, &EntityTree::killChallengeOwnershipTimeoutTimer, this, [=](const QString& certID) {
         QReadLocker locker(&_tempEntityCertificateIDMapLock);
-        EntityItemID id = _tempEntityCertificateIDMap.take(certID);
-        if (entityItemID == id && _challengeOwnershipTimeoutTimer) {
-            _challengeOwnershipTimeoutTimer->stop();
-            _challengeOwnershipTimeoutTimer->deleteLater();
+        QList<EntityItemID> localIDList = _tempEntityCertificateIDMap.take(certID);
+        QList<EntityItemID>::iterator i;
+        for (i = localIDList.begin(); i != localIDList.end(); ++i) {
+            if (entityItemID == *i && _challengeOwnershipTimeoutTimer) {
+                localIDList.removeAll(*i);
+                _challengeOwnershipTimeoutTimer->stop();
+                _challengeOwnershipTimeoutTimer->deleteLater();
+            }
         }
+        _tempEntityCertificateIDMap.insert(certID, localIDList);
     });
     connect(_challengeOwnershipTimeoutTimer, &QTimer::timeout, this, [=]() {
         qCDebug(entities) << "Ownership challenge timed out, deleting entity" << entityItemID;
@@ -1167,7 +1178,7 @@ QByteArray EntityTree::computeEncryptedNonce(const QString& certID, const QStrin
     RSA* rsa = PEM_read_bio_RSAPublicKey(bio, NULL, NULL, NULL);
 
     if (rsa) {
-        QUuid nonce = QUuid::createUuid();
+        QUuid nonce = ;
         const unsigned int textLength = nonce.toString().length();
         QByteArray encryptedText(RSA_size(rsa), 0);
         const int encryptStatus = RSA_public_encrypt(textLength,
