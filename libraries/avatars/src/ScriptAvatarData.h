@@ -33,6 +33,8 @@ class ScriptAvatarData : public QObject {
     Q_PROPERTY(float headPitch READ getHeadPitch)
     Q_PROPERTY(float headYaw READ getHeadYaw)
     Q_PROPERTY(float headRoll READ getHeadRoll)
+    Q_PROPERTY(glm::vec3 globalPosition READ getGlobalPosition)
+    Q_PROPERTY(glm::vec3 globalBoundingBoxCorner READ getGlobalBoundingBoxCorner)
     //
     // PHYSICAL PROPERTIES: VELOCITY
     //
@@ -85,6 +87,8 @@ public:
     float getHeadPitch() const;
     float getHeadYaw() const;
     float getHeadRoll() const;
+    glm::vec3 getGlobalPosition() const;
+    glm::vec3 getGlobalBoundingBoxCorner() const;
     //
     // PHYSICAL PROPERTIES: VELOCITY
     //

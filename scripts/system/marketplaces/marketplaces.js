@@ -448,14 +448,14 @@ var selectionDisplay = null; // for gridTool.js to ignore
 
     var end = {
         type: "sphere",
-        dimensions: {x:0.1, y:0.1, z:0.1},
+        dimensions: { x: 0.05, y: 0.05, z: 0.05 },
         solid: true,
         color: {red:0, green:255, blue:0},
         ignoreRayIntersection: true
     };
     var end2 = {
         type: "sphere",
-        dimensions: {x:0.1, y:0.1, z:0.1},
+        dimensions: { x: 0.1, y: 0.1, z: 0.1 },
         solid: true,
         color: {red:255, green:0, blue:0},
         ignoreRayIntersection: true
@@ -469,7 +469,11 @@ var selectionDisplay = null; // for gridTool.js to ignore
         renderStates: renderStates,
         defaultRenderStates: defaultRenderStates,
         distanceScaleEnd: true,
-        triggers: [ {action: Controller.Standard.LTClick, button: "Focus"}, {action: Controller.Standard.LTClick, button: "Primary"} ],
+        triggers: [
+            { action: Controller.Hardware.Keyboard.LeftMouseButton, button: "Focus" },
+            { action: Controller.Hardware.Keyboard.LeftMouseButton, button: "Primary" },
+            { action: Controller.Hardware.Keyboard.RightMouseButton, button: "Secondary" }
+        ],
         hover: true,
         enabled: true
     });

@@ -100,6 +100,20 @@ float ScriptAvatarData::getHeadRoll() const {
         return 0.0f;
     }
 }
+glm::vec3 ScriptAvatarData::getGlobalPosition() const {
+    if (AvatarSharedPointer sharedAvatarData = _avatarData.lock()) {
+        return sharedAvatarData->getClientGlobalPosition();
+    } else {
+        return glm::vec3();
+    }
+}
+glm::vec3 ScriptAvatarData::getGlobalBoundingBoxCorner() const {
+    if (AvatarSharedPointer sharedAvatarData = _avatarData.lock()) {
+        return sharedAvatarData->getGlobalBoundingBoxCorner();
+    } else {
+        return glm::vec3();
+    }
+}
 //
 // PHYSICAL PROPERTIES: POSITION AND ORIENTATION
 // END
