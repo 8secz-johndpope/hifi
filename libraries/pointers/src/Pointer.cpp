@@ -111,6 +111,8 @@ void Pointer::generatePointerEvents(unsigned int pointerID, const PickResultPoin
             emit pointerManager->hoverBeginOverlay(hoveredObject.objectID, hoveredEvent);
         } else if (hoveredObject.type == HUD) {
             emit pointerManager->hoverBeginHUD(hoveredEvent);
+        } else if (hoveredObject.type == AVATAR) {
+            emit pointerManager->hoverBeginAvatar(hoveredObject.objectID, hoveredEvent);
         }
     } else if (_enabled && _hover && doHover) {
         if (hoveredObject.type == OVERLAY) {
@@ -130,6 +132,8 @@ void Pointer::generatePointerEvents(unsigned int pointerID, const PickResultPoin
                     emit pointerManager->hoverEndEntity(_prevHoveredObject.objectID, hoveredEvent);
                 } else if (_prevHoveredObject.type == HUD) {
                     emit pointerManager->hoverEndHUD(hoveredEvent);
+                } else if (_prevHoveredObject.type == AVATAR) {
+                    emit pointerManager->hoverEndAvatar(hoveredObject.objectID, hoveredEvent);
                 }
             }
         }
@@ -152,6 +156,8 @@ void Pointer::generatePointerEvents(unsigned int pointerID, const PickResultPoin
                     emit pointerManager->hoverEndOverlay(_prevHoveredObject.objectID, hoveredEvent);
                 } else if (_prevHoveredObject.type == HUD) {
                     emit pointerManager->hoverEndHUD(hoveredEvent);
+                } else if (_prevHoveredObject.type == AVATAR) {
+                    emit pointerManager->hoverEndAvatar(_prevHoveredObject.objectID, hoveredEvent);
                 }
             }
         }
@@ -166,6 +172,8 @@ void Pointer::generatePointerEvents(unsigned int pointerID, const PickResultPoin
                     emit pointerManager->hoverEndEntity(_prevHoveredObject.objectID, hoveredEvent);
                 } else if (_prevHoveredObject.type == OVERLAY) {
                     emit pointerManager->hoverEndOverlay(_prevHoveredObject.objectID, hoveredEvent);
+                } else if (_prevHoveredObject.type == AVATAR) {
+                    emit pointerManager->hoverEndAvatar(_prevHoveredObject.objectID, hoveredEvent);
                 }
             }
         }
@@ -177,6 +185,8 @@ void Pointer::generatePointerEvents(unsigned int pointerID, const PickResultPoin
                 emit pointerManager->hoverEndOverlay(_prevHoveredObject.objectID, hoveredEvent);
             } else if (_prevHoveredObject.type == HUD) {
                 emit pointerManager->hoverEndHUD(hoveredEvent);
+            } else if (_prevHoveredObject.type == AVATAR) {
+                emit pointerManager->hoverEndAvatar(_prevHoveredObject.objectID, hoveredEvent);
             }
         }
     }
@@ -193,6 +203,8 @@ void Pointer::generatePointerEvents(unsigned int pointerID, const PickResultPoin
             emit pointerManager->triggerBeginOverlay(hoveredObject.objectID, hoveredEvent);
         } else if (hoveredObject.type == HUD) {
             emit pointerManager->triggerBeginHUD(hoveredEvent);
+        } else if (hoveredObject.type == AVATAR) {
+            emit pointerManager->triggerBeginAvatar(hoveredObject.objectID, hoveredEvent);
         }
         _triggeredObjects[button] = hoveredObject;
     }
@@ -209,6 +221,8 @@ void Pointer::generatePointerEvents(unsigned int pointerID, const PickResultPoin
             emit pointerManager->triggerContinueOverlay(_triggeredObjects[button].objectID, triggeredEvent);
         } else if (_triggeredObjects[button].type == HUD) {
             emit pointerManager->triggerContinueHUD(triggeredEvent);
+        } else if (_triggeredObjects[button].type == AVATAR) {
+            emit pointerManager->triggerContinueAvatar(_triggeredObjects[button].objectID, triggeredEvent);
         }
     }
 
@@ -224,6 +238,8 @@ void Pointer::generatePointerEvents(unsigned int pointerID, const PickResultPoin
             emit pointerManager->triggerEndOverlay(_triggeredObjects[button].objectID, triggeredEvent);
         } else if (_triggeredObjects[button].type == HUD) {
             emit pointerManager->triggerEndHUD(triggeredEvent);
+        } else if (_triggeredObjects[button].type == AVATAR) {
+            emit pointerManager->triggerEndAvatar(_triggeredObjects[button].objectID, triggeredEvent);
         }
         _triggeredObjects.erase(button);
     }
@@ -236,6 +252,8 @@ void Pointer::generatePointerEvents(unsigned int pointerID, const PickResultPoin
             emit pointerManager->hoverEndOverlay(_prevHoveredObject.objectID, hoveredEvent);
         } else if (_prevHoveredObject.type == HUD) {
             emit pointerManager->hoverEndHUD(hoveredEvent);
+        } else if (_prevHoveredObject.type == AVATAR) {
+            emit pointerManager->hoverEndAvatar(_prevHoveredObject.objectID, hoveredEvent);
         }
     }
 

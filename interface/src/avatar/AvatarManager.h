@@ -23,6 +23,7 @@
 #include <shared/RateCounter.h>
 #include <avatars-renderer/ScriptAvatar.h>
 #include <AudioInjector.h>
+#include <PointerEvent.h>
 
 #include "AvatarMotionState.h"
 #include "MyAvatar.h"
@@ -82,6 +83,15 @@ public:
     Q_INVOKABLE void setAvatarSortCoefficient(const QString& name, const QScriptValue& value);
 
     float getMyAvatarSendRate() const { return _myAvatarSendRate.rate(); }
+
+signals:
+    void hoverEnterPointerEvent(const QUuid& avatarID, const PointerEvent& event);
+    void hoverOverPointerEvent(const QUuid& avatarID, const PointerEvent& event);
+    void hoverLeavePointerEvent(const QUuid& avatarID, const PointerEvent& event);
+
+    void mousePressPointerEvent(const QUuid& avatarID, const PointerEvent& event);
+    void mouseMovePointerEvent(const QUuid& avatarID, const PointerEvent& event);
+    void mouseReleasePointerEvent(const QUuid& avatarID, const PointerEvent& event);
 
 public slots:
     void updateAvatarRenderStatus(bool shouldRenderAvatars);

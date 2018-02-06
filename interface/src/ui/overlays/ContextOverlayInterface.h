@@ -64,7 +64,8 @@ signals:
     void contextOverlayClicked(const QUuid& currentEntityWithContextOverlay);
 
 public slots:
-    bool createOrDestroyContextOverlay(const EntityItemID& entityItemID, const PointerEvent& event);
+    bool createOrDestroyContextOverlay_entity(const EntityItemID& entityItemID, const PointerEvent& event);
+    bool createOrDestroyContextOverlay_avatar(const QUuid& avatarID, const PointerEvent& event);
     bool destroyContextOverlay(const EntityItemID& entityItemID, const PointerEvent& event);
     bool destroyContextOverlay(const EntityItemID& entityItemID);
     void contextOverlays_mousePressOnOverlay(const OverlayID& overlayID, const PointerEvent& event);
@@ -72,6 +73,8 @@ public slots:
     void contextOverlays_hoverLeaveOverlay(const OverlayID& overlayID, const PointerEvent& event);
     void contextOverlays_hoverEnterEntity(const EntityItemID& entityID, const PointerEvent& event);
     void contextOverlays_hoverLeaveEntity(const EntityItemID& entityID, const PointerEvent& event);
+    void contextOverlays_hoverEnterAvatar(const QUuid& avatarID, const PointerEvent& event);
+    void contextOverlays_hoverLeaveAvatar(const QUuid& avatarID, const PointerEvent& event);
     bool contextOverlayFilterPassed(const EntityItemID& entityItemID);
 
 private slots:
@@ -95,6 +98,8 @@ private:
     void openMarketplace();
     void enableEntityHighlight(const EntityItemID& entityItemID);
     void disableEntityHighlight(const EntityItemID& entityItemID);
+    void enableAvatarHighlight(const QUuid& avatarID);
+    void disableAvatarHighlight(const QUuid& avatarID);
 
     void deletingEntity(const EntityItemID& entityItemID);
 

@@ -35,6 +35,7 @@
 #include <UsersScriptingInterface.h>
 #include <UUID.h>
 #include <avatars-renderer/OtherAvatar.h>
+#include <PointerManager.h>
 
 #include "Application.h"
 #include "AvatarManager.h"
@@ -72,6 +73,14 @@ AvatarManager::AvatarManager(QObject* parent) :
             removeAvatar(nodeID, KillAvatarReason::AvatarIgnored);
         }
     });
+
+    auto pointerManager = DependencyManager::get<PointerManager>();
+    connect(pointerManager.data(), &PointerManager::hoverBeginAvatar, this, &AvatarManager::hoverEnterPointerEvent);
+    connect(pointerManager.data(), &PointerManager::hoverContinueAvatar, this, &AvatarManager::hoverOverPointerEvent);
+    connect(pointerManager.data(), &PointerManager::hoverEndAvatar, this, &AvatarManager::hoverLeavePointerEvent);
+    connect(pointerManager.data(), &PointerManager::triggerBeginAvatar, this, &AvatarManager::mousePressPointerEvent);
+    connect(pointerManager.data(), &PointerManager::triggerContinueAvatar, this, &AvatarManager::mouseMovePointerEvent);
+    connect(pointerManager.data(), &PointerManager::triggerEndAvatar, this, &AvatarManager::mouseReleasePointerEvent);
 }
 
 AvatarManager::~AvatarManager() {

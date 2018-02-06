@@ -72,6 +72,13 @@ signals:
     void hoverBeginHUD(const PointerEvent& pointerEvent);
     void hoverContinueHUD(const PointerEvent& pointerEvent);
     void hoverEndHUD(const PointerEvent& pointerEvent);
+
+    void triggerBeginAvatar(const QUuid& id, const PointerEvent& pointerEvent);
+    void triggerContinueAvatar(const QUuid& id, const PointerEvent& pointerEvent);
+    void triggerEndAvatar(const QUuid& id, const PointerEvent& pointerEvent);
+    void hoverBeginAvatar(const QUuid& id, const PointerEvent& pointerEvent);
+    void hoverContinueAvatar(const QUuid& id, const PointerEvent& pointerEvent);
+    void hoverEndAvatar(const QUuid& id, const PointerEvent& pointerEvent);
 };
 
 #endif // hifi_pointers_PointerManager_h

@@ -507,7 +507,7 @@ Script.include("/~/system/libraries/Xform.js");
                                         direction: Vec3.subtract(ZERO_VEC, rayPickInfo.surfaceNormal),
                                         button: "Secondary"
                                     };
-                                    if (ContextOverlay.createOrDestroyContextOverlay(rayPickInfo.objectID, pointerEvent)) {
+                                    if (ContextOverlay.createOrDestroyContextOverlay_entity(rayPickInfo.objectID, pointerEvent)) {
                                         _this.entityWithContextOverlay = rayPickInfo.objectID;
                                     }
                                 }
