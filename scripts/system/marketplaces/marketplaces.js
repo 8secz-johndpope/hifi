@@ -446,41 +446,6 @@ var selectionDisplay = null; // for gridTool.js to ignore
         Wallet.walletStatusChanged.disconnect(sendCommerceSettings);
     });
 
-    var end = {
-        type: "sphere",
-        dimensions: { x: 0.05, y: 0.05, z: 0.05 },
-        solid: true,
-        color: {red:0, green:255, blue:0},
-        ignoreRayIntersection: true
-    };
-    var end2 = {
-        type: "sphere",
-        dimensions: { x: 0.1, y: 0.1, z: 0.1 },
-        solid: true,
-        color: {red:255, green:0, blue:0},
-        ignoreRayIntersection: true
-    };
-
-    var renderStates = [ {name: "test", end: end} ];
-    var defaultRenderStates = [ {name: "test", distance: 10.0, end: end2} ];
-    var pointer = Pointers.createPointer(PickType.Ray, {
-        joint: "Mouse",
-        filter: Picks.PICK_AVATARS | Picks.PICK_INCLUDE_NONCOLLIDABLE,
-        renderStates: renderStates,
-        defaultRenderStates: defaultRenderStates,
-        distanceScaleEnd: true,
-        triggers: [
-            { action: Controller.Hardware.Keyboard.LeftMouseButton, button: "Focus" },
-            { action: Controller.Hardware.Keyboard.LeftMouseButton, button: "Primary" },
-            { action: Controller.Hardware.Keyboard.RightMouseButton, button: "Secondary" }
-        ],
-        hover: true,
-        enabled: true
-    });
-    Pointers.setRenderState(pointer, "test");
-
-
-
     // Function Name: wireEventBridge()
     //
     // Description:

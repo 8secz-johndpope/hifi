@@ -20,6 +20,8 @@
 #include <commerce/Ledger.h>
 
 #include <PointerManager.h>
+#include <raypick/PickScriptingInterface.h>
+#include <raypick/LaserPointer.h>
 
 #ifndef MIN
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
@@ -71,6 +73,27 @@ ContextOverlayInterface::ContextOverlayInterface() {
     connect(&qApp->getOverlays(), &Overlays::mousePressOnOverlay, this, &ContextOverlayInterface::contextOverlays_mousePressOnOverlay);
     connect(&qApp->getOverlays(), &Overlays::hoverEnterOverlay, this, &ContextOverlayInterface::contextOverlays_hoverEnterOverlay);
     connect(&qApp->getOverlays(), &Overlays::hoverLeaveOverlay, this, &ContextOverlayInterface::contextOverlays_hoverLeaveOverlay);
+
+    QVariantMap laserPointerProps;
+    laserPointerProps["joint"] = "Mouse";
+    laserPointerProps["filter"] = PickScriptingInterface::PICK_AVATARS() | PickScriptingInterface::PICK_INCLUDE_NONCOLLIDABLE();
+    PointerTriggers triggers;
+    //triggers: [
+    //    { action: Controller.Hardware.Keyboard.LeftMouseButton, button : "Focus" },
+    //    { action: Controller.Hardware.Keyboard.LeftMouseButton, button : "Primary" },
+    //    { action: Controller.Hardware.Keyboard.RightMouseButton, button : "Secondary" }
+    //],
+    DependencyManager::get<PointerManager>()->addPointer(std::make_shared<LaserPointer>(laserPointerProps,
+        LaserPointer::RenderStateMap(), // renderStates
+        LaserPointer::DefaultRenderStateMap(), // defaultRenderStates
+        true, // hover
+        triggers, // triggers
+        false, // faceAvatar
+        false, // centerEndY
+        false, // lockEnd
+        false, // distanceScaleEnd
+        false, // scaleWithAvatar
+        true)); // enabled
 
     connect(_avatarManager.data(), &AvatarManager::avatarRemovedEvent, this, &ContextOverlayInterface::avatarRemovedEvent);
     connect(_avatarManager.data(), &AvatarManager::mousePressPointerEvent, this, &ContextOverlayInterface::createOrDestroyContextOverlay_avatar);
@@ -335,6 +358,7 @@ void ContextOverlayInterface::contextOverlays_hoverLeaveEntity(const EntityItemI
 }
 
 void ContextOverlayInterface::contextOverlays_hoverEnterAvatar(const QUuid& avatarID, const PointerEvent& event) {
+    qDebug() << "ZRF HERE ENTER";
     bool isMouse = event.getID() == PointerManager::MOUSE_POINTER_ID || DependencyManager::get<PointerManager>()->isMouse(event.getID());
     if (_enabled && !isMouse) {
         enableAvatarHighlight(avatarID);
@@ -342,6 +366,7 @@ void ContextOverlayInterface::contextOverlays_hoverEnterAvatar(const QUuid& avat
 }
 
 void ContextOverlayInterface::contextOverlays_hoverLeaveAvatar(const QUuid& avatarID, const PointerEvent& event) {
+    qDebug() << "ZRF HERE LEAVE";
     bool isMouse = event.getID() == PointerManager::MOUSE_POINTER_ID || DependencyManager::get<PointerManager>()->isMouse(event.getID());
     if (_currentObjectWithContextOverlay.first != avatarID && _enabled && !isMouse) {
         disableAvatarHighlight(avatarID);
