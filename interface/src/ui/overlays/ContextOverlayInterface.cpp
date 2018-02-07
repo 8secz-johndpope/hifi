@@ -78,12 +78,15 @@ ContextOverlayInterface::ContextOverlayInterface() {
     laserPointerProps["joint"] = "Mouse";
     laserPointerProps["filter"] = PickScriptingInterface::PICK_AVATARS() | PickScriptingInterface::PICK_INCLUDE_NONCOLLIDABLE();
     PointerTriggers triggers;
-    //triggers: [
-    //    { action: Controller.Hardware.Keyboard.LeftMouseButton, button : "Focus" },
-    //    { action: Controller.Hardware.Keyboard.LeftMouseButton, button : "Primary" },
-    //    { action: Controller.Hardware.Keyboard.RightMouseButton, button : "Secondary" }
-    //],
-    DependencyManager::get<PointerManager>()->addPointer(std::make_shared<LaserPointer>(laserPointerProps,
+    auto userInputMapper = DependencyManager::get<UserInputMapper>();
+    // C++ equivalent of the JS `Controller.Hardware.Keyboard.LeftMouseButton`
+    controller::Endpoint::Pointer endpoint = userInputMapper->endpointFor(userInputMapper->inputFromAction(controller::Action::CONTEXT_MENU));
+    triggers.emplace_back(endpoint, "Focus");
+    triggers.emplace_back(endpoint, "Primary");
+    // C++ equivalent of the JS `Controller.Hardware.Keyboard.RightMouseButton`
+    endpoint = userInputMapper->endpointFor(userInputMapper->inputFromAction(controller::Action::RETICLE_CLICK));
+    triggers.emplace_back(endpoint, "Secondary");
+    unsigned int pointer = DependencyManager::get<PointerManager>()->addPointer(std::make_shared<LaserPointer>(laserPointerProps,
         LaserPointer::RenderStateMap(), // renderStates
         LaserPointer::DefaultRenderStateMap(), // defaultRenderStates
         true, // hover
@@ -94,6 +97,12 @@ ContextOverlayInterface::ContextOverlayInterface() {
         false, // distanceScaleEnd
         false, // scaleWithAvatar
         true)); // enabled
+    if (pointer == PointerEvent::INVALID_POINTER_ID) {
+        qCDebug(context_overlay) << "Couldn't create a new Laser Pointer!";
+    } else {
+        DependencyManager::get<PointerManager>()->setRenderState(pointer, "state"); // Necessary to get hover events
+    }
+
 
     connect(_avatarManager.data(), &AvatarManager::avatarRemovedEvent, this, &ContextOverlayInterface::avatarRemovedEvent);
     connect(_avatarManager.data(), &AvatarManager::mousePressPointerEvent, this, &ContextOverlayInterface::createOrDestroyContextOverlay_avatar);
