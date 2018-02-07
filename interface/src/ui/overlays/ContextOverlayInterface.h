@@ -77,7 +77,6 @@ signals:
 public slots:
     bool contextOverlayFilterPassed(const EntityItemID& entityItemID);
 
-    bool createOrDestroyContextOverlay(const QUuid& objectID, const ObjectWithOverlayType& objectType, const PointerEvent& event);
     bool createOrDestroyContextOverlay_entity(const EntityItemID& entityItemID, const PointerEvent& event);
     bool createOrDestroyContextOverlay_avatar(const QUuid& avatarID, const PointerEvent& event);
 

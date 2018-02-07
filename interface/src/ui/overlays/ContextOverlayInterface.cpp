@@ -201,10 +201,11 @@ bool ContextOverlayInterface::createOrDestroyContextOverlay_avatar(const QUuid& 
         glm::vec3 avatarPosition = _avatarManager->getAvatar(avatarID)->getPosition();
         glm::vec3 avatarGlobalBoundingBoxCorner = _avatarManager->getAvatar(avatarID)->getGlobalBoundingBoxCorner();
         glm::vec3 avatarGlobalBoundingBoxDimensions = 2.0f * (avatarGlobalBoundingBoxCorner - _avatarManager->getAvatar(avatarID)->getGlobalPosition());
+        avatarGlobalBoundingBoxDimensions.x = abs(avatarGlobalBoundingBoxDimensions.x);
+        avatarGlobalBoundingBoxDimensions.y = abs(avatarGlobalBoundingBoxDimensions.y);
+        avatarGlobalBoundingBoxDimensions.z = abs(avatarGlobalBoundingBoxDimensions.z);
         AABox avatarBoundingBox = AABox(avatarGlobalBoundingBoxCorner, avatarGlobalBoundingBoxDimensions);
         glm::vec3 cameraPosition = qApp->getCamera().getPosition();
-        glm::vec3 contextOverlayPosition;
-        glm::vec2 contextOverlayDimensions;
 
         // Update the cached Entity Marketplace ID
         _entityMarketplaceID = QString();
@@ -220,9 +221,9 @@ bool ContextOverlayInterface::createOrDestroyContextOverlay_avatar(const QUuid& 
         if (event.getID() == 1) { // "1" is left hand
             offsetAngle *= -1.0f;
         }
-        contextOverlayPosition = cameraPosition +
+        glm::vec3 contextOverlayPosition = cameraPosition +
             (glm::quat(glm::radians(glm::vec3(0.0f, offsetAngle, 0.0f)))) * (direction * (distance - CONTEXT_OVERLAY_OFFSET_DISTANCE));
-        contextOverlayDimensions = glm::vec2(CONTEXT_OVERLAY_SIZE, CONTEXT_OVERLAY_SIZE) * glm::distance(contextOverlayPosition, cameraPosition);
+        glm::vec2 contextOverlayDimensions = glm::vec2(CONTEXT_OVERLAY_SIZE, CONTEXT_OVERLAY_SIZE) * glm::distance(contextOverlayPosition, cameraPosition);
 
         // Finally, setup and draw the Context Overlay
         if (_contextOverlayID == UNKNOWN_OVERLAY_ID || !qApp->getOverlays().isAddedOverlay(_contextOverlayID)) {
@@ -335,18 +336,14 @@ void ContextOverlayInterface::contextOverlays_hoverLeaveEntity(const EntityItemI
 
 void ContextOverlayInterface::contextOverlays_hoverEnterAvatar(const QUuid& avatarID, const PointerEvent& event) {
     bool isMouse = event.getID() == PointerManager::MOUSE_POINTER_ID || DependencyManager::get<PointerManager>()->isMouse(event.getID());
-    qDebug() << "ZRF HOVER ENTER AVATAR";
-    enableAvatarHighlight(avatarID);
-    if (/*contextOverlayFilterPassed(avatarID) && */_enabled && !isMouse) {
+    if (_enabled && !isMouse) {
         enableAvatarHighlight(avatarID);
     }
 }
 
 void ContextOverlayInterface::contextOverlays_hoverLeaveAvatar(const QUuid& avatarID, const PointerEvent& event) {
     bool isMouse = event.getID() == PointerManager::MOUSE_POINTER_ID || DependencyManager::get<PointerManager>()->isMouse(event.getID());
-    qDebug() << "ZRF HOVER LEAVE AVATAR";
-    disableAvatarHighlight(avatarID);
-    if (/*_currentEntityWithContextOverlay != entityID && */_enabled && !isMouse) {
+    if (_currentObjectWithContextOverlay.first != avatarID && _enabled && !isMouse) {
         disableAvatarHighlight(avatarID);
     }
 }
@@ -469,6 +466,7 @@ void ContextOverlayInterface::openMarketplace() {
 }
 
 void ContextOverlayInterface::enableEntityHighlight(const EntityItemID& entityItemID) {
+    _selectionScriptingInterface->clearSelectedItemsList("contextOverlayHighlightList");
     _selectionScriptingInterface->addToSelectedItemsList("contextOverlayHighlightList", "entity", entityItemID);
 }
 
@@ -477,6 +475,7 @@ void ContextOverlayInterface::disableEntityHighlight(const EntityItemID& entityI
 }
 
 void ContextOverlayInterface::enableAvatarHighlight(const QUuid& avatarID) {
+    _selectionScriptingInterface->clearSelectedItemsList("contextOverlayHighlightList");
     _selectionScriptingInterface->addToSelectedItemsList("contextOverlayHighlightList", "avatar", avatarID);
 }
 
