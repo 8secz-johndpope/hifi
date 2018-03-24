@@ -23,7 +23,7 @@ var DEFAULT_SCRIPTS_COMBINED = [
     "system/pal.js", // "system/mod.js", // older UX, if you prefer
     "system/makeUserConnection.js",
     "system/tablet-goto.js",
-    "system/marketplaces/marketplaces.js",
+    "system/marketplaces/newMarketplace.js",
     "system/commerce/wallet.js",
     "system/edit.js",
     "system/notifications.js",

@@ -31,6 +31,7 @@ Rectangle {
     property bool ownershipStatusReceived: false;
     property bool balanceReceived: false;
     property bool availableUpdatesReceived: false;
+    property bool itemsReceived: false;
     property string baseItemName: "";
     property string itemName;
     property string itemId;
@@ -57,6 +58,32 @@ Rectangle {
     property string baseAppURL;
     // Style
     color: hifi.colors.white;
+
+    Connections {
+        target: Marketplace;
+        
+		onItemsResult: {
+            if (result.current_page && result.status !== 'success') {
+                console.log("Failed to get marketplace items", result.message);
+			} else {
+				// Looking at multiple items (i.e. the front page)
+				if (result.current_page) {
+                    console.log("Somehow getting multiple items!");
+				// Looking at individual item page
+				} else {
+                    root.itemName = result.title;
+                    root.itemPrice = result.cost;
+                    //root.itemHref = message.params.itemHref; // Should only be filled in for non-certified items here
+                    root.itemAuthor = result.creator;
+                    //root.itemEdition = message.params.itemEdition || -1;
+                    refreshBuyUI();
+				}
+				
+				root.itemsReceived = true;
+			}
+		}
+    }
+
     Connections {
         target: Commerce;
 
@@ -366,7 +393,7 @@ Rectangle {
         Rectangle {
             id: loading;
             z: 997;
-            visible: !root.ownershipStatusReceived || !root.balanceReceived || !root.availableUpdatesReceived;
+            visible: !root.ownershipStatusReceived || !root.balanceReceived || !root.availableUpdatesReceived || !root.itemsReceived;
             anchors.fill: parent;
             color: hifi.colors.white;
 
@@ -657,7 +684,7 @@ Rectangle {
                 anchors.right: parent.right;
                 text: "Cancel"
                 onClicked: {
-                    sendToScript({method: 'checkout_cancelClicked', params: itemId});
+                    sendToScript({method: 'checkout_cancelClicked', itemId: root.itemId});
                 }
             }
         }
@@ -1066,13 +1093,8 @@ Rectangle {
         switch (message.method) {
             case 'updateCheckoutQML':
                 root.itemId = message.params.itemId;
-                root.itemName = message.params.itemName.trim();
-                root.itemPrice = message.params.itemPrice;
-                root.itemHref = message.params.itemHref;
-                root.referrer = message.params.referrer;
-                root.itemAuthor = message.params.itemAuthor;
-                root.itemEdition = message.params.itemEdition || -1;
-                refreshBuyUI();
+                root.itemsReceived = false;
+                Marketplace.items(root.itemId);
             break;
             default:
                 console.log('Unrecognized message from marketplaces.js:', JSON.stringify(message));
