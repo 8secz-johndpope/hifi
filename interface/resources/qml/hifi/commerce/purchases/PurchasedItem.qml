@@ -51,6 +51,7 @@ Item {
     property string upgradeUrl;
     property string upgradeTitle;
     property bool isShowingMyItems;
+    property bool isInGiftMode;
 
     property string originalStatusText;
     property string originalStatusColor;
@@ -500,7 +501,7 @@ Item {
             id: appButtonContainer;
             color: hifi.colors.white;
             z: 994;
-            visible: root.isInstalled;
+            visible: root.isInstalled && !root.isInGiftMode;
             anchors.fill: buttonContainer;
 
             HifiControlsUit.Button {
@@ -563,7 +564,9 @@ Item {
             
             onClicked: {
                 Tablet.playSound(TabletEnums.ButtonClick);
-                if (root.itemType === "contentSet") {
+                if (root.isInGiftMode) {
+                    sendToPurchases({method: 'giftAsset', itemName: root.itemName, certId: root.certificateId})
+                } else if (root.itemType === "contentSet") {
                     sendToPurchases({method: 'showReplaceContentLightbox', itemHref: root.itemHref});
                 } else if (root.itemType === "avatar") {
                     sendToPurchases({method: 'showChangeAvatarLightbox', itemName: root.itemName, itemHref: root.itemHref});
@@ -614,7 +617,7 @@ Item {
                 label: Item {
                     HiFiGlyphs {
                         id: rezIcon;
-                        text: (root.buttonGlyph)[itemTypesArray.indexOf(root.itemType)];
+                        text: root.isInGiftMode ? hifi.glyphs.reload : (root.buttonGlyph)[itemTypesArray.indexOf(root.itemType)];
                         // Size
                         size: 60;
                         // Anchors
@@ -640,7 +643,7 @@ Item {
                         size: 15;
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
-                        text: MyAvatar.skeletonModelURL === root.itemHref ? "CURRENT" : (root.buttonTextNormal)[itemTypesArray.indexOf(root.itemType)];
+                        text: root.isInGiftMode ? "GIFT" : MyAvatar.skeletonModelURL === root.itemHref ? "CURRENT" : (root.buttonTextNormal)[itemTypesArray.indexOf(root.itemType)];
                     }
                 }
             }

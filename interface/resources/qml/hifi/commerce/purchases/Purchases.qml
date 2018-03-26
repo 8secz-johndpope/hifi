@@ -20,6 +20,7 @@ import "../../../controls" as HifiControls
 import "../wallet" as HifiWallet
 import "../common" as HifiCommerceCommon
 import "../inspectionCertificate" as HifiInspectionCertificate
+import "../common/sendAsset" as HifiSendAsset
 
 // references XXX from root context
 
@@ -34,6 +35,7 @@ Rectangle {
     property bool punctuationMode: false;
     property bool pendingInventoryReply: true;
     property bool isShowingMyItems: false;
+    property bool isInGiftMode: false;
     property bool isDebuggingFirstUseTutorial: false;
     property int pendingItemCount: 0;
     property string installedApps;
@@ -143,7 +145,7 @@ Rectangle {
 
     HifiInspectionCertificate.InspectionCertificate {
         id: inspectionCertificate;
-        z: 999;
+        z: 998;
         visible: false;
         anchors.fill: parent;
 
@@ -156,6 +158,7 @@ Rectangle {
 
     HifiCommerceCommon.CommerceLightbox {
         id: lightboxPopup;
+        z: 999;
         visible: false;
         anchors.fill: parent;
 
@@ -170,12 +173,31 @@ Rectangle {
         }
     }
 
+    HifiSendAsset.SendAsset {
+        id: sendAsset;
+        z: 998;
+        visible: root.activeView === "giftAsset";
+        anchors.fill: parent;
+        parentAppTitleBarHeight: 70;
+        parentAppNavBarHeight: 0;
+
+        Connections {
+            onSendSignalToParent: {
+                if (msg.method === 'sendAssetHome_back') {
+                    root.activeView = "purchasesMain";
+                } else {
+                    sendToScript(msg);
+                }
+            }
+        }
+    }
+
     //
     // TITLE BAR START
     //
     HifiCommerceCommon.EmulatedMarketplaceHeader {
         id: titleBarContainer;
-        z: 998;
+        z: 997;
         visible: !needsLogIn.visible;
         // Size
         width: parent.width;
@@ -309,7 +331,7 @@ Rectangle {
         // FILTER BAR START
         //
         Item {
-            z: 997;
+            z: 996;
             id: filterBarContainer;
             // Size
             height: 40;
@@ -317,7 +339,7 @@ Rectangle {
             anchors.left: parent.left;
             anchors.leftMargin: 8;
             anchors.right: parent.right;
-            anchors.rightMargin: 16;
+            anchors.rightMargin: 8;
             anchors.top: parent.top;
             anchors.topMargin: 4;
 
@@ -341,7 +363,8 @@ Rectangle {
                 property string previousPrimaryFilter: "";
                 colorScheme: hifi.colorSchemes.faintGray;
                 anchors.top: parent.top;
-                anchors.right: parent.right;
+                anchors.right: giftModeButton.left;
+                anchors.rightMargin: 8;
                 anchors.left: myText.right;
                 anchors.leftMargin: 16;
                 textFieldHeight: 39;
@@ -391,13 +414,26 @@ Rectangle {
                     filterBar.previousText = filterBar.text;
                 }
             }
+
+            HifiControlsUit.GlyphButton {
+                id: giftModeButton;
+                anchors.right: parent.right;
+                anchors.verticalCenter: parent.verticalCenter;
+                height: parent.height - 4;
+                width: height;
+                glyph: root.isInGiftMode ? hifi.glyphs.close : hifi.glyphs.reload;
+                size: height;
+                onClicked: {
+                    root.isInGiftMode = !root.isInGiftMode;
+                }
+            }
         }
         //
         // FILTER BAR END
         //
 
         HifiControlsUit.Separator {
-            z: 996;
+            z: 995;
             id: separator;
             colorScheme: 2;
             anchors.left: parent.left;
@@ -449,6 +485,7 @@ Rectangle {
                 upgradeTitle: model.upgrade_title;
                 itemType: model.itemType;
                 isShowingMyItems: root.isShowingMyItems;
+                isInGiftMode: root.isInGiftMode;
                 anchors.topMargin: 10;
                 anchors.bottomMargin: 10;
 
@@ -523,6 +560,10 @@ Rectangle {
                             }
                         } else if (msg.method === "updateItemClicked") {
                             sendToScript(msg);
+                        } else if (msg.method === "giftAsset") {
+                            sendAsset.assetName = msg.itemName;
+                            sendAsset.assetCertID = msg.certId;
+                            root.activeView = "giftAsset";
                         }
                     }
                 }
@@ -890,6 +931,9 @@ Rectangle {
             break;
             case 'purchases_showMyItems':
                 root.isShowingMyItems = true;
+            break;
+            case 'updateConnections':
+                sendAsset.updateConnections(message.connections);
             break;
             default:
                 console.log('Unrecognized message from marketplaces.js:', JSON.stringify(message));

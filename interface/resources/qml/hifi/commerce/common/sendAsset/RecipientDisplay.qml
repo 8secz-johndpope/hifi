@@ -1,6 +1,6 @@
 //
 //  RecipientDisplay.qml
-//  qml/hifi/commerce/wallet/sendMoney
+//  qml/hifi/commerce/common/sendAsset
 //
 //  RecipientDisplay
 //

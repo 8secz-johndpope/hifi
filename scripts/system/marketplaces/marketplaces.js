@@ -9,7 +9,7 @@
 //
 
 /* global Tablet, Script, HMD, UserActivityLogger, Entities, Account, Wallet, ContextOverlay, Settings, Camera, Vec3,
-   Quat, MyAvatar, Clipboard, Menu, Grid, Uuid, GlobalServices, openLoginWindow, Overlays, SoundCache,
+   Quat, MyAvatar, Clipboard, Menu, Grid, Uuid, GlobalServices, openLoginWindow, getConnectionData, Overlays, SoundCache,
    DesktopPreviewProvider */
 /* eslint indent: ["error", 4, { "outerIIFEBody": 0 }] */
 
@@ -19,6 +19,7 @@ var selectionDisplay = null; // for gridTool.js to ignore
 
     Script.include("/~/system/libraries/WebTablet.js");
     Script.include("/~/system/libraries/gridTool.js");
+    Script.include("/~/system/libraries/connectionUtils.js");
 
     var METAVERSE_SERVER_URL = Account.metaverseServerURL;
     var MARKETPLACE_URL = METAVERSE_SERVER_URL + "/marketplace";
@@ -600,6 +601,9 @@ var selectionDisplay = null; // for gridTool.js to ignore
                 tablet.gotoWebScreen(message.upgradeUrl + "?edition=" + message.itemEdition,
                     MARKETPLACES_INJECT_SCRIPT_URL);
                 break;
+            case 'giftAsset':
+
+                break;
             case 'passphrasePopup_cancelClicked':
             case 'needsLogIn_cancelClicked':
                 tablet.gotoWebScreen(MARKETPLACE_URL_INITIAL, MARKETPLACES_INJECT_SCRIPT_URL);
@@ -649,9 +653,12 @@ var selectionDisplay = null; // for gridTool.js to ignore
                 });
                 break;
             case 'refreshConnections':
+                print('Refreshing Connections...');
+                getConnectionData(false);
+                break;
             case 'enable_ChooseRecipientNearbyMode':
             case 'disable_ChooseRecipientNearbyMode':
-            case 'sendMoney_sendPublicly':
+            case 'sendAsset_sendPublicly':
                 // NOP
                 break;
             case 'wallet_availableUpdatesReceived':
