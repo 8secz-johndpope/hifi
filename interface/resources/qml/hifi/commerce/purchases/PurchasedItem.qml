@@ -168,6 +168,112 @@ Item {
                 anchors.right: closeContextMenuContainer.left;
                 anchors.rightMargin: 8;
                 color: hifi.colors.white;
+
+                Component {
+                    id: contextCardButton;
+
+                    Item {
+                        property alias buttonGlyphText: buttonGlyph.text;
+                        property alias buttonText: buttonText.text;
+                        property var buttonClicked;
+
+                        HiFiGlyphs {
+                            id: buttonGlyph;
+                            anchors.top: parent.top;
+                            anchors.topMargin: 4;
+                            anchors.horizontalCenter: parent.horizontalCenter;
+                            anchors.bottom: parent.verticalCenter;
+                            width: parent.width;
+                            size: 40;
+                            horizontalAlignment: Text.AlignHCenter;
+                            verticalAlignment: Text.AlignVCenter;
+                            color: hifi.colors.black;
+                        }
+
+                        RalewayRegular {
+                            id: buttonText;
+                            anchors.top: parent.verticalCenter;
+                            anchors.topMargin: 4;
+                            anchors.bottom: parent.bottom;
+                            anchors.bottomMargin: 4;
+                            anchors.horizontalCenter: parent.horizontalCenter;
+                            width: parent.width;
+                            color: hifi.colors.black;
+                            size: 16;
+                            wrapMode: Text.Wrap;
+                            horizontalAlignment: Text.AlignHCenter;
+                            verticalAlignment: Text.AlignTop;
+                        }
+
+                        MouseArea {
+                            id: buttonMouseArea;
+                            anchors.fill: parent;
+                            hoverEnabled: enabled;
+                            onClicked: {
+                                parent.buttonClicked();
+                            }
+                            onEntered: {
+                                buttonGlyph.color = hifi.colors.blueHighlight;
+                                buttonText.color = hifi.colors.blueHighlight;
+                            }
+                            onExited: {
+                                buttonGlyph.color = hifi.colors.black;
+                                buttonText.color = hifi.colors.black;
+                            }
+                        }
+                    }
+                }
+
+                Loader {
+                    id: giftButton;
+                    sourceComponent: contextCardButton;
+                    anchors.right: parent.right;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    width: 70;
+
+                    onLoaded: {
+                        item.buttonGlyphText = hifi.glyphs.paperPlane;
+                        item.buttonText = "Gift";
+                        item.buttonClicked = function() {
+                            sendToPurchases({method: 'giftAsset', itemName: root.itemName, certId: root.certificateId})
+                        }
+                    }
+                }
+
+                Loader {
+                    id: marketplaceButton;
+                    sourceComponent: contextCardButton;
+                    anchors.right: giftButton.left;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    width: 100;
+
+                    onLoaded: {
+                        item.buttonGlyphText = hifi.glyphs.paperPlane;
+                        item.buttonText = "View in Marketplace";
+                        item.buttonClicked = function() {
+                            sendToPurchases({method: 'purchases_itemInfoClicked', itemId: root.itemId});
+                        }
+                    }
+                }
+
+                Loader {
+                    id: certificateButton;
+                    sourceComponent: contextCardButton;
+                    anchors.right: marketplaceButton.left;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    width: 100;
+
+                    onLoaded: {
+                        item.buttonGlyphText = hifi.glyphs.scriptNew;
+                        item.buttonText = "View Certificate";
+                        item.buttonClicked = function() {
+                            sendToPurchases({method: 'purchases_itemCertificateClicked', itemCertificateId: root.certificateId});
+                        }
+                    }
+                }
             }
 
             Rectangle {
@@ -195,7 +301,7 @@ Item {
                     }
                     size: 16;
                     color: hifi.colors.baseGray;
-                    wrapMode: Text.WordWrap;
+                    wrapMode: Text.Wrap;
                     verticalAlignment: Text.AlignVCenter;
 
                     onLinkActivated: {
@@ -422,7 +528,15 @@ Item {
             width: 30;
             height: width;
 
-            property bool upgradeAvailable: root.upgradeUrl !== "" && !root.isShowingMyItems;
+            property bool updateAvailable: root.upgradeUrl !== "" && !root.isShowingMyItems;
+
+            Rectangle {
+                visible: contextMenuButtonContainer.updateAvailable;
+                anchors.fill: parent;
+                radius: height;
+                border.width: 1;
+                border.color: "#E2334D";
+            }
             
             HiFiGlyphs {
                 id: contextMenuGlyph;
@@ -431,7 +545,7 @@ Item {
                 size: 46;
                 horizontalAlignment: Text.AlignHCenter;
                 verticalAlignment: Text.AlignVCenter;
-                color: contextMenuButtonContainer.upgradeAvailable ? hifi.colors.redAccent : hifi.colors.black;
+                color: contextMenuButtonContainer.updateAvailable ? "#E2334D" : hifi.colors.black;
             }
 
             MouseArea {
@@ -443,10 +557,10 @@ Item {
                     root.sendToPurchases({ method: 'flipCard' });
                 }
                 onEntered: {
-                    contextMenuGlyph.color = contextMenuButtonContainer.upgradeAvailable ? hifi.colors.redHighlight : hifi.colors.blueHighlight;
+                    contextMenuGlyph.color = contextMenuButtonContainer.updateAvailable ? hifi.colors.redHighlight : hifi.colors.blueHighlight;
                 }
                 onExited: {
-                    contextMenuGlyph.color = contextMenuButtonContainer.upgradeAvailable ? hifi.colors.redAccent : hifi.colors.black;
+                    contextMenuGlyph.color = contextMenuButtonContainer.updateAvailable ? "#E2334D" : hifi.colors.black;
                 }
             }
         }
@@ -506,9 +620,7 @@ Item {
             
             onClicked: {
                 Tablet.playSound(TabletEnums.ButtonClick);
-                /*if (root.isInGiftMode) {
-                    sendToPurchases({method: 'giftAsset', itemName: root.itemName, certId: root.certificateId})
-                } else */if (root.itemType === "contentSet") {
+                if (root.itemType === "contentSet") {
                     sendToPurchases({method: 'showReplaceContentLightbox', itemHref: root.itemHref});
                 } else if (root.itemType === "avatar") {
                     sendToPurchases({method: 'showChangeAvatarLightbox', itemName: root.itemName, itemHref: root.itemHref});

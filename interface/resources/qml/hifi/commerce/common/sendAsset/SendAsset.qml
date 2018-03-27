@@ -340,14 +340,15 @@ Item {
             HifiControlsUit.Button {
                 id: backButton_sendAssetHome;
                 visible: parentAppNavBarHeight === 0;
-                color: hifi.buttons.noneBorderless;
-                colorScheme: hifi.colorSchemes.dark;
+                color: hifi.buttons.white;
+                colorScheme: hifi.colorSchemes.light;
                 anchors.left: parent.left;
-                anchors.leftMargin: 24;
+                anchors.leftMargin: 20;
+                anchors.right: parent.right;
+                anchors.rightMargin: 20;
                 anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 24;
+                anchors.bottomMargin: 40;
                 height: 40;
-                width: 150;
                 text: "BACK";
                 onClicked: {
                     resetSendAssetData();
