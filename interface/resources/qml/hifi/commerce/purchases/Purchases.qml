@@ -35,7 +35,6 @@ Rectangle {
     property bool punctuationMode: false;
     property bool pendingInventoryReply: true;
     property bool isShowingMyItems: false;
-    property bool isInGiftMode: false;
     property bool isDebuggingFirstUseTutorial: false;
     property int pendingItemCount: 0;
     property string installedApps;
@@ -363,7 +362,7 @@ Rectangle {
                 property string previousPrimaryFilter: "";
                 colorScheme: hifi.colorSchemes.faintGray;
                 anchors.top: parent.top;
-                anchors.right: giftModeButton.left;
+                anchors.right: parent.right;
                 anchors.rightMargin: 8;
                 anchors.left: myText.right;
                 anchors.leftMargin: 16;
@@ -414,19 +413,6 @@ Rectangle {
                     filterBar.previousText = filterBar.text;
                 }
             }
-
-            HifiControlsUit.GlyphButton {
-                id: giftModeButton;
-                anchors.right: parent.right;
-                anchors.verticalCenter: parent.verticalCenter;
-                height: parent.height - 4;
-                width: height;
-                glyph: root.isInGiftMode ? hifi.glyphs.close : hifi.glyphs.reload;
-                size: height;
-                onClicked: {
-                    root.isInGiftMode = !root.isInGiftMode;
-                }
-            }
         }
         //
         // FILTER BAR END
@@ -463,7 +449,6 @@ Rectangle {
             snapMode: ListView.SnapToItem;
             // Anchors
             anchors.top: separator.bottom;
-            anchors.topMargin: 12;
             anchors.left: parent.left;
             anchors.bottom: updatesAvailableBanner.visible ? updatesAvailableBanner.top : parent.bottom;
             width: parent.width;
@@ -474,18 +459,16 @@ Rectangle {
                 itemHref: download_url;
                 certificateId: certificate_id;
                 purchaseStatus: status;
-                purchaseStatusChanged: statusChanged;
                 itemEdition: model.edition_number;
                 numberSold: model.number_sold;
                 limitedRun: model.limited_run;
                 displayedItemCount: model.displayedItemCount;
-                permissionExplanationCardVisible: model.permissionExplanationCardVisible;
+                cardBackVisible: model.cardBackVisible;
                 isInstalled: model.isInstalled;
                 upgradeUrl: model.upgrade_url;
                 upgradeTitle: model.upgrade_title;
                 itemType: model.itemType;
                 isShowingMyItems: root.isShowingMyItems;
-                isInGiftMode: root.isInGiftMode;
                 anchors.topMargin: 10;
                 anchors.bottomMargin: 10;
 
@@ -550,12 +533,12 @@ Rectangle {
                             lightboxPopup.visible = true;
                         } else if (msg.method === "setFilterText") {
                             filterBar.text = msg.filterText;
-                        } else if (msg.method === "openPermissionExplanationCard") {
+                        } else if (msg.method === "flipCard") {
                             for (var i = 0; i < filteredPurchasesModel.count; i++) {
                                 if (i !== index || msg.closeAll) {
-                                    filteredPurchasesModel.setProperty(i, "permissionExplanationCardVisible", false);
+                                    filteredPurchasesModel.setProperty(i, "cardBackVisible", false);
                                 } else {
-                                    filteredPurchasesModel.setProperty(i, "permissionExplanationCardVisible", true);
+                                    filteredPurchasesModel.setProperty(i, "cardBackVisible", true);
                                 }
                             }
                         } else if (msg.method === "updateItemClicked") {
@@ -875,7 +858,7 @@ Rectangle {
                     continue;
                 }
                 filteredPurchasesModel.append(tempPurchasesModel.get(i));
-                filteredPurchasesModel.setProperty(i, 'permissionExplanationCardVisible', false);
+                filteredPurchasesModel.setProperty(i, 'cardBackVisible', false);
                 filteredPurchasesModel.setProperty(i, 'isInstalled', ((root.installedApps).indexOf(currentId) > -1));
             }
 
