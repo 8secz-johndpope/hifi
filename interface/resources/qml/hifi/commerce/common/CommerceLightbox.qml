@@ -28,7 +28,7 @@ Rectangle {
     property string button1color: hifi.buttons.noneBorderlessGray;
     property string button1text;
     property string button1method;
-    property string button2color: hifi.buttons.noneBorderless;
+    property string button2color: hifi.buttons.blue;
     property string button2text;
     property string button2method;
     property string buttonLayout: "leftright";
