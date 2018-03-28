@@ -117,10 +117,6 @@ Rectangle {
                 purchasesContentsList.positionViewAtIndex(currentIndex, ListView.Beginning);
             }
 
-            if (root.pendingInventoryReply && root.pendingItemCount > 0) {
-                inventoryTimer.start();
-            }
-
             root.pendingInventoryReply = false;
         }
 
@@ -165,6 +161,8 @@ Rectangle {
             onSendToParent: {
                 if (msg.method === 'commerceLightboxLinkClicked') {
                     Qt.openUrlExternally(msg.linkUrl);
+                } else if (msg.method === 'openGiftAsset') {
+                    root.activeView = "giftAsset";
                 } else {
                     sendToScript(msg);
                 }
@@ -546,7 +544,37 @@ Rectangle {
                         } else if (msg.method === "giftAsset") {
                             sendAsset.assetName = msg.itemName;
                             sendAsset.assetCertID = msg.certId;
-                            root.activeView = "giftAsset";
+
+                            if (msg.itemType === "avatar" && MyAvatar.skeletonModelURL === msg.itemHref) {
+                                lightboxPopup.titleText = "Change Avatar to Default";
+                                lightboxPopup.bodyText = "You are currently wearing the avatar that you are trying to gift.<br><br>" +
+                                "If you proceed, your avatar will be changed to the default avatar.";
+                                lightboxPopup.button1text = "CANCEL";
+                                lightboxPopup.button1method = "root.visible = false;"
+                                lightboxPopup.button2text = "CONFIRM";
+                                lightboxPopup.button2method = "MyAvatar.skeletonModelURL = ''; sendToParent({method: 'openGiftAsset'}); root.visible = false;";
+                                lightboxPopup.visible = true;
+                            } else if (msg.itemType === "app" && msg.isInstalled) {
+                                lightboxPopup.titleText = "Uninstall App";
+                                lightboxPopup.bodyText = "You are currently using the app that you are trying to gift.<br><br>" +
+                                "If you proceed, the app will be uninstalled.";
+                                lightboxPopup.button1text = "CANCEL";
+                                lightboxPopup.button1method = "root.visible = false;"
+                                lightboxPopup.button2text = "CONFIRM";
+                                lightboxPopup.button2method = "Commerce.uninstallApp('" + msg.itemHref + "'); sendToParent({method: 'openGiftAsset'}); root.visible = false;";
+                                lightboxPopup.visible = true;
+                            } else if (msg.itemType === "wearable") {
+                                lightboxPopup.titleText = "Remove Wearable";
+                                lightboxPopup.bodyText = "You are currently wearing the wearable that you are trying to send.<br><br>" +
+                                "If you proceed, this wearable will be removed.";
+                                lightboxPopup.button1text = "CANCEL";
+                                lightboxPopup.button1method = "root.visible = false;"
+                                lightboxPopup.button2text = "CONFIRM";
+                                lightboxPopup.button2method = "sendToParent({method: 'openGiftAsset'}); root.visible = false;";
+                                lightboxPopup.visible = true;
+                            } else {
+                                root.activeView = "giftAsset";
+                            }
                         }
                     }
                 }
@@ -724,26 +752,6 @@ Rectangle {
             bottom: parent.bottom;
             left: parent.left;
             right: parent.right;
-        }
-    }
-
-    onVisibleChanged: {
-        if (!visible) {
-            inventoryTimer.stop();
-        }
-    }
-
-    Timer {
-        id: inventoryTimer;
-        interval: 4000; // Change this back to 90000 after demo
-        //interval: 90000;
-        onTriggered: {
-            if (root.activeView === "purchasesMain" && !root.pendingInventoryReply) {
-                console.log("Refreshing Purchases...");
-                root.pendingInventoryReply = true;
-                Commerce.inventory();
-                Commerce.getAvailableUpdates();
-            }
         }
     }
 

@@ -46,6 +46,7 @@ Item {
     property bool isInstalled;
     property string upgradeUrl;
     property string upgradeTitle;
+    property bool updateAvailable: root.upgradeUrl !== "" && !root.isShowingMyItems;
     property bool isShowingMyItems;
 
     property string originalStatusText;
@@ -175,6 +176,8 @@ Item {
                     Item {
                         property alias buttonGlyphText: buttonGlyph.text;
                         property alias buttonText: buttonText.text;
+                        property string buttonColor: hifi.colors.black;
+                        property string buttonColor_hover: hifi.colors.blueHighlight;
                         property var buttonClicked;
 
                         HiFiGlyphs {
@@ -187,7 +190,7 @@ Item {
                             size: 40;
                             horizontalAlignment: Text.AlignHCenter;
                             verticalAlignment: Text.AlignVCenter;
-                            color: hifi.colors.black;
+                            color: buttonColor;
                         }
 
                         RalewayRegular {
@@ -195,14 +198,14 @@ Item {
                             anchors.top: parent.verticalCenter;
                             anchors.topMargin: 4;
                             anchors.bottom: parent.bottom;
-                            anchors.bottomMargin: 4;
+                            anchors.bottomMargin: 12;
                             anchors.horizontalCenter: parent.horizontalCenter;
                             width: parent.width;
-                            color: hifi.colors.black;
+                            color: buttonColor;
                             size: 16;
                             wrapMode: Text.Wrap;
                             horizontalAlignment: Text.AlignHCenter;
-                            verticalAlignment: Text.AlignTop;
+                            verticalAlignment: Text.AlignVCenter;
                         }
 
                         MouseArea {
@@ -213,12 +216,12 @@ Item {
                                 parent.buttonClicked();
                             }
                             onEntered: {
-                                buttonGlyph.color = hifi.colors.blueHighlight;
-                                buttonText.color = hifi.colors.blueHighlight;
+                                buttonGlyph.color = buttonColor_hover;
+                                buttonText.color = buttonColor_hover;
                             }
                             onExited: {
-                                buttonGlyph.color = hifi.colors.black;
-                                buttonText.color = hifi.colors.black;
+                                buttonGlyph.color = buttonColor;
+                                buttonText.color = buttonColor;
                             }
                         }
                     }
@@ -226,17 +229,25 @@ Item {
 
                 Loader {
                     id: giftButton;
+                    visible: !root.isShowingMyItems;
                     sourceComponent: contextCardButton;
                     anchors.right: parent.right;
                     anchors.top: parent.top;
                     anchors.bottom: parent.bottom;
-                    width: 70;
+                    width: 62;
 
                     onLoaded: {
                         item.buttonGlyphText = hifi.glyphs.paperPlane;
                         item.buttonText = "Gift";
                         item.buttonClicked = function() {
-                            sendToPurchases({method: 'giftAsset', itemName: root.itemName, certId: root.certificateId})
+                            sendToPurchases({
+                                method: 'giftAsset',
+                                itemName: root.itemName,
+                                certId: root.certificateId,
+                                itemType: root.itemType,
+                                itemHref: root.itemHref,
+                                isInstalled: root.isInstalled
+                            })
                         }
                     }
                 }
@@ -244,7 +255,7 @@ Item {
                 Loader {
                     id: marketplaceButton;
                     sourceComponent: contextCardButton;
-                    anchors.right: giftButton.left;
+                    anchors.right: giftButton.visible ? giftButton.left : parent.right;
                     anchors.top: parent.top;
                     anchors.bottom: parent.bottom;
                     width: 100;
@@ -271,6 +282,43 @@ Item {
                         item.buttonText = "View Certificate";
                         item.buttonClicked = function() {
                             sendToPurchases({method: 'purchases_itemCertificateClicked', itemCertificateId: root.certificateId});
+                        }
+                    }
+                }
+
+                Loader {
+                    id: uninstallButton;
+                    visible: root.isInstalled;
+                    sourceComponent: contextCardButton;
+                    anchors.right: certificateButton.left;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    width: 78;
+
+                    onLoaded: {
+                        item.buttonGlyphText = hifi.glyphs.scriptNew;
+                        item.buttonText = "Uninstall";
+                        item.buttonClicked = function() {
+                            Commerce.uninstallApp(root.itemHref);
+                        }
+                    }
+                }
+
+                Loader {
+                    id: updateButton;
+                    visible: root.updateAvailable;
+                    sourceComponent: contextCardButton;
+                    anchors.right: uninstallButton.visible ? uninstallButton.left : certificateButton.left;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    width: 84;
+
+                    onLoaded: {
+                        item.buttonGlyphText = hifi.glyphs.scriptNew;
+                        item.buttonText = "Update";
+                        item.buttonColor = "#E2334D";
+                        item.buttonClicked = function() {
+                            sendToPurchases({method: 'updateItemClicked', itemId: root.itemId, itemEdition: root.itemEdition, upgradeUrl: root.upgradeUrl});
                         }
                     }
                 }
@@ -331,10 +379,10 @@ Item {
         }
 
         transitions: Transition {
-            NumberAnimation {
+            SmoothedAnimation {
                 target: rotation;
                 property: "angle";
-                duration: 400;
+                velocity: 600;
             }
         }
     }
@@ -358,6 +406,7 @@ Item {
             anchors.bottom: parent.bottom;
             width: height * 1.78;
             fillMode: Image.PreserveAspectCrop;
+            mipmap: true;
 
             MouseArea {
                 anchors.fill: parent;
@@ -385,20 +434,6 @@ Item {
             // Alignment
             horizontalAlignment: Text.AlignLeft;
             verticalAlignment: Text.AlignVCenter;
-
-            MouseArea {
-                anchors.fill: parent;
-                hoverEnabled: enabled;
-                onClicked: {
-                    sendToPurchases({method: 'purchases_itemInfoClicked', itemId: root.itemId});
-                }
-                onEntered: {
-                    itemName.color = hifi.colors.blueHighlight;
-                }
-                onExited: {
-                    itemName.color = hifi.colors.black;
-                }
-            }
         }
 
         RalewayRegular {
@@ -469,10 +504,10 @@ Item {
                         }
                     }
                 // Size
-                size: 36;
+                size: 34;
                 // Anchors
                 anchors.top: parent.top;
-                anchors.topMargin: -8;
+                anchors.topMargin: -10;
                 anchors.left: statusText.right;
                 anchors.bottom: parent.bottom;
                 // Style
@@ -528,10 +563,8 @@ Item {
             width: 30;
             height: width;
 
-            property bool updateAvailable: root.upgradeUrl !== "" && !root.isShowingMyItems;
-
             Rectangle {
-                visible: contextMenuButtonContainer.updateAvailable;
+                visible: root.updateAvailable;
                 anchors.fill: parent;
                 radius: height;
                 border.width: 1;
@@ -545,7 +578,7 @@ Item {
                 size: 46;
                 horizontalAlignment: Text.AlignHCenter;
                 verticalAlignment: Text.AlignVCenter;
-                color: contextMenuButtonContainer.updateAvailable ? "#E2334D" : hifi.colors.black;
+                color: root.updateAvailable ? "#E2334D" : hifi.colors.black;
             }
 
             MouseArea {
@@ -557,10 +590,10 @@ Item {
                     root.sendToPurchases({ method: 'flipCard' });
                 }
                 onEntered: {
-                    contextMenuGlyph.color = contextMenuButtonContainer.updateAvailable ? hifi.colors.redHighlight : hifi.colors.blueHighlight;
+                    contextMenuGlyph.color = root.updateAvailable ? hifi.colors.redHighlight : hifi.colors.blueHighlight;
                 }
                 onExited: {
-                    contextMenuGlyph.color = contextMenuButtonContainer.updateAvailable ? "#E2334D" : hifi.colors.black;
+                    contextMenuGlyph.color = root.updateAvailable ? "#E2334D" : hifi.colors.black;
                 }
             }
         }
@@ -625,8 +658,12 @@ Item {
                 } else if (root.itemType === "avatar") {
                     sendToPurchases({method: 'showChangeAvatarLightbox', itemName: root.itemName, itemHref: root.itemHref});
                 } else if (root.itemType === "app") {
-                    // "Run" and "Uninstall" buttons are separate.
-                    Commerce.installApp(root.itemHref);
+                    if (root.isInstalled) {
+                        Commerce.openApp(root.itemHref);
+                    } else {
+                        // "Run" and "Uninstall" buttons are separate.
+                        Commerce.installApp(root.itemHref);
+                    }
                 } else {
                     sendToPurchases({method: 'purchases_rezClicked', itemHref: root.itemHref, itemType: root.itemType});
                     root.showConfirmation = true;
@@ -692,7 +729,7 @@ Item {
                     }
                     RalewayBold {
                         id: rezIconLabel;
-                        text: MyAvatar.skeletonModelURL === root.itemHref ? "CURRENT" : (root.buttonTextNormal)[itemTypesArray.indexOf(root.itemType)];
+                        text: root.isInstalled ? "OPEN" : (MyAvatar.skeletonModelURL === root.itemHref ? "CURRENT" : (root.buttonTextNormal)[itemTypesArray.indexOf(root.itemType)]);
                         anchors.verticalCenter: parent.verticalCenter;
                         width: rezIconLabelTextMetrics.width;
                         x: parent.width/2 - rezIconLabelTextMetrics.width/2 + rezIconTextMetrics.width/2;
@@ -710,13 +747,15 @@ Item {
             id: noPermissionGlyph;
             visible: !root.hasPermissionToRezThis;
             anchors.verticalCenter: buttonContainer.verticalCenter;
-            anchors.left: buttonContainer.right;
+            anchors.left: buttonContainer.left;
+            anchors.right: buttonContainer.right;
+            anchors.rightMargin: -40;
             text: hifi.glyphs.info;
             // Size
             size: 44;
-            width: 32;
             // Style
             color: hifi.colors.redAccent;
+            horizontalAlignment: Text.AlignRight;
             
             MouseArea {
                 anchors.fill: parent;

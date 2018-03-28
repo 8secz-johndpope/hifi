@@ -73,7 +73,7 @@ Rectangle {
             anchors.right: parent.right;
             anchors.rightMargin: 30;
             height: paintedHeight;
-            color: hifi.colors.baseGray;
+            color: hifi.colors.black;
             size: 24;
             verticalAlignment: Text.AlignTop;
             wrapMode: Text.WordWrap;
@@ -105,7 +105,7 @@ Rectangle {
             anchors.right: parent.right;
             anchors.rightMargin: 30;
             height: paintedHeight;
-            color: hifi.colors.baseGray;
+            color: hifi.colors.black;
             size: 20;
             verticalAlignment: Text.AlignTop;
             wrapMode: Text.WordWrap;
@@ -130,12 +130,12 @@ Rectangle {
                 colorScheme: hifi.colorSchemes.light;
                 anchors.top: root.buttonLayout === "leftright" ? parent.top : parent.top;
                 anchors.left: parent.left;
-                anchors.leftMargin: 10;
+                anchors.leftMargin: 30;
                 anchors.right: root.buttonLayout === "leftright" ? undefined : parent.right;
                 anchors.rightMargin: root.buttonLayout === "leftright" ? undefined : 10;
                 width: root.buttonLayout === "leftright" ? (root.button2text ? parent.width/2 - anchors.leftMargin*2 : parent.width - anchors.leftMargin * 2) :
                     (undefined);
-                height: 50;
+                height: 40;
                 text: root.button1text;
                 onClicked: {
                     eval(button1method);
@@ -153,9 +153,9 @@ Rectangle {
                 anchors.left: root.buttonLayout === "leftright" ? undefined : parent.left;
                 anchors.leftMargin: root.buttonLayout === "leftright" ? undefined : 10;
                 anchors.right: parent.right;
-                anchors.rightMargin: 10;
+                anchors.rightMargin: 30;
                 width: root.buttonLayout === "leftright" ? parent.width/2 - anchors.rightMargin*2 : undefined;
-                height: 50;
+                height: 40;
                 text: root.button2text;
                 onClicked: {
                     eval(button2method);
