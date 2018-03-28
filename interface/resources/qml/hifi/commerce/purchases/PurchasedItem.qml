@@ -44,6 +44,7 @@ Item {
     property bool hasPermissionToRezThis;
     property bool cardBackVisible;
     property bool isInstalled;
+    property bool isBeingWorn;
     property string upgradeUrl;
     property string upgradeTitle;
     property bool updateAvailable: root.upgradeUrl !== "" && !root.isShowingMyItems;
@@ -237,7 +238,7 @@ Item {
                     width: 62;
 
                     onLoaded: {
-                        item.buttonGlyphText = hifi.glyphs.paperPlane;
+                        item.buttonGlyphText = hifi.glyphs.gift;
                         item.buttonText = "Gift";
                         item.buttonClicked = function() {
                             sendToPurchases({
@@ -247,7 +248,7 @@ Item {
                                 itemType: root.itemType,
                                 itemHref: root.itemHref,
                                 isInstalled: root.isInstalled
-                            })
+                            });
                         }
                     }
                 }
@@ -261,7 +262,7 @@ Item {
                     width: 100;
 
                     onLoaded: {
-                        item.buttonGlyphText = hifi.glyphs.paperPlane;
+                        item.buttonGlyphText = hifi.glyphs.market;
                         item.buttonText = "View in Marketplace";
                         item.buttonClicked = function() {
                             sendToPurchases({method: 'purchases_itemInfoClicked', itemId: root.itemId});
@@ -278,7 +279,7 @@ Item {
                     width: 100;
 
                     onLoaded: {
-                        item.buttonGlyphText = hifi.glyphs.scriptNew;
+                        item.buttonGlyphText = hifi.glyphs.certificate;
                         item.buttonText = "View Certificate";
                         item.buttonClicked = function() {
                             sendToPurchases({method: 'purchases_itemCertificateClicked', itemCertificateId: root.certificateId});
@@ -296,7 +297,7 @@ Item {
                     width: 78;
 
                     onLoaded: {
-                        item.buttonGlyphText = hifi.glyphs.scriptNew;
+                        item.buttonGlyphText = hifi.glyphs.uninstall;
                         item.buttonText = "Uninstall";
                         item.buttonClicked = function() {
                             Commerce.uninstallApp(root.itemHref);
@@ -314,7 +315,7 @@ Item {
                     width: 84;
 
                     onLoaded: {
-                        item.buttonGlyphText = hifi.glyphs.scriptNew;
+                        item.buttonGlyphText = hifi.glyphs.update;
                         item.buttonText = "Update";
                         item.buttonColor = "#E2334D";
                         item.buttonClicked = function() {
@@ -573,7 +574,7 @@ Item {
             
             HiFiGlyphs {
                 id: contextMenuGlyph;
-                text: "\ue019"
+                text: hifi.glyphs.verticalEllipsis;
                 anchors.fill: parent;
                 size: 46;
                 horizontalAlignment: Text.AlignHCenter;

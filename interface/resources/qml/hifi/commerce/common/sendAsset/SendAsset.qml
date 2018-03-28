@@ -1140,7 +1140,9 @@ Item {
                     lightboxPopup.bodyText = "Enabling this option will create a particle effect between you and " +
                         "your recipient that is visible to everyone nearby.";
                     lightboxPopup.button1text = "CLOSE";
-                    lightboxPopup.button1method = "root.visible = false;"
+                    lightboxPopup.button1method = function() {
+                        lightboxPopup.visible = false;
+                    }
                     lightboxPopup.visible = true;
                 }
             }
