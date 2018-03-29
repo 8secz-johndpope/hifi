@@ -40,7 +40,6 @@ Rectangle {
     property string installedApps;
     property bool keyboardRaised: false;
     property int numUpdatesAvailable: 0;
-    property var currentlyWornWearables: [];
     // Style
     color: hifi.colors.white;
     Connections {
@@ -162,8 +161,6 @@ Rectangle {
             onSendToParent: {
                 if (msg.method === 'commerceLightboxLinkClicked') {
                     Qt.openUrlExternally(msg.linkUrl);
-                } else if (msg.method === 'openGiftAsset') {
-                    root.activeView = "giftAsset";
                 } else {
                     sendToScript(msg);
                 }
@@ -183,6 +180,7 @@ Rectangle {
             onSendSignalToParent: {
                 if (msg.method === 'sendAssetHome_back') {
                     root.activeView = "purchasesMain";
+                    sendToScript({ method: 'purchases_updateWearables' });
                 } else {
                     sendToScript(msg);
                 }
@@ -469,7 +467,7 @@ Rectangle {
                 displayedItemCount: model.displayedItemCount;
                 cardBackVisible: model.cardBackVisible;
                 isInstalled: model.isInstalled;
-                isBeingWorn: model.isBeingWorn;
+                wornEntityID: model.wornEntityID;
                 upgradeUrl: model.upgrade_url;
                 upgradeTitle: model.upgrade_title;
                 itemType: model.itemType;
@@ -486,7 +484,7 @@ Rectangle {
 
                             // Race condition - Wearable might not be rezzed by the time the "currently worn werables" model is created
                             if (itemType === "wearable") {
-                                root.getCurrentlyWornWearables();
+                                sendToScript({ method: 'purchases_updateWearables' });
                             }
                         } else if (msg.method === 'purchases_itemCertificateClicked') {
                             inspectionCertificate.visible = true;
@@ -587,7 +585,7 @@ Rectangle {
                                 lightboxPopup.button2text = "CONFIRM";
                                 lightboxPopup.button2method = function() {
                                     MyAvatar.skeletonModelURL = '';
-                                    sendToScript({method: 'openGiftAsset'});
+                                    root.activeView = "giftAsset";
                                     lightboxPopup.visible = false;
                                 };
                                 lightboxPopup.visible = true;
@@ -602,11 +600,11 @@ Rectangle {
                                 lightboxPopup.button2text = "CONFIRM";
                                 lightboxPopup.button2method = function() {
                                     Commerce.uninstallApp(msg.itemHref);
-                                    sendToScript({method: 'openGiftAsset'});
+                                    root.activeView = "giftAsset";
                                     lightboxPopup.visible = false;
                                 };
                                 lightboxPopup.visible = true;
-                            } else if (msg.itemType === "wearable" && msg.isBeingWorn) {
+                            } else if (msg.itemType === "wearable" && msg.wornEntityID !== '') {
                                 lightboxPopup.titleText = "Remove Wearable";
                                 lightboxPopup.bodyText = "You are currently wearing the wearable that you are trying to send.<br><br>" +
                                 "If you proceed, this wearable will be removed.";
@@ -616,7 +614,9 @@ Rectangle {
                                 }
                                 lightboxPopup.button2text = "CONFIRM";
                                 lightboxPopup.button2method = function() {
-                                    sendToScript({method: 'openGiftAsset'});
+                                    Entities.deleteEntity(msg.wornEntityID);
+                                    filteredPurchasesModel.setProperty(index, 'wornEntityID', '');
+                                    root.activeView = "giftAsset";
                                     lightboxPopup.visible = false;
                                 };
                                 lightboxPopup.visible = true;
@@ -906,7 +906,7 @@ Rectangle {
             filterBar.text !== filterBar.previousText ||
             filterBar.primaryFilter !== filterBar.previousPrimaryFilter) {
             filteredPurchasesModel.clear();
-            var currentId, currentIsBeingWorn;
+            var currentId;
             for (var i = 0; i < tempPurchasesModel.count; i++) {
                 currentId = tempPurchasesModel.get(i).id;
                 
@@ -916,10 +916,10 @@ Rectangle {
                 filteredPurchasesModel.append(tempPurchasesModel.get(i));
                 filteredPurchasesModel.setProperty(i, 'cardBackVisible', false);
                 filteredPurchasesModel.setProperty(i, 'isInstalled', ((root.installedApps).indexOf(currentId) > -1));
-                filteredPurchasesModel.setProperty(i, 'isBeingWorn', false);
+                filteredPurchasesModel.setProperty(i, 'wornEntityID', '');
             }
-
-            getCurrentlyWornWearables();
+            
+            sendToScript({ method: 'purchases_updateWearables' });
             populateDisplayedItemCounts();
             sortByDate();
         }
@@ -947,34 +947,13 @@ Rectangle {
         }
     }
     
-    function getCurrentlyWornWearables() {
-        root.currentlyWornWearables = [];
-
-        var ATTACHMENT_SEARCH_RADIUS = 100; // meters (just in case)
-
-        var isEntityBeingWorn = function(entityID) {
-            return Entities.getEntityProperties(entityID, 'parentID').parentID === MyAvatar.sessionUUID;
-        };
-
-        var nearbyEntities = Entities.findEntitiesByType('Model', MyAvatar.position, ATTACHMENT_SEARCH_RADIUS);
-        
-        console.log("ZRF FOUND ENTITIES: " + nearbyEntities);
-
-        for (var i = 0; i < nearbyEntities.length; i++) {
-            console.log("ZRF HERE 02: " + nearbyEntities[i]);
-            if (isEntityBeingWorn(nearbyEntities[i])) {
-                root.currentlyWornWearables.push({
-                    entityCertID: Entities.getEntityProperties(nearbyEntities[i], 'certificateID').certificateID,
-                    entityEdition: Entities.getEntityProperties(nearbyEntities[i], 'editionNumber').editionNumber
-                });
-            }
-        }
-        
+    function updateCurrentlyWornWearables(wearables) {
         for (var i = 0; i < filteredPurchasesModel.count; i++) {
-            for (var j = 0; j < root.currentlyWornWearables.length; j++) {
-                if (root.currentlyWornWearables[j].entityCertID === tempPurchasesModel.get(i).itemEdition &&
-                    root.currentlyWornWearables[j].entityEdition === tempPurchasesModel.get(i).certificateId) {
-                    filteredPurchasesModel.setProperty(i, 'isBeingWorn', true);
+            for (var j = 0; j < wearables.length; j++) {
+                if (filteredPurchasesModel.get(i).itemType === "wearable" &&
+                    wearables[j].entityCertID === filteredPurchasesModel.get(i).certificate_id &&
+                    wearables[j].entityEdition.toString() === filteredPurchasesModel.get(i).edition_number) {
+                    filteredPurchasesModel.setProperty(i, 'wornEntityID', wearables[j].entityID);
                     break;
                 }
             }
@@ -1009,6 +988,9 @@ Rectangle {
             break;
             case 'updateConnections':
                 sendAsset.updateConnections(message.connections);
+            break;
+            case 'updateWearables':
+                updateCurrentlyWornWearables(message.wornWearables);
             break;
             default:
                 console.log('Unrecognized message from marketplaces.js:', JSON.stringify(message));

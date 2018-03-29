@@ -44,7 +44,7 @@ Item {
     property bool hasPermissionToRezThis;
     property bool cardBackVisible;
     property bool isInstalled;
-    property bool isBeingWorn;
+    property string wornEntityID;
     property string upgradeUrl;
     property string upgradeTitle;
     property bool updateAvailable: root.upgradeUrl !== "" && !root.isShowingMyItems;
@@ -241,13 +241,15 @@ Item {
                         item.buttonGlyphText = hifi.glyphs.gift;
                         item.buttonText = "Gift";
                         item.buttonClicked = function() {
+                            sendToPurchases({ method: 'flipCard', closeAll: true });
                             sendToPurchases({
                                 method: 'giftAsset',
                                 itemName: root.itemName,
                                 certId: root.certificateId,
                                 itemType: root.itemType,
                                 itemHref: root.itemHref,
-                                isInstalled: root.isInstalled
+                                isInstalled: root.isInstalled,
+                                wornEntityID: root.wornEntityID
                             });
                         }
                     }
@@ -265,6 +267,7 @@ Item {
                         item.buttonGlyphText = hifi.glyphs.market;
                         item.buttonText = "View in Marketplace";
                         item.buttonClicked = function() {
+                            sendToPurchases({ method: 'flipCard', closeAll: true });
                             sendToPurchases({method: 'purchases_itemInfoClicked', itemId: root.itemId});
                         }
                     }
@@ -282,6 +285,7 @@ Item {
                         item.buttonGlyphText = hifi.glyphs.certificate;
                         item.buttonText = "View Certificate";
                         item.buttonClicked = function() {
+                            sendToPurchases({ method: 'flipCard', closeAll: true });
                             sendToPurchases({method: 'purchases_itemCertificateClicked', itemCertificateId: root.certificateId});
                         }
                     }
@@ -300,6 +304,7 @@ Item {
                         item.buttonGlyphText = hifi.glyphs.uninstall;
                         item.buttonText = "Uninstall";
                         item.buttonClicked = function() {
+                            sendToPurchases({ method: 'flipCard', closeAll: true });
                             Commerce.uninstallApp(root.itemHref);
                         }
                     }
@@ -319,6 +324,7 @@ Item {
                         item.buttonText = "Update";
                         item.buttonColor = "#E2334D";
                         item.buttonClicked = function() {
+                            sendToPurchases({ method: 'flipCard', closeAll: true });
                             sendToPurchases({method: 'updateItemClicked', itemId: root.itemId, itemEdition: root.itemEdition, upgradeUrl: root.upgradeUrl});
                         }
                     }

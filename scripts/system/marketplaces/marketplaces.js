@@ -666,6 +666,25 @@ var selectionDisplay = null; // for gridTool.js to ignore
                 userHasUpdates = message.numUpdates > 0;
                 messagesWaiting(userHasUpdates);
                 break;
+            case 'purchases_updateWearables':
+                var currentlyWornWearables = [];
+                var ATTACHMENT_SEARCH_RADIUS = 100; // meters (just in case)
+
+                var nearbyEntities = Entities.findEntitiesByType('Model', MyAvatar.position, ATTACHMENT_SEARCH_RADIUS);
+
+                for (var i = 0; i < nearbyEntities.length; i++) {
+                    var currentProperties = Entities.getEntityProperties(nearbyEntities[i], ['certificateID', 'editionNumber', 'parentID']);
+                    if (currentProperties.parentID === MyAvatar.sessionUUID) {
+                        currentlyWornWearables.push({
+                            entityID: nearbyEntities[i],
+                            entityCertID: currentProperties.certificateID,
+                            entityEdition: currentProperties.editionNumber
+                        });
+                    }
+                }
+
+                tablet.sendToQml({ method: 'updateWearables', wornWearables: currentlyWornWearables });
+                break;
             default:
                 print('Unrecognized message from Checkout.qml or Purchases.qml: ' + JSON.stringify(message));
         }

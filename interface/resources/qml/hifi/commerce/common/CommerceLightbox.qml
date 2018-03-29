@@ -176,7 +176,7 @@ Rectangle {
         root.button1color = hifi.buttons.noneBorderlessGray;
         root.button1text = "";
         root.button1method = function() {};
-        root.button2color = hifi.buttons.noneBorderless;
+        root.button2color = hifi.buttons.blue;
         root.button2text = "";
         root.button2method = function() {};
         root.buttonLayout = "leftright";
