@@ -68,7 +68,7 @@ Item {
             balanceText.text = result.data.balance;
         }
 
-        onTransferHfcToNodeResult: {
+        onTransferAssetToNodeResult: {
             root.isCurrentlySendingAsset = false;
 
             if (result.status === 'success') {
@@ -87,7 +87,7 @@ Item {
             }
         }
 
-        onTransferHfcToUsernameResult: {
+        onTransferAssetToUsernameResult: {
             root.isCurrentlySendingAsset = false;
 
             if (result.status === 'success') {
@@ -953,6 +953,7 @@ Item {
 
             HifiControlsUit.TextField {
                 id: amountTextField;
+                text: root.assetName === "" ? "" : "1";
                 colorScheme: root.assetName === "" ? hifi.colorSchemes.dark : hifi.colorSchemes.light;
                 inputMethodHints: Qt.ImhDigitsOnly;
                 // Anchors
@@ -1220,9 +1221,15 @@ Item {
                             amountTextField.focus = false;
                             optionalMessage.focus = false;
                             if (sendAssetStep.referrer === "connections") {
-                                Commerce.transferHfcToUsername(sendAssetStep.selectedRecipientUserName, parseInt(amountTextField.text), optionalMessage.text);
+                                Commerce.transferAssetToUsername(sendAssetStep.selectedRecipientUserName,
+                                    root.assetCertID,
+                                    parseInt(amountTextField.text),
+                                    optionalMessage.text);
                             } else if (sendAssetStep.referrer === "nearby") {
-                                Commerce.transferHfcToNode(sendAssetStep.selectedRecipientNodeID, parseInt(amountTextField.text), optionalMessage.text);
+                                Commerce.transferAssetToNode(sendAssetStep.selectedRecipientNodeID,
+                                    root.assetCertID,
+                                    parseInt(amountTextField.text),
+                                    optionalMessage.text);
                             }
                         }
                     // Sending Asset
@@ -1682,9 +1689,15 @@ Item {
                 onClicked: {
                     root.isCurrentlySendingAsset = true;
                     if (sendAssetStep.referrer === "connections") {
-                        Commerce.transferHfcToUsername(sendAssetStep.selectedRecipientUserName, parseInt(amountTextField.text), optionalMessage.text);
+                        Commerce.transferAssetToUsername(sendAssetStep.selectedRecipientUserName,
+                            root.assetCertID,
+                            parseInt(amountTextField.text),
+                            optionalMessage.text);
                     } else if (sendAssetStep.referrer === "nearby") {
-                        Commerce.transferHfcToNode(sendAssetStep.selectedRecipientNodeID, parseInt(amountTextField.text), optionalMessage.text);
+                        Commerce.transferAssetToNode(sendAssetStep.selectedRecipientNodeID,
+                            root.assetCertID,
+                            parseInt(amountTextField.text),
+                            optionalMessage.text);
                     }
                 }
             }
