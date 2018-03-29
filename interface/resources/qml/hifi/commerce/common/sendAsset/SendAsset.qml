@@ -1204,37 +1204,31 @@ Item {
                 width: 150;
                 text: "SUBMIT";
                 onClicked: {
-                    // Sending HFC
-                    if (root.assetName === "") {
-                        if (parseInt(amountTextField.text) > parseInt(balanceText.text)) {
-                            amountTextField.focus = true;
-                            amountTextField.error = true;
-                            amountTextFieldError.text = "<i>amount exceeds available funds</i>";
-                        } else if (amountTextField.text === "" || parseInt(amountTextField.text) < 1) {
-                            amountTextField.focus = true;
-                            amountTextField.error = true;
-                            amountTextFieldError.text = "<i>invalid amount</i>";
-                        } else {
-                            amountTextFieldError.text = "";
-                            amountTextField.error = false;
-                            root.isCurrentlySendingAsset = true;
-                            amountTextField.focus = false;
-                            optionalMessage.focus = false;
-                            if (sendAssetStep.referrer === "connections") {
-                                Commerce.transferAssetToUsername(sendAssetStep.selectedRecipientUserName,
-                                    root.assetCertID,
-                                    parseInt(amountTextField.text),
-                                    optionalMessage.text);
-                            } else if (sendAssetStep.referrer === "nearby") {
-                                Commerce.transferAssetToNode(sendAssetStep.selectedRecipientNodeID,
-                                    root.assetCertID,
-                                    parseInt(amountTextField.text),
-                                    optionalMessage.text);
-                            }
-                        }
-                    // Sending Asset
+                    if (root.assetName === "" && parseInt(amountTextField.text) > parseInt(balanceText.text)) {
+                        amountTextField.focus = true;
+                        amountTextField.error = true;
+                        amountTextFieldError.text = "<i>amount exceeds available funds</i>";
+                    } else if (root.assetName === "" && (amountTextField.text === "" || parseInt(amountTextField.text) < 1)) {
+                        amountTextField.focus = true;
+                        amountTextField.error = true;
+                        amountTextFieldError.text = "<i>invalid amount</i>";
                     } else {
-                    
+                        amountTextFieldError.text = "";
+                        amountTextField.error = false;
+                        root.isCurrentlySendingAsset = true;
+                        amountTextField.focus = false;
+                        optionalMessage.focus = false;
+                        if (sendAssetStep.referrer === "connections") {
+                            Commerce.transferAssetToUsername(sendAssetStep.selectedRecipientUserName,
+                                root.assetCertID,
+                                parseInt(amountTextField.text),
+                                optionalMessage.text);
+                        } else if (sendAssetStep.referrer === "nearby") {
+                            Commerce.transferAssetToNode(sendAssetStep.selectedRecipientNodeID,
+                                root.assetCertID,
+                                parseInt(amountTextField.text),
+                                optionalMessage.text);
+                        }
                     }
                 }
             }
