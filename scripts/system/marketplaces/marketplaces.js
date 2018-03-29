@@ -85,10 +85,12 @@ var selectionDisplay = null; // for gridTool.js to ignore
     }
 
     function messagesWaiting(isWaiting) {
-        marketplaceButton.editProperties({
-            icon: (isWaiting ? WAITING_ICON : NORMAL_ICON),
-            activeIcon: (isWaiting ? WAITING_ACTIVE : NORMAL_ACTIVE)
-        });
+        if (marketplaceButton) {
+            marketplaceButton.editProperties({
+                icon: (isWaiting ? WAITING_ICON : NORMAL_ICON),
+                activeIcon: (isWaiting ? WAITING_ACTIVE : NORMAL_ACTIVE)
+            });
+        }
     }
 
     function onCanWriteAssetsChanged() {
@@ -1161,13 +1163,13 @@ var selectionDisplay = null; // for gridTool.js to ignore
     var marketplaceButton;
     var buttonName = "MARKET";
     var tablet = null;
+    var NORMAL_ICON = "icons/tablet-icons/market-i.svg";
+    var NORMAL_ACTIVE = "icons/tablet-icons/market-a.svg";
+    var WAITING_ICON = "icons/tablet-icons/market-i-msg.svg";
+    var WAITING_ACTIVE = "icons/tablet-icons/market-a-msg.svg";
     function startup() {
         tablet = Tablet.getTablet("com.highfidelity.interface.tablet.system");
-        var NORMAL_ICON = "icons/tablet-icons/market-i.svg";
-        var NORMAL_ACTIVE = "icons/tablet-icons/market-a.svg";
-        var WAITING_ICON = "icons/tablet-icons/market-i-msg.svg";
-        var WAITING_ACTIVE = "icons/tablet-icons/market-a-msg.svg";
-        var marketplaceButton = tablet.addButton({
+        marketplaceButton = tablet.addButton({
             icon: NORMAL_ICON,
             activeIcon: NORMAL_ACTIVE,
             text: buttonName,
