@@ -252,7 +252,7 @@ Item {
 
             RalewaySemiBold {
                 id: sendAssetText;
-                text: root.assetName === "" ? "Send Money To:" : "Send \"" + root.assetName + "\" To:";
+                text: root.assetName === "" ? "Send Money To:" : "Gift \"" + root.assetName + "\" To:";
                 // Anchors
                 anchors.top: parent.top;
                 anchors.topMargin: 26;
@@ -745,7 +745,7 @@ Item {
 
                 RalewaySemiBold {
                     id: sendToText;
-                    text: "Send to:";
+                    text: root.assetName === "" ? "Send to:" : "Gift to:";
                     // Anchors
                     anchors.top: parent.top;
                     anchors.topMargin: 36;
@@ -850,7 +850,7 @@ Item {
 
         RalewaySemiBold {
             id: sendAssetText_sendAssetStep;
-            text: root.assetName === "" ? "Send Money" : "Send \"" + root.assetName + "\"";
+            text: root.assetName === "" ? "Send Money" : "Gift \"" + root.assetName + "\"";
             // Anchors
             anchors.top: parent.top;
             anchors.topMargin: 26;
@@ -876,7 +876,7 @@ Item {
 
             RalewaySemiBold {
                 id: sendToText_sendAssetStep;
-                text: "Send to:";
+                text: root.assetName === "" ? "Send to:" : "Gift to:";
                 // Anchors
                 anchors.top: parent.top;
                 anchors.left: parent.left;
@@ -1152,7 +1152,7 @@ Item {
                     parent.color = hifi.colors.blueAccent;
                 }
                 onClicked: {
-                    lightboxPopup.titleText = "Send Effect";
+                    lightboxPopup.titleText = (root.assetName === "" ? "Send Effect" : "Gift Effect");
                     lightboxPopup.bodyImageSource = "sendAsset/images/send-money-effect-sm.jpg"; // Path relative to CommerceLightbox.qml
                     lightboxPopup.bodyText = "Enabling this option will create a particle effect between you and " +
                         "your recipient that is visible to everyone nearby.";
