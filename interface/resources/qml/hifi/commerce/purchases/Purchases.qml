@@ -178,7 +178,7 @@ Rectangle {
 
         Connections {
             onSendSignalToParent: {
-                if (msg.method === 'sendAssetHome_back') {
+                if (msg.method === 'sendAssetHome_back' || msg.method === 'closeSendAsset') {
                     root.activeView = "purchasesMain";
                     sendToScript({ method: 'purchases_updateWearables' });
                 } else {

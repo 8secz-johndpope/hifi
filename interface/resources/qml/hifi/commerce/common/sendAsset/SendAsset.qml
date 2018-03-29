@@ -1294,7 +1294,7 @@ Item {
 
             RalewaySemiBold {
                 id: paymentSentText;
-                text: "Payment Sent";
+                text: root.assetName === "" ? "Payment Sent" : '"' + root.assetName + '"';
                 // Anchors
                 anchors.top: parent.top;
                 anchors.topMargin: 26;
@@ -1329,6 +1329,9 @@ Item {
                     onClicked: {
                         root.nextActiveView = "sendAssetHome";
                         resetSendAssetData();
+                        if (root.assetName === "") {
+                            sendToContainer({method: "closeSendAsset"});
+                        }
                     }
                 }
             }
@@ -1375,6 +1378,7 @@ Item {
 
             Item {
                 id: amountContainer_paymentSuccess;
+                visible: root.assetName === "";
                 anchors.top: sendToContainer_paymentSuccess.bottom;
                 anchors.topMargin: 16;
                 anchors.left: parent.left;
@@ -1431,7 +1435,7 @@ Item {
                 id: optionalMessage_paymentSuccess;
                 text: optionalMessage.text;
                 // Anchors
-                anchors.top: amountContainer_paymentSuccess.bottom;
+                anchors.top: amountContainer_paymentSuccess.visible ? amountContainer_paymentSuccess.bottom : sendToContainer_paymentSuccess.bottom;
                 anchors.left: parent.left;
                 anchors.leftMargin: 110;
                 anchors.right: parent.right;
@@ -1460,6 +1464,9 @@ Item {
                 onClicked: {
                     root.nextActiveView = "sendAssetHome";
                     resetSendAssetData();
+                    if (root.assetName === "") {
+                        sendToContainer({method: "closeSendAsset"});
+                    }
                 }
             }
         }
@@ -1481,7 +1488,7 @@ Item {
 
             RalewaySemiBold {
                 id: paymentFailureText;
-                text: "Payment Failed";
+                text: root.assetName === "" ? "Payment Failed" : '"' + root.assetName + '"';
                 // Anchors
                 anchors.top: parent.top;
                 anchors.topMargin: 26;
@@ -1516,13 +1523,16 @@ Item {
                     onClicked: {
                         root.nextActiveView = "sendAssetHome";
                         resetSendAssetData();
+                        if (root.assetName === "") {
+                            sendToContainer({method: "closeSendAsset"});
+                        }
                     }
                 }
             }
 
             RalewaySemiBold {
                 id: paymentFailureDetailText;
-                text: "The recipient you specified was unable to receive your payment.";
+                text: "The recipient you specified was unable to receive your " + (root.assetName === "" ? "payment." : "gift.");
                 anchors.top: paymentFailureText.bottom;
                 anchors.topMargin: 20;
                 anchors.left: parent.left;
@@ -1580,6 +1590,7 @@ Item {
 
             Item {
                 id: amountContainer_paymentFailure;
+                visible: root.assetName === "";
                 anchors.top: sendToContainer_paymentFailure.bottom;
                 anchors.topMargin: 16;
                 anchors.left: parent.left;
@@ -1636,7 +1647,7 @@ Item {
                 id: optionalMessage_paymentFailuire;
                 text: optionalMessage.text;
                 // Anchors
-                anchors.top: amountContainer_paymentFailure.bottom;
+                anchors.top: amountContainer_paymentFailure.visible ? amountContainer_paymentFailure.bottom : sendToContainer_paymentFailure.bottom;
                 anchors.left: parent.left;
                 anchors.leftMargin: 110;
                 anchors.right: parent.right;
@@ -1665,6 +1676,9 @@ Item {
                 onClicked: {
                     root.nextActiveView = "sendAssetHome";
                     resetSendAssetData();
+                    if (root.assetName === "") {
+                        sendToContainer({method: "closeSendAsset"});
+                    }
                 }
             }
 
