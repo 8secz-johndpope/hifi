@@ -1329,7 +1329,7 @@ Item {
                     onClicked: {
                         root.nextActiveView = "sendAssetHome";
                         resetSendAssetData();
-                        if (root.assetName === "") {
+                        if (root.assetName !== "") {
                             sendToContainer({method: "closeSendAsset"});
                         }
                     }
@@ -1464,7 +1464,7 @@ Item {
                 onClicked: {
                     root.nextActiveView = "sendAssetHome";
                     resetSendAssetData();
-                    if (root.assetName === "") {
+                    if (root.assetName !== "") {
                         sendToContainer({method: "closeSendAsset"});
                     }
                 }
@@ -1523,7 +1523,7 @@ Item {
                     onClicked: {
                         root.nextActiveView = "sendAssetHome";
                         resetSendAssetData();
-                        if (root.assetName === "") {
+                        if (root.assetName !== "") {
                             sendToContainer({method: "closeSendAsset"});
                         }
                     }
@@ -1676,7 +1676,7 @@ Item {
                 onClicked: {
                     root.nextActiveView = "sendAssetHome";
                     resetSendAssetData();
-                    if (root.assetName === "") {
+                    if (root.assetName !== "") {
                         sendToContainer({method: "closeSendAsset"});
                     }
                 }

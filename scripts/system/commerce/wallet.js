@@ -19,44 +19,8 @@
 
     var MARKETPLACE_URL = Account.metaverseServerURL + "/marketplace";
 
-    // Function Name: onButtonClicked()
-    //
-    // Description:
-    //   -Fired when the app button is pressed.
-    //
-    // Relevant Variables:
-    //   -WALLET_QML_SOURCE: The path to the Wallet QML
-    //   -onWalletScreen: true/false depending on whether we're looking at the app.
-    var WALLET_QML_SOURCE = "hifi/commerce/wallet/Wallet.qml";
-    var MARKETPLACE_PURCHASES_QML_PATH = "hifi/commerce/purchases/Purchases.qml";
-    var onWalletScreen = false;
-    function onButtonClicked() {
-        if (!tablet) {
-            print("Warning in buttonClicked(): 'tablet' undefined!");
-            return;
-        }
-        if (onWalletScreen) {
-            // for toolbar-mode: go back to home screen, this will close the window.
-            tablet.gotoHomeScreen();
-        } else {
-            tablet.loadQMLSource(WALLET_QML_SOURCE);
-        }
-    }
 
-    // Function Name: sendToQml()
-    //
-    // Description:
-    //   -Use this function to send a message to the QML (i.e. to change appearances). The "message" argument is what is sent to
-    //    the QML in the format "{method, params}", like json-rpc. See also fromQml().
-    function sendToQml(message) {
-        tablet.sendToQml(message);
-    }
-
-    //***********************************************
-    //
-    // BEGIN Avatar Selector logic
-    //
-    //***********************************************
+    // BEGIN AVATAR SELECTOR LOGIC
     var UNSELECTED_TEXTURES = {
         "idle-D": Script.resolvePath("./assets/models/Avatar-Overlay-v1.fbx/Avatar-Overlay-v1.fbm/avatar-overlay-idle.png"),
         "idle-E": Script.resolvePath("./assets/models/Avatar-Overlay-v1.fbx/Avatar-Overlay-v1.fbm/avatar-overlay-idle.png")
@@ -327,7 +291,7 @@
                 userName: ''
             };
             sendToQml(message);
-            
+
             ExtendedOverlay.some(function (overlay) {
                 var id = overlay.key;
                 var selected = ExtendedOverlay.isSelected(id);
@@ -433,11 +397,40 @@
     triggerMapping.from(Controller.Standard.LTClick).peek().to(makeClickHandler(Controller.Standard.LeftHand));
     triggerPressMapping.from(Controller.Standard.RT).peek().to(makePressHandler(Controller.Standard.RightHand));
     triggerPressMapping.from(Controller.Standard.LT).peek().to(makePressHandler(Controller.Standard.LeftHand));
-    //***********************************************
+    // END AVATAR SELECTOR LOGIC
+
+    // Function Name: onButtonClicked()
     //
-    // END Avatar Selector logic
+    // Description:
+    //   -Fired when the app button is pressed.
     //
-    //***********************************************
+    // Relevant Variables:
+    //   -WALLET_QML_SOURCE: The path to the Wallet QML
+    //   -onWalletScreen: true/false depending on whether we're looking at the app.
+    var WALLET_QML_SOURCE = "hifi/commerce/wallet/Wallet.qml";
+    var MARKETPLACE_PURCHASES_QML_PATH = "hifi/commerce/purchases/Purchases.qml";
+    var onWalletScreen = false;
+    function onButtonClicked() {
+        if (!tablet) {
+            print("Warning in buttonClicked(): 'tablet' undefined!");
+            return;
+        }
+        if (onWalletScreen) {
+            // for toolbar-mode: go back to home screen, this will close the window.
+            tablet.gotoHomeScreen();
+        } else {
+            tablet.loadQMLSource(WALLET_QML_SOURCE);
+        }
+    }
+
+    // Function Name: sendToQml()
+    //
+    // Description:
+    //   -Use this function to send a message to the QML (i.e. to change appearances). The "message" argument is what is sent to
+    //    the QML in the format "{method, params}", like json-rpc. See also fromQml().
+    function sendToQml(message) {
+        tablet.sendToQml(message);
+    }
 
     var sendMoneyRecipient;
     var sendMoneyParticleEffectUpdateTimer;

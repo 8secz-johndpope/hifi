@@ -990,6 +990,10 @@ Rectangle {
             case 'updateConnections':
                 sendAsset.updateConnections(message.connections);
             break;
+            case 'selectRecipient':
+            case 'updateSelectedRecipientUsername':
+                sendAsset.fromScript(message);
+            break;
             case 'updateWearables':
                 updateCurrentlyWornWearables(message.wornWearables);
             break;
