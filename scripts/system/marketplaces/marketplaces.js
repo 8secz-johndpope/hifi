@@ -494,6 +494,7 @@ var selectionDisplay = null; // for gridTool.js to ignore
         if (onMarketplaceScreen || onCommerceScreen) {
             tablet.gotoHomeScreen();
         }
+        deleteSendAssetParticleEffect();
         tablet.removeButton(marketplaceButton);
         tablet.screenChanged.disconnect(onScreenChanged);
         ContextOverlay.contextOverlayClicked.disconnect(setCertificateInfo);
@@ -530,6 +531,80 @@ var selectionDisplay = null; // for gridTool.js to ignore
                 hasEventBridge = false;
             }
         }
+    }
+
+    var sendAssetRecipient;
+    var sendAssetParticleEffectUpdateTimer;
+    var particleEffectTimestamp;
+    var sendAssetParticleEffect;
+    var SEND_ASSET_PARTICLE_TIMER_UPDATE = 250;
+    var SEND_ASSET_PARTICLE_EMITTING_DURATION = 3000;
+    var SEND_ASSET_PARTICLE_LIFETIME_SECONDS = 8;
+    var SEND_ASSET_PARTICLE_PROPERTIES = {
+        accelerationSpread: { x: 0, y: 0, z: 0 },
+        alpha: 1,
+        alphaFinish: 1,
+        alphaSpread: 0,
+        alphaStart: 1,
+        azimuthFinish: 0,
+        azimuthStart: -6,
+        color: { red: 143, green: 5, blue: 255 },
+        colorFinish: { red: 255, green: 0, blue: 204 },
+        colorSpread: { red: 0, green: 0, blue: 0 },
+        colorStart: { red: 0, green: 136, blue: 255 },
+        emitAcceleration: { x: 0, y: 0, z: 0 }, // Immediately gets updated to be accurate
+        emitDimensions: { x: 0, y: 0, z: 0 },
+        emitOrientation: { x: 0, y: 0, z: 0 },
+        emitRate: 4,
+        emitSpeed: 2.1,
+        emitterShouldTrail: true,
+        isEmitting: 1,
+        lifespan: SEND_ASSET_PARTICLE_LIFETIME_SECONDS + 1, // Immediately gets updated to be accurate
+        lifetime: SEND_ASSET_PARTICLE_LIFETIME_SECONDS + 1,
+        maxParticles: 20,
+        name: 'hfc-particles',
+        particleRadius: 0.2,
+        polarFinish: 0,
+        polarStart: 0,
+        radiusFinish: 0.05,
+        radiusSpread: 0,
+        radiusStart: 0.2,
+        speedSpread: 0,
+        textures: "http://hifi-content.s3.amazonaws.com/alan/dev/Particles/Bokeh-Particle-HFC.png",
+        type: 'ParticleEffect'
+    };
+
+    function updateSendAssetParticleEffect() {
+        var timestampNow = Date.now();
+        if ((timestampNow - particleEffectTimestamp) > (SEND_ASSET_PARTICLE_LIFETIME_SECONDS * 1000)) {
+            deleteSendAssetParticleEffect();
+            return;
+        } else if ((timestampNow - particleEffectTimestamp) > SEND_ASSET_PARTICLE_EMITTING_DURATION) {
+            Entities.editEntity(sendAssetParticleEffect, {
+                isEmitting: 0
+            });
+        } else if (sendAssetParticleEffect) {
+            var recipientPosition = AvatarList.getAvatar(sendAssetRecipient).position;
+            var distance = Vec3.distance(recipientPosition, MyAvatar.position);
+            var accel = Vec3.subtract(recipientPosition, MyAvatar.position);
+            accel.y -= 3.0;
+            var life = Math.sqrt(2 * distance / Vec3.length(accel));
+            Entities.editEntity(sendAssetParticleEffect, {
+                emitAcceleration: accel,
+                lifespan: life
+            });
+        }
+    }
+
+    function deleteSendAssetParticleEffect() {
+        if (sendAssetParticleEffectUpdateTimer) {
+            Script.clearInterval(sendAssetParticleEffectUpdateTimer);
+            sendAssetParticleEffectUpdateTimer = null;
+        }
+        if (sendAssetParticleEffect) {
+            sendAssetParticleEffect = Entities.deleteEntity(sendAssetParticleEffect);
+        }
+        sendAssetRecipient = null;
     }
 
     // Function Name: fromQml()
@@ -658,7 +733,6 @@ var selectionDisplay = null; // for gridTool.js to ignore
                 break;
             case 'enable_ChooseRecipientNearbyMode':
             case 'disable_ChooseRecipientNearbyMode':
-            case 'sendAsset_sendPublicly':
                 // NOP
                 break;
             case 'wallet_availableUpdatesReceived':
@@ -684,6 +758,24 @@ var selectionDisplay = null; // for gridTool.js to ignore
                 }
 
                 tablet.sendToQml({ method: 'updateWearables', wornWearables: currentlyWornWearables });
+                break;
+            case 'sendAsset_sendPublicly':
+                if (message.assetName !== "") {
+                    deleteSendAssetParticleEffect();
+                    sendAssetRecipient = message.recipient;
+                    var amount = message.amount;
+                    var props = SEND_ASSET_PARTICLE_PROPERTIES;
+                    props.parentID = MyAvatar.sessionUUID;
+                    props.position = MyAvatar.position;
+                    props.position.y += 0.2;
+                    if (message.effectImage) {
+                        props.textures = message.effectImage;
+                    }
+                    sendAssetParticleEffect = Entities.addEntity(props, true);
+                    particleEffectTimestamp = Date.now();
+                    updateSendAssetParticleEffect();
+                    sendAssetParticleEffectUpdateTimer = Script.setInterval(updateSendAssetParticleEffect, SEND_ASSET_PARTICLE_TIMER_UPDATE);
+                }
                 break;
             default:
                 print('Unrecognized message from Checkout.qml or Purchases.qml: ' + JSON.stringify(message));

@@ -18,7 +18,7 @@ import QtGraphicalEffects 1.0
 import "../../../../styles-uit"
 import "../../../../controls-uit" as HifiControlsUit
 import "../../../../controls" as HifiControls
-import "../../common" as HifiCommerceCommon
+import "../" as HifiCommerceCommon
 
 Item {
     HifiConstants { id: hifi; }
@@ -35,6 +35,7 @@ Item {
     property bool isCurrentlySendingAsset: false;
     property string assetName: "";
     property string assetCertID: "";
+    property string sendingPubliclyEffectImage;
         
     // This object is always used in a popup or full-screen Wallet section.
     // This MouseArea is used to prevent a user from being
@@ -50,9 +51,14 @@ Item {
 
     // Background
     Rectangle {
+        z: 1;
         visible: root.assetName !== "" && sendAssetStep.visible;
-        anchors.fill: parent;
-        color: hifi.colors.darkGray;
+        anchors.top: parent.top;
+        anchors.topMargin: root.parentAppTitleBarHeight;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+        color: hifi.colors.white;
     }
 
     Connections {
@@ -68,7 +74,13 @@ Item {
             if (result.status === 'success') {
                 root.nextActiveView = 'paymentSuccess';
                 if (sendPubliclyCheckbox.checked && sendAssetStep.referrer === "nearby") {
-                    sendSignalToParent({method: 'sendAsset_sendPublicly', recipient: sendAssetStep.selectedRecipientNodeID, amount: parseInt(amountTextField.text)});
+                    sendSignalToParent({
+                        method: 'sendAsset_sendPublicly',
+                        assetName: root.assetName,
+                        recipient: sendAssetStep.selectedRecipientNodeID,
+                        amount: parseInt(amountTextField.text),
+                        effectImage: root.sendingPubliclyEffectImage
+                    });
                 }
             } else {
                 root.nextActiveView = 'paymentFailure';
@@ -225,9 +237,11 @@ Item {
             anchors.bottom: parent.bottom;
             anchors.top: userInfoContainer.visible ? undefined : parent.top;
             height: userInfoContainer.visible ? 440 : undefined;
+            color: hifi.colors.white;
     
             LinearGradient {
                 anchors.fill: parent;
+                visible: root.assetName === "";
                 start: Qt.point(0, 0);
                 end: Qt.point(0, height);
                 gradient: Gradient {
@@ -409,7 +423,7 @@ Item {
             HiFiGlyphs {
                 id: closeGlyphButton_connections;
                 text: hifi.glyphs.close;
-                color: hifi.colors.lightGrayText;
+                color: root.assetName === "" ? hifi.colors.lightGrayText : hifi.colors.baseGray;
                 size: 26;
                 anchors.top: parent.top;
                 anchors.topMargin: 10;
@@ -587,7 +601,7 @@ Item {
                         // Style
                         font.pixelSize: 18;
                         font.family: ralewayRegular.name
-                        color: hifi.colors.darkGray
+                        color: hifi.colors.darkGray;
                         wrapMode: Text.Wrap
                         textFormat: Text.StyledText;
                         property string instructions:
@@ -655,7 +669,7 @@ Item {
             HiFiGlyphs {
                 id: closeGlyphButton_nearby;
                 text: hifi.glyphs.close;
-                color: hifi.colors.lightGrayText;
+                color: root.assetName === "" ? hifi.colors.lightGrayText : hifi.colors.baseGray;
                 size: 26;
                 anchors.top: parent.top;
                 anchors.topMargin: 10;
@@ -847,7 +861,7 @@ Item {
             // Text size
             size: 22;
             // Style
-            color: hifi.colors.white;
+            color: root.assetName === "" ? hifi.colors.white : hifi.colors.black;
         }
 
         Item {
@@ -871,7 +885,7 @@ Item {
                 // Text size
                 size: 18;
                 // Style
-                color: hifi.colors.white;
+                color: root.assetName === "" ? hifi.colors.white : hifi.colors.black;
                 verticalAlignment: Text.AlignVCenter;
             }
 
@@ -881,6 +895,7 @@ Item {
                 anchors.right: changeButton.left;
                 anchors.rightMargin: 12;
                 height: parent.height;
+                textColor: root.assetName === "" ? hifi.colors.white : hifi.colors.black;
 
                 displayName: sendAssetStep.selectedRecipientDisplayName;
                 userName: sendAssetStep.selectedRecipientUserName;
@@ -892,7 +907,7 @@ Item {
             // "CHANGE" button
             HifiControlsUit.Button {
                 id: changeButton;
-                color: hifi.buttons.none;
+                color: root.assetName === "" ? hifi.buttons.none : hifi.buttons.noneBorderlessGray;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.right: parent.right;
                 anchors.verticalCenter: parent.verticalCenter;
@@ -938,7 +953,7 @@ Item {
 
             HifiControlsUit.TextField {
                 id: amountTextField;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: root.assetName === "" ? hifi.colorSchemes.dark : hifi.colorSchemes.light;
                 inputMethodHints: Qt.ImhDigitsOnly;
                 // Anchors
                 anchors.verticalCenter: parent.verticalCenter;
@@ -1048,11 +1063,12 @@ Item {
                 // Style
                 background: Rectangle {
                     anchors.fill: parent;
-                    color: optionalMessage.activeFocus ? hifi.colors.black : hifi.colors.baseGrayShadow;
+                    color: root.assetName === "" ? (optionalMessage.activeFocus ? hifi.colors.black : hifi.colors.baseGrayShadow) :
+                        (optionalMessage.activeFocus ? "#EFEFEF" : "#EEEEEE");
                     border.width: optionalMessage.activeFocus ? 1 : 0;
                     border.color: optionalMessage.activeFocus ? hifi.colors.primaryHighlight : hifi.colors.textFieldLightBackground;
                 }
-                color: hifi.colors.white;
+                color: root.assetName === "" ? hifi.colors.white : hifi.colors.black;
                 textFormat: TextEdit.PlainText;
                 wrapMode: TextEdit.Wrap;
                 activeFocusOnPress: true;
@@ -1088,7 +1104,7 @@ Item {
                 // Text size
                 size: 16;
                 // Style
-                color: optionalMessage.text.length === optionalMessage.maximumLength ? "#ea89a5" : hifi.colors.lightGrayText;
+                color: optionalMessage.text.length === optionalMessage.maximumLength ? "#ea89a5" : (root.assetName === "" ? hifi.colors.lightGrayText : hifi.colors.baseGrayHighlight);
                 verticalAlignment: Text.AlignTop;
                 horizontalAlignment: Text.AlignRight;
             }
@@ -1097,7 +1113,7 @@ Item {
         HifiControlsUit.CheckBox {
             id: sendPubliclyCheckbox;
             visible: sendAssetStep.referrer === "nearby";
-            checked: Settings.getValue("sendMoneyNearbyPublicly", true);
+            checked: Settings.getValue("sendAssetsNearbyPublicly", true);
             text: "Show Effect"
             // Anchors
             anchors.top: messageContainer.bottom;
@@ -1107,7 +1123,7 @@ Item {
             width: 110;
             boxSize: 28;
             onCheckedChanged: {
-                Settings.setValue("sendMoneyNearbyPublicly", checked);
+                Settings.setValue("sendAssetsNearbyPublicly", checked);
             }
         }
         RalewaySemiBold {
@@ -1161,7 +1177,7 @@ Item {
             // "CANCEL" button
             HifiControlsUit.Button {
                 id: cancelButton_sendAssetStep;
-                color: hifi.buttons.noneBorderlessWhite;
+                color: root.assetName === "" ? hifi.buttons.noneBorderlessWhite : hifi.buttons.noneBorderlessGray;
                 colorScheme: hifi.colorSchemes.dark;
                 anchors.left: parent.left;
                 anchors.leftMargin: 24;
@@ -1179,7 +1195,7 @@ Item {
             HifiControlsUit.Button {
                 id: sendButton;
                 color: hifi.buttons.blue;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: root.assetName === "" ? hifi.colorSchemes.dark : hifi.colorSchemes.light;
                 anchors.right: parent.right;
                 anchors.rightMargin: 24;
                 anchors.verticalCenter: parent.verticalCenter;
@@ -1433,7 +1449,7 @@ Item {
             HifiControlsUit.Button {
                 id: closeButton;
                 color: hifi.buttons.blue;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: root.assetName === "" ? hifi.colorSchemes.dark : hifi.colorSchemes.light;
                 anchors.horizontalCenter: parent.horizontalCenter;
                 anchors.bottom: parent.bottom;
                 anchors.bottomMargin: 80;
@@ -1638,7 +1654,7 @@ Item {
             HifiControlsUit.Button {
                 id: closeButton_paymentFailure;
                 color: hifi.buttons.noneBorderless;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: root.assetName === "" ? hifi.colorSchemes.dark : hifi.colorSchemes.light;
                 anchors.horizontalCenter: parent.horizontalCenter;
                 anchors.bottom: parent.bottom;
                 anchors.bottomMargin: 80;
@@ -1655,7 +1671,7 @@ Item {
             HifiControlsUit.Button {
                 id: retryButton_paymentFailure;
                 color: hifi.buttons.blue;
-                colorScheme: hifi.colorSchemes.dark;
+                colorScheme: root.assetName === "" ? hifi.colorSchemes.dark : hifi.colorSchemes.light;
                 anchors.right: parent.right;
                 anchors.rightMargin: 12;
                 anchors.bottom: parent.bottom;
@@ -1709,7 +1725,7 @@ Item {
         sendAssetStep.selectedRecipientProfilePic = "";
         amountTextField.text = "";
         optionalMessage.text = "";
-        sendPubliclyCheckbox.checked = Settings.getValue("sendMoneyNearbyPublicly", true);
+        sendPubliclyCheckbox.checked = Settings.getValue("sendAssetsNearbyPublicly", true);
         sendAssetStep.referrer = "";
     }
 

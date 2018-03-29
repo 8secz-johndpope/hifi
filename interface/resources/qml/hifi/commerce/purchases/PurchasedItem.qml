@@ -179,6 +179,7 @@ Item {
                         property alias buttonText: buttonText.text;
                         property string buttonColor: hifi.colors.black;
                         property string buttonColor_hover: hifi.colors.blueHighlight;
+                        property alias enabled: buttonMouseArea.enabled;
                         property var buttonClicked;
 
                         HiFiGlyphs {
@@ -191,7 +192,7 @@ Item {
                             size: 40;
                             horizontalAlignment: Text.AlignHCenter;
                             verticalAlignment: Text.AlignVCenter;
-                            color: buttonColor;
+                            color: buttonMouseArea.enabled ? buttonColor : hifi.colors.lightGrayText;
                         }
 
                         RalewayRegular {
@@ -202,7 +203,7 @@ Item {
                             anchors.bottomMargin: 12;
                             anchors.horizontalCenter: parent.horizontalCenter;
                             width: parent.width;
-                            color: buttonColor;
+                            color: buttonMouseArea.enabled ? buttonColor : hifi.colors.lightGrayText;
                             size: 16;
                             wrapMode: Text.Wrap;
                             horizontalAlignment: Text.AlignHCenter;
@@ -238,6 +239,7 @@ Item {
                     width: 62;
 
                     onLoaded: {
+                        item.enabled = (root.purchaseStatus === "confirmed");
                         item.buttonGlyphText = hifi.glyphs.gift;
                         item.buttonText = "Gift";
                         item.buttonClicked = function() {
@@ -249,7 +251,8 @@ Item {
                                 itemType: root.itemType,
                                 itemHref: root.itemHref,
                                 isInstalled: root.isInstalled,
-                                wornEntityID: root.wornEntityID
+                                wornEntityID: root.wornEntityID,
+                                effectImage: root.itemPreviewImageUrl
                             });
                         }
                     }

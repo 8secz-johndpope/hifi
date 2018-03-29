@@ -573,6 +573,7 @@ Rectangle {
                         } else if (msg.method === "giftAsset") {
                             sendAsset.assetName = msg.itemName;
                             sendAsset.assetCertID = msg.certId;
+                            sendAsset.sendingPubliclyEffectImage = msg.effectImage;
 
                             if (msg.itemType === "avatar" && MyAvatar.skeletonModelURL === msg.itemHref) {
                                 lightboxPopup.titleText = "Change Avatar to Default";

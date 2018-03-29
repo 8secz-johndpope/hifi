@@ -591,17 +591,22 @@
                 removeOverlays();
                 break;
             case 'sendAsset_sendPublicly':
-                deleteSendMoneyParticleEffect();
-                sendMoneyRecipient = message.recipient;
-                var amount = message.amount;
-                var props = SEND_MONEY_PARTICLE_PROPERTIES;
-                props.parentID = MyAvatar.sessionUUID;
-                props.position = MyAvatar.position;
-                props.position.y += 0.2;
-                sendMoneyParticleEffect = Entities.addEntity(props, true);
-                particleEffectTimestamp = Date.now();
-                updateSendMoneyParticleEffect();
-                sendMoneyParticleEffectUpdateTimer = Script.setInterval(updateSendMoneyParticleEffect, SEND_MONEY_PARTICLE_TIMER_UPDATE);
+                if (message.assetName === "") {
+                    deleteSendMoneyParticleEffect();
+                    sendMoneyRecipient = message.recipient;
+                    var amount = message.amount;
+                    var props = SEND_MONEY_PARTICLE_PROPERTIES;
+                    props.parentID = MyAvatar.sessionUUID;
+                    props.position = MyAvatar.position;
+                    props.position.y += 0.2;
+                    if (message.effectImage) {
+                        props.textures = message.effectImage;
+                    }
+                    sendMoneyParticleEffect = Entities.addEntity(props, true);
+                    particleEffectTimestamp = Date.now();
+                    updateSendMoneyParticleEffect();
+                    sendMoneyParticleEffectUpdateTimer = Script.setInterval(updateSendMoneyParticleEffect, SEND_MONEY_PARTICLE_TIMER_UPDATE);
+                }
                 break;
             case 'transactionHistory_goToBank':
                 if (Account.metaverseServerURL.indexOf("staging") >= 0) {
