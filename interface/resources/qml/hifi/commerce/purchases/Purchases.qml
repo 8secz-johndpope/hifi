@@ -33,7 +33,6 @@ Rectangle {
     property bool securityImageResultReceived: false;
     property bool purchasesReceived: false;
     property bool punctuationMode: false;
-    property bool pendingInventoryReply: true;
     property bool isShowingMyItems: false;
     property bool isDebuggingFirstUseTutorial: false;
     property int pendingItemCount: 0;
@@ -116,8 +115,6 @@ Rectangle {
 
                 purchasesContentsList.positionViewAtIndex(currentIndex, ListView.Beginning);
             }
-
-            root.pendingInventoryReply = false;
         }
 
         onAvailableUpdatesResult: {
@@ -180,7 +177,8 @@ Rectangle {
             onSendSignalToParent: {
                 if (msg.method === 'sendAssetHome_back' || msg.method === 'closeSendAsset') {
                     root.activeView = "purchasesMain";
-                    sendToScript({ method: 'purchases_updateWearables' });
+                    Commerce.inventory();
+                    Commerce.getAvailableUpdates();
                 } else {
                     sendToScript(msg);
                 }
