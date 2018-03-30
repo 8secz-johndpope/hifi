@@ -1212,7 +1212,6 @@ var selectionDisplay = null; // for gridTool.js to ignore
         GlobalServices.myUsernameChanged.disconnect(onUsernameChanged);
         marketplaceButton.clicked.disconnect(onButtonClicked);
         tablet.removeButton(marketplaceButton);
-        tablet.screenChanged.disconnect(onScreenChanged);
         tablet.webEventReceived.disconnect(onMessage);
         Wallet.walletStatusChanged.disconnect(sendCommerceSettings);
         Window.messageBoxClosed.disconnect(onMessageBoxClosed);

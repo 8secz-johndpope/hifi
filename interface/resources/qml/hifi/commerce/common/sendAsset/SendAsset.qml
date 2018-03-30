@@ -1280,11 +1280,12 @@ Item {
     // Sending Asset Overlay END
     
     // Payment Success BEGIN
-    Item {
+    Rectangle {
         id: paymentSuccess;
 
         visible: root.currentActiveView === "paymentSuccess";
         anchors.fill: parent;
+        color: Qt.rgba(0.0, 0.0, 0.0, 0.8);
 
         Rectangle {
             anchors.centerIn: parent;
@@ -1330,7 +1331,7 @@ Item {
                         root.nextActiveView = "sendAssetHome";
                         resetSendAssetData();
                         if (root.assetName !== "") {
-                            sendToContainer({method: "closeSendAsset"});
+                            sendSignalToParent({method: "closeSendAsset"});
                         }
                     }
                 }
@@ -1465,7 +1466,7 @@ Item {
                     root.nextActiveView = "sendAssetHome";
                     resetSendAssetData();
                     if (root.assetName !== "") {
-                        sendToContainer({method: "closeSendAsset"});
+                        sendSignalToParent({method: "closeSendAsset"});
                     }
                 }
             }
@@ -1474,11 +1475,12 @@ Item {
     // Payment Success END
     
     // Payment Failure BEGIN
-    Item {
+    Rectangle {
         id: paymentFailure;
 
         visible: root.currentActiveView === "paymentFailure";
         anchors.fill: parent;
+        color: Qt.rgba(0.0, 0.0, 0.0, 0.8);
 
         Rectangle {
             anchors.centerIn: parent;
@@ -1524,7 +1526,7 @@ Item {
                         root.nextActiveView = "sendAssetHome";
                         resetSendAssetData();
                         if (root.assetName !== "") {
-                            sendToContainer({method: "closeSendAsset"});
+                            sendSignalToParent({method: "closeSendAsset"});
                         }
                     }
                 }
@@ -1677,7 +1679,7 @@ Item {
                     root.nextActiveView = "sendAssetHome";
                     resetSendAssetData();
                     if (root.assetName !== "") {
-                        sendToContainer({method: "closeSendAsset"});
+                        sendSignalToParent({method: "closeSendAsset"});
                     }
                 }
             }
