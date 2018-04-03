@@ -84,7 +84,7 @@ protected:
     Q_INVOKABLE void transferAssetToNode(const QString& nodeID, const QString& certificateID, const int& amount, const QString& optionalMessage);
     Q_INVOKABLE void transferAssetToUsername(const QString& username, const QString& certificateID, const int& amount, const QString& optionalMessage);
 
-    Q_INVOKABLE void replaceContentSet(const QString& itemHref);
+    Q_INVOKABLE void replaceContentSet(const QString& itemHref, const QString& certificateID);
 
     Q_INVOKABLE QString getInstalledApps();
     Q_INVOKABLE bool installApp(const QString& appHref);

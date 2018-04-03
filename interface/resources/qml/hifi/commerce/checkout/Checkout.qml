@@ -96,6 +96,7 @@ Rectangle {
                 root.activeView = "checkoutFailure";
                 UserActivityLogger.commercePurchaseFailure(root.itemId, root.itemAuthor, root.itemPrice, !root.alreadyOwned, result.message);
             } else {
+                root.certificateId = result.data.certificate_id;
                 root.itemHref = result.data.download_url;
                 if (result.data.categories.indexOf("Wearables") > -1) {
                     root.itemType = "wearable";
@@ -188,7 +189,7 @@ Rectangle {
     onItemHrefChanged: {
         if (root.itemHref.indexOf(".fst") > -1) {
             root.itemType = "avatar";
-        } else if (root.itemHref.indexOf('.json.gz') > -1) {
+        } else if (root.itemHref.indexOf('.json.gz') > -1 || root.itemHref.indexOf('.content.zip') > -1) {
             root.itemType = "contentSet";
         } else if (root.itemHref.indexOf('.app.json') > -1) {
             root.itemType = "app";

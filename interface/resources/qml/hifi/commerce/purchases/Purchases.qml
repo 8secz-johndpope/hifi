@@ -480,7 +480,7 @@ Rectangle {
                         } else if (msg.method === "purchases_rezClicked") {
                             sendToScript({method: 'purchases_rezClicked', itemHref: itemHref, itemType: itemType});
 
-                            // Race condition - Wearable might not be rezzed by the time the "currently worn werables" model is created
+                            // Race condition - Wearable might not be rezzed by the time the "currently worn wearbles" model is created
                             if (itemType === "wearable") {
                                 sendToScript({ method: 'purchases_updateWearables' });
                             }
@@ -519,7 +519,7 @@ Rectangle {
                             }
                             lightboxPopup.button2text = "CONFIRM";
                             lightboxPopup.button2method = function() {
-                                Commerce.replaceContentSet(msg.itemHref);
+                                Commerce.replaceContentSet(msg.itemHref, msg.certID);
                                 lightboxPopup.visible = false;
                             };
                             lightboxPopup.visible = true;
@@ -871,7 +871,7 @@ Rectangle {
                 currentItemType = "avatar";
             } else if (currentCategories.indexOf("Wearables") > -1) {
                 currentItemType = "wearable";
-            } else if (currentRootFileUrl.endsWith('.json.gz')) {
+            } else if (currentRootFileUrl.endsWith('.json.gz') || currentRootFileUrl.endsWith('.content.zip')) {
                 currentItemType = "contentSet";
             } else if (currentRootFileUrl.endsWith('.app.json')) {
                 currentItemType = "app";

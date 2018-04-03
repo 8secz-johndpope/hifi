@@ -31,7 +31,7 @@ public:
     void inventory(const QStringList& keys);
     void history(const QStringList& keys, const int& pageNumber);
     void account();
-    void updateLocation(const QString& asset_id, const QString location, const bool controlledFailure = false);
+    void updateLocation(const QString& asset_id, const QString& location, const bool& alsoUpdateSiblings = false, const bool controlledFailure = false);
     void certificateInfo(const QString& certificateId);
     void transferAssetToNode(const QString& hfc_key, const QString& nodeID, const QString& certificateID, const int& amount, const QString& optionalMessage);
     void transferAssetToUsername(const QString& hfc_key, const QString& username, const QString& certificateID, const int& amount, const QString& optionalMessage);
