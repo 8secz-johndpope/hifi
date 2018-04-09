@@ -658,6 +658,7 @@ bool Wallet::getSecurityImage() {
 
     // if already decrypted, don't do it again
     if (_securityImage) {
+        updateImageProvider();
         emit securityImageResult(true);
         return true;
     }
