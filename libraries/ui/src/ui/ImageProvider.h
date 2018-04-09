@@ -26,8 +26,7 @@ public:
     void setSecurityImage(const QPixmap* pixmap);
 protected:
     static QReadWriteLock _rwLock;
-    static QPixmap* _securityImage;
-
+    QPixmap _securityImage;
 };
 
 #endif //hifi_ImageProvider_h

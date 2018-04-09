@@ -16,26 +16,24 @@
 
 const QString ImageProvider::PROVIDER_NAME = "security";
 QReadWriteLock ImageProvider::_rwLock;
-QPixmap* ImageProvider::_securityImage = nullptr;
 
 ImageProvider::~ImageProvider() {
     QWriteLocker lock(&_rwLock);
-    if (_securityImage) {
-        delete _securityImage;
-        _securityImage = nullptr;
-    }
+    QPixmap greyPixmap(200, 200);
+    greyPixmap.fill(QColor("darkGrey"));
+    _securityImage = greyPixmap.copy();
 }
 
 void ImageProvider::setSecurityImage(const QPixmap* pixmap) {
     // no need to delete old one, that is managed by the wallet
     QWriteLocker lock(&_rwLock);
-    if (_securityImage) {
-        delete _securityImage;
-    }
+
     if (pixmap) {
-        _securityImage = new QPixmap(*pixmap);
+        _securityImage = pixmap->copy();
     } else {
-        _securityImage = nullptr;
+        QPixmap greyPixmap(200, 200);
+        greyPixmap.fill(QColor("darkGrey"));
+        _securityImage = greyPixmap.copy();
     }
 }
 
@@ -43,12 +41,12 @@ QPixmap ImageProvider::requestPixmap(const QString& id, QSize* size, const QSize
 
     // adjust the internal pixmap to have the requested size
     QReadLocker lock(&_rwLock);
-    if (id == "securityImage" && _securityImage) {
-        *size = _securityImage->size();
+    if (id == "securityImage") {
+        *size = _securityImage.size();
         if (requestedSize.width() > 0 && requestedSize.height() > 0) {
-            return _securityImage->scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
+            return _securityImage.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
         } else {
-            return _securityImage->copy();
+            return _securityImage.copy();
         }
     }
     // otherwise just return a grey pixmap.  This avoids annoying error messages in qml we would get
