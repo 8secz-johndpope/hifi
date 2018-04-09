@@ -1,5 +1,5 @@
 //
-//  ImageProvider.cpp
+//  SecurityImageProvider.cpp
 //  interface/src/ui
 //
 //  Created by David Kelly on 8/23/2017.
@@ -9,22 +9,17 @@
 //  See the accompanying file LICENSE or http://www.apache.org/licenses/LICENSE-2.0.html
 //
 
-#include "ImageProvider.h"
+#include "SecurityImageProvider.h"
 
 #include <QReadLocker>
 #include <QWriteLocker>
 
-const QString ImageProvider::PROVIDER_NAME = "security";
-QReadWriteLock ImageProvider::_rwLock;
+const QString SecurityImageProvider::PROVIDER_NAME = "security";
 
-ImageProvider::~ImageProvider() {
-    QWriteLocker lock(&_rwLock);
-    QPixmap greyPixmap(200, 200);
-    greyPixmap.fill(QColor("darkGrey"));
-    _securityImage = greyPixmap.copy();
+SecurityImageProvider::~SecurityImageProvider() {
 }
 
-void ImageProvider::setSecurityImage(const QPixmap* pixmap) {
+void SecurityImageProvider::setSecurityImage(const QPixmap* pixmap) {
     // no need to delete old one, that is managed by the wallet
     QWriteLocker lock(&_rwLock);
 
@@ -37,7 +32,7 @@ void ImageProvider::setSecurityImage(const QPixmap* pixmap) {
     }
 }
 
-QPixmap ImageProvider::requestPixmap(const QString& id, QSize* size, const QSize& requestedSize) {
+QPixmap SecurityImageProvider::requestPixmap(const QString& id, QSize* size, const QSize& requestedSize) {
 
     // adjust the internal pixmap to have the requested size
     QReadLocker lock(&_rwLock);
