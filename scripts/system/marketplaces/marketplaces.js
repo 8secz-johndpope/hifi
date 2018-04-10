@@ -160,6 +160,10 @@ var selectionDisplay = null; // for gridTool.js to ignore
                 setTabletVisibleInSecondaryCamera(true);
                 isHmdPreviewDisabledBySecurity = false;
             }
+
+            tablet.sendToQml({
+                method: 'inspectionCertificate_resetCert'
+            });
         }
 
         onCommerceScreen = onCommerceScreenNow;
@@ -180,12 +184,6 @@ var selectionDisplay = null; // for gridTool.js to ignore
             ContextOverlay.isInMarketplaceInspectionMode = true;
         } else {
             ContextOverlay.isInMarketplaceInspectionMode = false;
-        }
-
-        if (!onCommerceScreen) {
-            tablet.sendToQml({
-                method: 'inspectionCertificate_resetCert'
-            });
         }
     }
 

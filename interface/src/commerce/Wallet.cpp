@@ -566,7 +566,6 @@ bool Wallet::generateKeyPair() {
 }
 
 QStringList Wallet::listPublicKeys() {
-    qCInfo(commerce) << "Enumerating public keys.";
     return _publicKeys;
 }
 
