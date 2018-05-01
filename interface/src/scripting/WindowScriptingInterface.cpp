@@ -431,8 +431,8 @@ void WindowScriptingInterface::takeSecondaryCameraSnapshot(const QString& filena
     qApp->takeSecondaryCameraSnapshot(filename);
 }
 
-void WindowScriptingInterface::takeSecondaryCamera360Snapshot(const glm::vec3& cameraPosition, const QString& filename) {
-    qApp->takeSecondaryCamera360Snapshot(cameraPosition, filename);
+void WindowScriptingInterface::takeSecondaryCamera360Snapshot(const glm::vec3& cameraPosition, const bool& is3DSnapshot, const QString& filename) {
+    qApp->takeSecondaryCamera360Snapshot(cameraPosition, is3DSnapshot, filename);
 }
 
 void WindowScriptingInterface::shareSnapshot(const QString& path, const QUrl& href) {

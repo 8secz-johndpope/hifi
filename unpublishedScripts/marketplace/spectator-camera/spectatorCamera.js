@@ -425,7 +425,7 @@
             if (HMD.active && monitorShowsCameraView) {
                 setDisplay(false);
             }
-            Window.takeSecondaryCamera360Snapshot(Entities.getEntityProperties(camera, ["positon"]).position);
+            Window.takeSecondaryCamera360Snapshot(Entities.getEntityProperties(camera, ["positon"]).position, true);
         }
     }
     function registerTakeSnapshotControllerMapping() {

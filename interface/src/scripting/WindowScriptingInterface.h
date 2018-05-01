@@ -368,15 +368,17 @@ public slots:
 
     /**jsdoc
     * Takes a 360 snapshot given a position of the secondary camera (which does not need to have been previously set up).
+    * NOTE:  to provide a non-default value - all previous parameters must be provided.
     * @function Window.takeSecondaryCameraSnapshot
     * @param {vec3} [cameraPosition] - The (x, y, z) position of the camera for the 360 snapshot
+    * @param {bool} [is3DSnapshot] - Whether or not the 360 snapshot is a 3D snapshot
     * @param {string} [filename=""] - If this parameter is not given, the image will be saved as 'hifi-snap-by-<user name>-YYYY-MM-DD_HH-MM-SS'.
     *     If this parameter is <code>""</code> then the image will be saved as ".jpg".
     *     Otherwise, the image will be saved to this filename, with an appended ".jpg".
     *
     * var filename = QString();
     */
-    void takeSecondaryCamera360Snapshot(const glm::vec3& cameraPosition, const QString& filename = QString());
+    void takeSecondaryCamera360Snapshot(const glm::vec3& cameraPosition, const bool& is3DSnapshot = false, const QString& filename = QString());
 
     /**jsdoc
      * Emit a {@link Window.connectionAdded|connectionAdded} or a {@link Window.connectionError|connectionError} signal that

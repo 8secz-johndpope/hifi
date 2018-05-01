@@ -40,7 +40,7 @@ public:
     Snapshot();
 
     static QString saveSnapshot(QImage image, const QString& filename);
-    static void save360Snapshot(const glm::vec3& cameraPosition, const QString& filename);
+    static void save360Snapshot(const glm::vec3& cameraPosition, const bool& is3DSnapshot, const QString& filename);
     static QTemporaryFile* saveTempSnapshot(QImage image);
     static SnapshotMetaData* parseSnapshotData(QString snapshotPath);
 
@@ -64,17 +64,15 @@ private:
     static QTimer snapshotTimer;
     static qint16 snapshotIndex;
     static bool oldEnabled;
+    static glm::vec3 originalCameraPosition;
+    static glm::vec3 newCameraPosition;
     static QVariant oldAttachedEntityId;
     static QVariant oldOrientation;
     static QVariant oldvFoV;
     static QVariant oldNearClipPlaneDistance;
     static QVariant oldFarClipPlaneDistance;
-    static QImage downImage;
-    static QImage frontImage;
-    static QImage leftImage;
-    static QImage backImage;
-    static QImage rightImage;
-    static QImage upImage;
+    static QImage imageArray[12];
+    static bool is3DSnapshot;
     static void convertToEquirectangular();
 };
 

@@ -190,7 +190,7 @@ Rectangle {
         z: 999;
         id: processingSnapshot;
         anchors.fill: parent;
-        visible: root.processing360Snapshot;
+        visible: false//root.processing360Snapshot;
         color: Qt.rgba(0.0, 0.0, 0.0, 0.85);        
 
         // This object is always used in a popup.
