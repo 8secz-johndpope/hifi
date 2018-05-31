@@ -596,6 +596,26 @@ Rectangle {
                 }
             }
 
+            Timer {
+                id: buyTimer;
+                property int currentPurchaseCount: 0;
+                property int totalPurchases: 1;
+                interval: 500;
+                running: false;
+                repeat: false;
+                onTriggered: {
+                    if (buyTimer.currentPurchaseCount !== buyTimer.totalPurchases) {
+                        Commerce.buy(root.itemId, root.itemPrice);
+                        buyTimer.currentPurchaseCount++;
+                        buyTimer.start();
+                    } else {
+                        quantityField.text = 1;
+                        buyTimer.currentPurchaseCount = 0;
+                        buyTimer.totalPurchases = 1;
+                    }
+                }
+            }
+
             // "Buy" button
             HifiControlsUit.Button {
                 id: buyButton;
@@ -608,7 +628,7 @@ Rectangle {
                 anchors.topMargin: 10;
                 height: 50;
                 anchors.left: parent.left;
-                anchors.right: parent.right;
+                width: parent.width - 100;
                 text: (root.isUpdating && root.itemEdition > 0) ? "CONFIRM UPDATE" : (((root.isCertified) ? ((ownershipStatusReceived && balanceReceived && availableUpdatesReceived) ?
                     ((viewInMyPurchasesButton.visible && !root.isUpdating) ? "Buy It Again" : "Confirm Purchase") : "--") : "Get Item"));
                 onClicked: {
@@ -633,7 +653,8 @@ Rectangle {
                                 }
                                 lightboxPopup.button2text = "CONFIRM";
                                 lightboxPopup.button2method = function() {
-                                    Commerce.buy(root.itemId, root.itemPrice);
+                                    buyTimer.totalPurchases = parseInt(quantityField.text);
+                                    buyTimer.start();
                                     lightboxPopup.visible = false;
                                     buyButton.enabled = false;
                                     loading.visible = true;
@@ -642,7 +663,8 @@ Rectangle {
                             } else {
                                 buyButton.enabled = false;
                                 loading.visible = true;
-                                Commerce.buy(root.itemId, root.itemPrice);
+                                buyTimer.totalPurchases = parseInt(quantityField.text);
+                                buyTimer.start();
                             }
                         } else {
                             buyButton.enabled = false;
@@ -655,6 +677,20 @@ Rectangle {
                         }
                     }
                 }
+            }
+
+            HifiControlsUit.TextField {
+                id: quantityField;
+                visible: buyButton.visible;
+                text: "1";
+                anchors.top: buyButton.top;
+                anchors.bottom: buyButton.bottom;
+                anchors.left: buyButton.right;
+                anchors.leftMargin: 8;
+                anchors.right: parent.right;
+                placeholderText: "qty";
+                activeFocusOnPress: true;
+                activeFocusOnTab: true;
             }
 
             // "Cancel" button
