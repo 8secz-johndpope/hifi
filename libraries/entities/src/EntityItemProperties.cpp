@@ -2399,6 +2399,7 @@ OctreeElement::AppendState EntityItemProperties::encodeEntityEditPacket(PacketTy
             APPEND_ENTITY_PROPERTY(PROP_CLONE_AVATAR_ENTITY, properties.getCloneAvatarEntity());
 
             APPEND_ENTITY_PROPERTY(PROP_VISIBLE_IN_PRIMARY_CAMERA, properties.getIsVisibleInPrimaryCamera());
+            APPEND_ENTITY_PROPERTY(PROP_VISIBLE_IN_SECONDARY_CAMERA, properties.getIsVisibleInSecondaryCamera());
         }
 
         if (propertyCount > 0) {
@@ -2772,6 +2773,7 @@ bool EntityItemProperties::decodeEntityEditPacket(const unsigned char* data, int
     READ_ENTITY_PROPERTY_TO_PROPERTIES(PROP_CLONE_AVATAR_ENTITY, bool, setCloneAvatarEntity);
 
     READ_ENTITY_PROPERTY_TO_PROPERTIES(PROP_VISIBLE_IN_PRIMARY_CAMERA, bool, setIsVisibleInPrimaryCamera);
+    READ_ENTITY_PROPERTY_TO_PROPERTIES(PROP_VISIBLE_IN_SECONDARY_CAMERA, bool, setIsVisibleInSecondaryCamera);
 
     return valid;
 }
