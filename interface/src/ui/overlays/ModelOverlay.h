@@ -37,6 +37,11 @@ public:
     void clearSubRenderItemIDs();
     void setSubRenderItemIDs(const render::ItemIDs& ids);
 
+    virtual void setIsVisibleInPrimaryCamera(bool value) override {
+        Base3DOverlay::setIsVisibleInPrimaryCamera(value);
+        _visibleDirty = true;
+    }
+
     virtual void setIsVisibleInSecondaryCamera(bool value) override {
         Base3DOverlay::setIsVisibleInSecondaryCamera(value);
         _visibleDirty = true;

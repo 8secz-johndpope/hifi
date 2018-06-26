@@ -100,6 +100,7 @@ protected:
     virtual bool isTransparent() const { return _isFading ? Interpolate::calculateFadeRatio(_fadeStartTime) < 1.0f : false; }
     inline bool isValidRenderItem() const { return _renderItemID != Item::INVALID_ITEM_ID; }
 
+    virtual void setIsVisibleInPrimaryCamera(bool value) { _isVisibleInPrimaryCamera = value; }
     virtual void setIsVisibleInSecondaryCamera(bool value) { _isVisibleInSecondaryCamera = value; }
     
     template <typename F, typename T>
@@ -132,7 +133,8 @@ protected:
     uint64_t _updateTime{ usecTimestampNow() }; // used when sorting/throttling render updates
     bool _isFading{ _entitiesShouldFadeFunction() };
     bool _prevIsTransparent { false };
-    bool _visible { false };
+    bool _visible{ false };
+    bool _isVisibleInPrimaryCamera{ false };
     bool _isVisibleInSecondaryCamera { false };
     bool _canCastShadow { false };
     bool _cauterized { false };

@@ -33,7 +33,6 @@
 #include "EntityTreeRenderer.h"
 #include "EntitiesRendererLogging.h"
 
-
 void ModelEntityWrapper::setModel(const ModelPointer& model) {
     withWriteLock([&] {
         if (_model != model) {
@@ -46,37 +45,31 @@ void ModelEntityWrapper::setModel(const ModelPointer& model) {
 }
 
 ModelPointer ModelEntityWrapper::getModel() const {
-    return resultWithReadLock<ModelPointer>([&] {
-        return _model;
-    });
+    return resultWithReadLock<ModelPointer>([&] { return _model; });
 }
 
 bool ModelEntityWrapper::isModelLoaded() const {
-    return resultWithReadLock<bool>([&] {
-        return _model.operator bool() && _model->isLoaded();
-    });
+    return resultWithReadLock<bool>([&] { return _model.operator bool() && _model->isLoaded(); });
 }
 
 EntityItemPointer RenderableModelEntityItem::factory(const EntityItemID& entityID, const EntityItemProperties& properties) {
     EntityItemPointer entity(new RenderableModelEntityItem(entityID, properties.getDimensionsInitialized()),
                              [](EntityItem* ptr) { ptr->deleteLater(); });
-    
+
     entity->setProperties(properties);
 
     return entity;
 }
 
 RenderableModelEntityItem::RenderableModelEntityItem(const EntityItemID& entityItemID, bool dimensionsInitialized) :
-    ModelEntityWrapper(entityItemID),
-    _dimensionsInitialized(dimensionsInitialized) {
-    
-    
+    ModelEntityWrapper(entityItemID), _dimensionsInitialized(dimensionsInitialized) {
 }
 
-RenderableModelEntityItem::~RenderableModelEntityItem() { }
+RenderableModelEntityItem::~RenderableModelEntityItem() {
+}
 
 void RenderableModelEntityItem::setUnscaledDimensions(const glm::vec3& value) {
-    glm::vec3 newDimensions = glm::max(value, glm::vec3(0.0f)); // can never have negative dimensions
+    glm::vec3 newDimensions = glm::max(value, glm::vec3(0.0f));  // can never have negative dimensions
     if (getUnscaledDimensions() != newDimensions) {
         _dimensionsInitialized = true;
         ModelEntityItem::setUnscaledDimensions(value);
@@ -209,8 +202,7 @@ void RenderableModelEntityItem::updateModelBounds() {
         updateRenderItems = true;
     }
 
-    if (model->getScaleToFitDimensions() != getScaledDimensions() ||
-            model->getRegistrationPoint() != getRegistrationPoint()) {
+    if (model->getScaleToFitDimensions() != getScaledDimensions() || model->getRegistrationPoint() != getRegistrationPoint()) {
         // The machinery for updateModelBounds will give existing models the opportunity to fix their
         // translation/rotation/scale/registration.  The first two are straightforward, but the latter two
         // have guards to make sure they don't happen after they've already been set.  Here we reset those guards.
@@ -227,8 +219,7 @@ void RenderableModelEntityItem::updateModelBounds() {
 
     bool success;
     auto transform = getTransform(success);
-    if (success && (model->getTranslation() != transform.getTranslation() ||
-            model->getRotation() != transform.getRotation())) {
+    if (success && (model->getTranslation() != transform.getTranslation() || model->getRotation() != transform.getRotation())) {
         model->setTransformNoUpdateRenderItems(transform);
         updateRenderItems = true;
     }
@@ -249,9 +240,9 @@ void RenderableModelEntityItem::updateModelBounds() {
     }
 }
 
-
 EntityItemProperties RenderableModelEntityItem::getProperties(EntityPropertyFlags desiredProperties) const {
-    EntityItemProperties properties = ModelEntityItem::getProperties(desiredProperties); // get the properties from our base class
+    EntityItemProperties properties =
+        ModelEntityItem::getProperties(desiredProperties);  // get the properties from our base class
     if (_originalTexturesRead) {
         properties.setTextureNames(_originalTextures);
     }
@@ -273,8 +264,6 @@ EntityItemProperties RenderableModelEntityItem::getProperties(EntityPropertyFlag
         }
     }
 
-
-
     return properties;
 }
 
@@ -282,9 +271,14 @@ bool RenderableModelEntityItem::supportsDetailedRayIntersection() const {
     return isModelLoaded();
 }
 
-bool RenderableModelEntityItem::findDetailedRayIntersection(const glm::vec3& origin, const glm::vec3& direction,
-                         OctreeElementPointer& element, float& distance, BoxFace& face,
-                         glm::vec3& surfaceNormal, QVariantMap& extraInfo, bool precisionPicking) const {
+bool RenderableModelEntityItem::findDetailedRayIntersection(const glm::vec3& origin,
+                                                            const glm::vec3& direction,
+                                                            OctreeElementPointer& element,
+                                                            float& distance,
+                                                            BoxFace& face,
+                                                            glm::vec3& surfaceNormal,
+                                                            QVariantMap& extraInfo,
+                                                            bool precisionPicking) const {
     auto model = getModel();
     if (!model) {
         return true;
@@ -292,8 +286,8 @@ bool RenderableModelEntityItem::findDetailedRayIntersection(const glm::vec3& ori
     // qCDebug(entitiesrenderer) << "RenderableModelEntityItem::findDetailedRayIntersection() precisionPicking:"
     //                           << precisionPicking;
 
-    return model->findRayIntersectionAgainstSubMeshes(origin, direction, distance,
-               face, surfaceNormal, extraInfo, precisionPicking, false);
+    return model->findRayIntersectionAgainstSubMeshes(origin, direction, distance, face, surfaceNormal, extraInfo,
+                                                      precisionPicking, false);
 }
 
 void RenderableModelEntityItem::getCollisionGeometryResource() {
@@ -391,7 +385,7 @@ void RenderableModelEntityItem::computeShapeInfo(ShapeInfo& shapeInfo) {
         // to find one actual "mesh" (with one or more meshParts in it), but we loop over the meshes, just in case.
         foreach (const FBXMesh& mesh, collisionGeometry.meshes) {
             // each meshPart is a convex hull
-            foreach (const FBXMeshPart &meshPart, mesh.parts) {
+            foreach (const FBXMeshPart& meshPart, mesh.parts) {
                 pointCollection.push_back(QVector<glm::vec3>());
                 ShapeInfo::PointList& pointsInPart = pointCollection[i];
 
@@ -399,7 +393,7 @@ void RenderableModelEntityItem::computeShapeInfo(ShapeInfo& shapeInfo) {
                 uint32_t numIndices = (uint32_t)meshPart.triangleIndices.size();
                 // TODO: assert rather than workaround after we start sanitizing FBXMesh higher up
                 //assert(numIndices % TRIANGLE_STRIDE == 0);
-                numIndices -= numIndices % TRIANGLE_STRIDE; // WORKAROUND lack of sanity checking in FBXReader
+                numIndices -= numIndices % TRIANGLE_STRIDE;  // WORKAROUND lack of sanity checking in FBXReader
 
                 for (uint32_t j = 0; j < numIndices; j += TRIANGLE_STRIDE) {
                     glm::vec3 p0 = mesh.vertices[meshPart.triangleIndices[j]];
@@ -420,7 +414,7 @@ void RenderableModelEntityItem::computeShapeInfo(ShapeInfo& shapeInfo) {
                 numIndices = (uint32_t)meshPart.quadIndices.size();
                 // TODO: assert rather than workaround after we start sanitizing FBXMesh higher up
                 //assert(numIndices % QUAD_STRIDE == 0);
-                numIndices -= numIndices % QUAD_STRIDE; // WORKAROUND lack of sanity checking in FBXReader
+                numIndices -= numIndices % QUAD_STRIDE;  // WORKAROUND lack of sanity checking in FBXReader
 
                 for (uint32_t j = 0; j < numIndices; j += QUAD_STRIDE) {
                     glm::vec3 p0 = mesh.vertices[meshPart.quadIndices[j]];
@@ -479,7 +473,8 @@ void RenderableModelEntityItem::computeShapeInfo(ShapeInfo& shapeInfo) {
         const FBXGeometry& fbxGeometry = model->getFBXGeometry();
         int numFbxMeshes = fbxGeometry.meshes.size();
         int totalNumVertices = 0;
-        glm::mat4 invRegistraionOffset = glm::translate(dimensions * (getRegistrationPoint() - ENTITY_ITEM_DEFAULT_REGISTRATION_POINT));
+        glm::mat4 invRegistraionOffset =
+            glm::translate(dimensions * (getRegistrationPoint() - ENTITY_ITEM_DEFAULT_REGISTRATION_POINT));
         for (int i = 0; i < numFbxMeshes; i++) {
             const FBXMesh& mesh = fbxGeometry.meshes.at(i);
             if (mesh.clusters.size() > 0) {
@@ -495,7 +490,8 @@ void RenderableModelEntityItem::computeShapeInfo(ShapeInfo& shapeInfo) {
         }
         const int32_t MAX_VERTICES_PER_STATIC_MESH = 1e6;
         if (totalNumVertices > MAX_VERTICES_PER_STATIC_MESH) {
-            qWarning() << "model" << getModelURL() << "has too many vertices" << totalNumVertices << "and will collide as a box.";
+            qWarning() << "model" << getModelURL() << "has too many vertices" << totalNumVertices
+                       << "and will collide as a box.";
             shapeInfo.setParams(SHAPE_TYPE_BOX, 0.5f * dimensions);
             return;
         }
@@ -565,7 +561,7 @@ void RenderableModelEntityItem::computeShapeInfo(ShapeInfo& shapeInfo) {
                     if (partItr->_topology == graphics::Mesh::TRIANGLES) {
                         // TODO: assert rather than workaround after we start sanitizing FBXMesh higher up
                         //assert(numIndices % TRIANGLE_STRIDE == 0);
-                        numIndices -= numIndices % TRIANGLE_STRIDE; // WORKAROUND lack of sanity checking in FBXReader
+                        numIndices -= numIndices % TRIANGLE_STRIDE;  // WORKAROUND lack of sanity checking in FBXReader
 
                         auto indexItr = indices.cbegin<const gpu::BufferView::Index>() + partItr->_startIndex;
                         auto indexEnd = indexItr + numIndices;
@@ -622,7 +618,7 @@ void RenderableModelEntityItem::computeShapeInfo(ShapeInfo& shapeInfo) {
                     if (partItr->_topology == graphics::Mesh::TRIANGLES) {
                         // TODO: assert rather than workaround after we start sanitizing FBXMesh higher up
                         //assert(numIndices% TRIANGLE_STRIDE == 0);
-                        numIndices -= numIndices % TRIANGLE_STRIDE; // WORKAROUND lack of sanity checking in FBXReader
+                        numIndices -= numIndices % TRIANGLE_STRIDE;  // WORKAROUND lack of sanity checking in FBXReader
 
                         auto indexItr = indices.cbegin<const gpu::BufferView::Index>() + partItr->_startIndex;
                         auto indexEnd = indexItr + numIndices;
@@ -721,8 +717,8 @@ void RenderableModelEntityItem::setJointMap(std::vector<int> jointMap) {
 
 int RenderableModelEntityItem::avatarJointIndex(int modelJointIndex) {
     int result = -1;
-    int mapSize = (int) _jointMap.size();
-    if (modelJointIndex >=0 && modelJointIndex < mapSize) {
+    int mapSize = (int)_jointMap.size();
+    if (modelJointIndex >= 0 && modelJointIndex < mapSize) {
         result = _jointMap[modelJointIndex];
     }
 
@@ -792,7 +788,7 @@ bool RenderableModelEntityItem::setAbsoluteJointRotationInObjectFrame(int index,
     }
     AnimPose jointParentInversePose = jointParentPose.inverse();
 
-    AnimPose jointAbsolutePose; // in rig frame
+    AnimPose jointAbsolutePose;  // in rig frame
     success = rig.getAbsoluteJointPoseInRigFrame(index, jointAbsolutePose);
     if (!success) {
         return false;
@@ -823,7 +819,7 @@ bool RenderableModelEntityItem::setAbsoluteJointTranslationInObjectFrame(int ind
     }
     AnimPose jointParentInversePose = jointParentPose.inverse();
 
-    AnimPose jointAbsolutePose; // in rig frame
+    AnimPose jointAbsolutePose;  // in rig frame
     success = rig.getAbsoluteJointPoseInRigFrame(index, jointAbsolutePose);
     if (!success) {
         return false;
@@ -963,7 +959,7 @@ bool RenderableModelEntityItem::getMeshes(MeshProxyList& result) {
 }
 
 scriptable::ScriptableModelBase render::entities::ModelEntityRenderer::getScriptableModel() {
-    auto model = resultWithReadLock<ModelPointer>([this]{ return _model; });
+    auto model = resultWithReadLock<ModelPointer>([this] { return _model; });
 
     if (!model || !model->isLoaded()) {
         return scriptable::ScriptableModelBase();
@@ -980,12 +976,14 @@ scriptable::ScriptableModelBase render::entities::ModelEntityRenderer::getScript
 
 bool render::entities::ModelEntityRenderer::canReplaceModelMeshPart(int meshIndex, int partIndex) {
     // TODO: for now this method is just used to indicate that this provider generally supports mesh updates
-    auto model = resultWithReadLock<ModelPointer>([this]{ return _model; });
+    auto model = resultWithReadLock<ModelPointer>([this] { return _model; });
     return model && model->isLoaded();
 }
 
-bool render::entities::ModelEntityRenderer::replaceScriptableModelMeshPart(scriptable::ScriptableModelBasePointer newModel, int meshIndex, int partIndex) {
-    auto model = resultWithReadLock<ModelPointer>([this]{ return _model; });
+bool render::entities::ModelEntityRenderer::replaceScriptableModelMeshPart(scriptable::ScriptableModelBasePointer newModel,
+                                                                           int meshIndex,
+                                                                           int partIndex) {
+    auto model = resultWithReadLock<ModelPointer>([this] { return _model; });
 
     if (!model || !model->isLoaded()) {
         return false;
@@ -1020,7 +1018,7 @@ void RenderableModelEntityItem::copyAnimationJointDataToModel() {
         return;
     }
 
-    bool changed { false };
+    bool changed{ false };
     // relay any inbound joint changes from scripts/animation/network to the model/rig
     _jointDataLock.withWriteLock([&] {
         for (int index = 0; index < _localJointData.size(); ++index) {
@@ -1039,9 +1037,7 @@ void RenderableModelEntityItem::copyAnimationJointDataToModel() {
     });
 
     if (changed) {
-        forEachChild([&](SpatiallyNestablePointer object) {
-            object->locationChanged(false);
-        });
+        forEachChild([&](SpatiallyNestablePointer object) { object->locationChanged(false); });
     }
 }
 
@@ -1049,7 +1045,6 @@ using namespace render;
 using namespace render::entities;
 
 ModelEntityRenderer::ModelEntityRenderer(const EntityItemPointer& entity) : Parent(entity) {
-
 }
 
 void ModelEntityRenderer::setKey(bool didVisualGeometryRequestSucceed) {
@@ -1066,12 +1061,18 @@ ItemKey ModelEntityRenderer::getKey() {
 
 render::hifi::Tag ModelEntityRenderer::getTagMask() const {
     // Default behavior for model is to not be visible in main view if cauterized (aka parented to the avatar's neck joint)
-    return _cauterized ?
-        (_isVisibleInSecondaryCamera ? render::hifi::TAG_SECONDARY_VIEW : render::hifi::TAG_NONE) :
-        Parent::getTagMask(); // calculate which views to be shown in
+    if (_cauterized) {
+        if (_isVisibleInSecondaryCamera) {
+            return render::hifi::TAG_SECONDARY_VIEW;
+        } else {
+            return render::hifi::TAG_NONE;
+        }
+    } else {
+        return Parent::getTagMask(); // calculate which views to be shown in
+    }
 }
 
-uint32_t ModelEntityRenderer::metaFetchMetaSubItems(ItemIDs& subItems) { 
+uint32_t ModelEntityRenderer::metaFetchMetaSubItems(ItemIDs& subItems) {
     if (_model) {
         auto metaSubItems = _subRenderItemIDs;
         subItems.insert(subItems.end(), metaSubItems.begin(), metaSubItems.end());
@@ -1098,7 +1099,7 @@ void ModelEntityRenderer::animate(const TypedEntityPointer& entity) {
 
     QVector<EntityJointData> jointsData;
 
-    const QVector<FBXAnimationFrame>&  frames = _animation->getFramesReference(); // NOTE: getFrames() is too heavy
+    const QVector<FBXAnimationFrame>& frames = _animation->getFramesReference();  // NOTE: getFrames() is too heavy
     int frameCount = frames.size();
     if (frameCount <= 0) {
         return;
@@ -1118,7 +1119,7 @@ void ModelEntityRenderer::animate(const TypedEntityPointer& entity) {
 
     if (_jointMapping.size() != _model->getJointStateCount()) {
         qCWarning(entitiesrenderer) << "RenderableModelEntityItem::getAnimationFrame -- joint count mismatch"
-                    << _jointMapping.size() << _model->getJointStateCount();
+                                    << _jointMapping.size() << _model->getJointStateCount();
         return;
     }
 
@@ -1132,7 +1133,7 @@ void ModelEntityRenderer::animate(const TypedEntityPointer& entity) {
 
     const QVector<glm::quat>& rotations = frames[_lastKnownCurrentFrame].rotations;
     const QVector<glm::vec3>& translations = frames[_lastKnownCurrentFrame].translations;
-                
+
     jointsData.resize(_jointMapping.size());
     for (int j = 0; j < _jointMapping.size(); j++) {
         int index = _jointMapping[j];
@@ -1145,14 +1146,18 @@ void ModelEntityRenderer::animate(const TypedEntityPointer& entity) {
                     translationMat = glm::translate(translations[index]);
                 }
             } else if (index < animationJointNames.size()) {
-                QString jointName = fbxJoints[index].name; // Pushing this here so its not done on every entity, with the exceptions of those allowing for translation
-                
+                QString jointName =
+                    fbxJoints[index]
+                        .name;  // Pushing this here so its not done on every entity, with the exceptions of those allowing for translation
+
                 if (originalFbxIndices.contains(jointName)) {
                     // Making sure the joint names exist in the original model the animation is trying to apply onto. If they do, then remap and get it's translation.
-                    int remappedIndex = originalFbxIndices[jointName] - 1; // JointIndeces seem to always start from 1 and the found index is always 1 higher than actual.
+                    int remappedIndex =
+                        originalFbxIndices[jointName] -
+                        1;  // JointIndeces seem to always start from 1 and the found index is always 1 higher than actual.
                     translationMat = glm::translate(originalFbxJoints[remappedIndex].translation);
                 }
-            } 
+            }
             glm::mat4 rotationMat;
             if (index < rotations.size()) {
                 rotationMat = glm::mat4_cast(fbxJoints[index].preRotation * rotations[index] * fbxJoints[index].postRotation);
@@ -1160,8 +1165,8 @@ void ModelEntityRenderer::animate(const TypedEntityPointer& entity) {
                 rotationMat = glm::mat4_cast(fbxJoints[index].preRotation * fbxJoints[index].postRotation);
             }
 
-            glm::mat4 finalMat = (translationMat * fbxJoints[index].preTransform *
-                rotationMat * fbxJoints[index].postTransform);
+            glm::mat4 finalMat =
+                (translationMat * fbxJoints[index].preTransform * rotationMat * fbxJoints[index].postTransform);
             auto& jointData = jointsData[j];
             jointData.translation = extractTranslation(finalMat);
             jointData.translationSet = true;
@@ -1177,20 +1182,20 @@ void ModelEntityRenderer::animate(const TypedEntityPointer& entity) {
 
 bool ModelEntityRenderer::needsRenderUpdate() const {
     if (resultWithReadLock<bool>([&] {
-        if (_moving || _animating) {
-            return true;
-        }
+            if (_moving || _animating) {
+                return true;
+            }
 
-        if (!_texturesLoaded) {
-            return true;
-        }
+            if (!_texturesLoaded) {
+                return true;
+            }
 
-        if (!_prevModelLoaded) {
-            return true;
-        }
+            if (!_prevModelLoaded) {
+                return true;
+            }
 
-        return false;
-    })) {
+            return false;
+        })) {
         return true;
     }
 
@@ -1225,39 +1230,39 @@ bool ModelEntityRenderer::needsRenderUpdate() const {
 
 bool ModelEntityRenderer::needsRenderUpdateFromTypedEntity(const TypedEntityPointer& entity) const {
     if (resultWithReadLock<bool>([&] {
-        if (entity->hasModel() != _hasModel) {
-            return true;
-        }
+            if (entity->hasModel() != _hasModel) {
+                return true;
+            }
 
-        if (_parsedModelURL != entity->getModelURL()) {
-            return true;
-        }
+            if (_parsedModelURL != entity->getModelURL()) {
+                return true;
+            }
 
-        // No model to render, early exit
-        if (!_hasModel) {
+            // No model to render, early exit
+            if (!_hasModel) {
+                return false;
+            }
+
+            if (_lastTextures != entity->getTextures()) {
+                return true;
+            }
+
+            if (_animating != entity->isAnimatingSomething()) {
+                return true;
+            }
+
             return false;
-        }
-
-        if (_lastTextures != entity->getTextures()) {
-            return true;
-        }
-
-        if (_animating != entity->isAnimatingSomething()) {
-            return true;
-        }
-
-        return false;
-    })) { return true; }
+        })) {
+        return true;
+    }
 
     ModelPointer model;
-    withReadLock([&] {
-        model = _model;
-    });
+    withReadLock([&] { model = _model; });
 
     if (model && model->isLoaded()) {
         if (!entity->_dimensionsInitialized || entity->_needsInitialSimulation || !entity->_originalTexturesRead) {
             return true;
-       } 
+        }
 
         // Check to see if we need to update the model bounds
         if (entity->needsUpdateModelBounds()) {
@@ -1266,8 +1271,7 @@ bool ModelEntityRenderer::needsRenderUpdateFromTypedEntity(const TypedEntityPoin
 
         // Check to see if we need to update the model bounds
         auto transform = entity->getTransform();
-        if (model->getTranslation() != transform.getTranslation() ||
-            model->getRotation() != transform.getRotation()) {
+        if (model->getTranslation() != transform.getTranslation() || model->getRotation() != transform.getRotation()) {
             return true;
         }
 
@@ -1280,16 +1284,16 @@ bool ModelEntityRenderer::needsRenderUpdateFromTypedEntity(const TypedEntityPoin
     return false;
 }
 
-void ModelEntityRenderer::setCollisionMeshKey(const void*key) {
+void ModelEntityRenderer::setCollisionMeshKey(const void* key) {
     _collisionMeshKey = key;
 }
 
-void ModelEntityRenderer::doRenderUpdateSynchronousTyped(const ScenePointer& scene, Transaction& transaction, const TypedEntityPointer& entity) {
+void ModelEntityRenderer::doRenderUpdateSynchronousTyped(const ScenePointer& scene,
+                                                         Transaction& transaction,
+                                                         const TypedEntityPointer& entity) {
     DETAILED_PROFILE_RANGE(simulation_physics, __FUNCTION__);
     if (_hasModel != entity->hasModel()) {
-        withWriteLock([&] {
-            _hasModel = entity->hasModel();
-        });
+        withWriteLock([&] { _hasModel = entity->hasModel(); });
     }
 
     withWriteLock([&] {
@@ -1310,8 +1314,9 @@ void ModelEntityRenderer::doRenderUpdateSynchronousTyped(const ScenePointer& sce
                 auto entityRenderer = static_cast<EntityRenderer*>(&data);
                 entityRenderer->clearSubRenderItemIDs();
             });
-            emit DependencyManager::get<scriptable::ModelProviderFactory>()->
-                modelRemovedFromScene(entity->getEntityItemID(), NestableType::Entity, _model);
+            emit DependencyManager::get<scriptable::ModelProviderFactory>()->modelRemovedFromScene(entity->getEntityItemID(),
+                                                                                                   NestableType::Entity,
+                                                                                                   _model);
         }
         return;
     }
@@ -1323,9 +1328,10 @@ void ModelEntityRenderer::doRenderUpdateSynchronousTyped(const ScenePointer& sce
         connect(model.get(), &Model::setURLFinished, this, [&](bool didVisualGeometryRequestSucceed) {
             setKey(didVisualGeometryRequestSucceed);
             emit requestRenderUpdate();
-            if(didVisualGeometryRequestSucceed) {
-                emit DependencyManager::get<scriptable::ModelProviderFactory>()->
-                    modelAddedToScene(entity->getEntityItemID(), NestableType::Entity, _model);
+            if (didVisualGeometryRequestSucceed) {
+                emit DependencyManager::get<scriptable::ModelProviderFactory>()->modelAddedToScene(entity->getEntityItemID(),
+                                                                                                   NestableType::Entity,
+                                                                                                   _model);
             }
             _didLastVisualGeometryRequestSucceed = didVisualGeometryRequestSucceed;
         });
@@ -1344,30 +1350,26 @@ void ModelEntityRenderer::doRenderUpdateSynchronousTyped(const ScenePointer& sce
 
     // Nothing else to do unless the model is loaded
     if (!model->isLoaded()) {
-        withWriteLock([&] {
-            _prevModelLoaded = false;
-        });
+        withWriteLock([&] { _prevModelLoaded = false; });
         emit requestRenderUpdate();
         return;
     } else if (!_prevModelLoaded) {
-        withWriteLock([&] {
-            _prevModelLoaded = true;
-        });
+        withWriteLock([&] { _prevModelLoaded = true; });
     }
 
     // Check for initializing the model
     // FIXME: There are several places below here where we are modifying the entity, which we should not be doing from the renderable
     if (!entity->_dimensionsInitialized) {
         EntityItemProperties properties;
-        properties.setLastEdited(usecTimestampNow()); // we must set the edit time since we're editing it
+        properties.setLastEdited(usecTimestampNow());  // we must set the edit time since we're editing it
         auto extents = model->getMeshExtents();
         properties.setDimensions(extents.maximum - extents.minimum);
         qCDebug(entitiesrenderer) << "Autoresizing"
-            << (!entity->getName().isEmpty() ? entity->getName() : entity->getModelURL())
-            << "from mesh extents";
+                                  << (!entity->getName().isEmpty() ? entity->getName() : entity->getModelURL())
+                                  << "from mesh extents";
 
-        QMetaObject::invokeMethod(DependencyManager::get<EntityScriptingInterface>().data(), "editEntity",
-            Qt::QueuedConnection, Q_ARG(QUuid, entity->getEntityItemID()), Q_ARG(EntityItemProperties, properties));
+        QMetaObject::invokeMethod(DependencyManager::get<EntityScriptingInterface>().data(), "editEntity", Qt::QueuedConnection,
+                                  Q_ARG(QUuid, entity->getEntityItemID()), Q_ARG(EntityItemProperties, properties));
     }
 
     if (!entity->_originalTexturesRead) {
@@ -1425,9 +1427,7 @@ void ModelEntityRenderer::doRenderUpdateSynchronousTyped(const ScenePointer& sce
     }
 
     if (!_texturesLoaded && model->getGeometry() && model->getGeometry()->areTexturesLoaded()) {
-        withWriteLock([&] {
-            _texturesLoaded = true;
-        });
+        withWriteLock([&] { _texturesLoaded = true; });
         model->updateRenderItems();
     } else if (!_texturesLoaded) {
         emit requestRenderUpdate();
@@ -1443,11 +1443,11 @@ void ModelEntityRenderer::doRenderUpdateSynchronousTyped(const ScenePointer& sce
     // That is where _currentFrame and _lastAnimated were updated.
     if (_animating) {
         DETAILED_PROFILE_RANGE(simulation_physics, "Animate");
-        
+
         if (!jointsMapped()) {
             mapJoints(entity, model->getJointNames());
-        //else the joint have been mapped before but we have a new animation to load
-        } else if (_animation && (_animation->getURL().toString() != entity->getAnimationURL())) {             
+            //else the joint have been mapped before but we have a new animation to load
+        } else if (_animation && (_animation->getURL().toString() != entity->getAnimationURL())) {
             _animation = DependencyManager::get<AnimationCache>()->getAnimation(entity->getAnimationURL());
             _jointMappingCompleted = false;
             mapJoints(entity, model->getJointNames());
@@ -1457,6 +1457,11 @@ void ModelEntityRenderer::doRenderUpdateSynchronousTyped(const ScenePointer& sce
         }
         emit requestRenderUpdate();
     }
+}
+
+void ModelEntityRenderer::setIsVisibleInPrimaryCamera(bool value) {
+    Parent::setIsVisibleInPrimaryCamera(value);
+    setKey(_didLastVisualGeometryRequestSucceed);
 }
 
 void ModelEntityRenderer::setIsVisibleInSecondaryCamera(bool value) {
@@ -1472,14 +1477,12 @@ void ModelEntityRenderer::doRender(RenderArgs* args) {
     // If the model doesn't have visual geometry, render our bounding box as green wireframe
     static glm::vec4 greenColor(0.0f, 1.0f, 0.0f, 1.0f);
     gpu::Batch& batch = *args->_batch;
-    batch.setModelTransform(getModelTransform()); // we want to include the scale as well
+    batch.setModelTransform(getModelTransform());  // we want to include the scale as well
     DependencyManager::get<GeometryCache>()->renderWireCubeInstance(args, batch, greenColor);
 
 #if WANT_EXTRA_DEBUGGING
     ModelPointer model;
-    withReadLock([&] {
-        model = _model;
-    });
+    withReadLock([&] { model = _model; });
     if (model) {
         model->renderDebugMeshBoxes(batch);
     }

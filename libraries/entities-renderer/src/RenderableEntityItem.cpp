@@ -158,7 +158,15 @@ Item::Bound EntityRenderer::getBound() {
 }
 
 render::hifi::Tag EntityRenderer::getTagMask() const {
-    return _isVisibleInSecondaryCamera ? render::hifi::TAG_ALL_VIEWS : render::hifi::TAG_MAIN_VIEW;
+    if (_isVisibleInPrimaryCamera && _isVisibleInSecondaryCamera) {
+        return render::hifi::TAG_ALL_VIEWS;
+    } else if (_isVisibleInPrimaryCamera && !_isVisibleInSecondaryCamera) {
+        return render::hifi::TAG_MAIN_VIEW;
+    } else if (!_isVisibleInPrimaryCamera && _isVisibleInSecondaryCamera) {
+        return render::hifi::TAG_SECONDARY_VIEW;
+    } else {
+        return render::hifi::TAG_NONE;
+    }
 }
 
 ItemKey EntityRenderer::getKey() {
@@ -384,6 +392,7 @@ void EntityRenderer::doRenderUpdateSynchronous(const ScenePointer& scene, Transa
 
         _moving = entity->isMovingRelativeToParent();
         _visible = entity->getVisible();
+        setIsVisibleInPrimaryCamera(entity->isVisibleInPrimaryCamera());
         setIsVisibleInSecondaryCamera(entity->isVisibleInSecondaryCamera());
         _canCastShadow = entity->getCanCastShadow();
         _cauterized = entity->getCauterized();

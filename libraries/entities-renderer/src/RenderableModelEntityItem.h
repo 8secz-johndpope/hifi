@@ -165,6 +165,7 @@ protected:
 
     render::hifi::Tag getTagMask() const override;
 
+    void setIsVisibleInPrimaryCamera(bool value) override;
     void setIsVisibleInSecondaryCamera(bool value) override;
 
 private:

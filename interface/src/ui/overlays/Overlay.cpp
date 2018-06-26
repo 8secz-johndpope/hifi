@@ -256,8 +256,16 @@ render::ItemKey Overlay::getKey() {
         builder.withInvisible();
     }
 
-    // always visible in primary view.  if isVisibleInSecondaryCamera, also draw in secondary view
-    render::hifi::Tag viewTagBits = getIsVisibleInSecondaryCamera() ? render::hifi::TAG_ALL_VIEWS : render::hifi::TAG_MAIN_VIEW;
+    render::hifi::Tag viewTagBits;
+    if (getIsVisibleInPrimaryCamera() && getIsVisibleInSecondaryCamera()) {
+        viewTagBits = render::hifi::TAG_ALL_VIEWS;
+    } else if (getIsVisibleInPrimaryCamera() && !getIsVisibleInSecondaryCamera()) {
+        viewTagBits = render::hifi::TAG_MAIN_VIEW;
+    } else if (!getIsVisibleInPrimaryCamera() && getIsVisibleInSecondaryCamera()) {
+        viewTagBits = render::hifi::TAG_SECONDARY_VIEW;
+    } else {
+        viewTagBits = render::hifi::TAG_NONE;
+    }
     builder.withTagBits(viewTagBits);
 
     return builder.build();

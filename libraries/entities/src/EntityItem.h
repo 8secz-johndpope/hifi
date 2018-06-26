@@ -277,6 +277,9 @@ public:
     bool getVisible() const;
     void setVisible(bool value);
 
+    bool isVisibleInPrimaryCamera() const;
+    void setIsVisibleInPrimaryCamera(bool value);
+
     bool isVisibleInSecondaryCamera() const;
     void setIsVisibleInSecondaryCamera(bool value);
 
@@ -591,7 +594,8 @@ protected:
     QString _collisionSoundURL { ENTITY_ITEM_DEFAULT_COLLISION_SOUND_URL };
     glm::vec3 _registrationPoint { ENTITY_ITEM_DEFAULT_REGISTRATION_POINT };
     float _angularDamping { ENTITY_ITEM_DEFAULT_ANGULAR_DAMPING };
-    bool _visible { ENTITY_ITEM_DEFAULT_VISIBLE };
+    bool _visible{ ENTITY_ITEM_DEFAULT_VISIBLE };
+    bool _isVisibleInPrimaryCamera{ ENTITY_ITEM_DEFAULT_VISIBLE_IN_PRIMARY_CAMERA };
     bool _isVisibleInSecondaryCamera { ENTITY_ITEM_DEFAULT_VISIBLE_IN_SECONDARY_CAMERA };
     bool _canCastShadow{ ENTITY_ITEM_DEFAULT_CAN_CAST_SHADOW };
     bool _collisionless { ENTITY_ITEM_DEFAULT_COLLISIONLESS };

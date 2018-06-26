@@ -38,6 +38,7 @@ Base3DOverlay::Base3DOverlay(const Base3DOverlay* base3DOverlay) :
     _drawInFront(base3DOverlay->_drawInFront),
     _drawHUDLayer(base3DOverlay->_drawHUDLayer),
     _isGrabbable(base3DOverlay->_isGrabbable),
+    _isVisibleInPrimaryCamera(base3DOverlay->_isVisibleInPrimaryCamera),
     _isVisibleInSecondaryCamera(base3DOverlay->_isVisibleInSecondaryCamera)
 {
     setTransform(base3DOverlay->getTransform());
@@ -143,6 +144,13 @@ void Base3DOverlay::setProperties(const QVariantMap& originalProperties) {
         setIsGrabbable(isGrabbable.toBool());
     }
 
+    auto isVisibleInPrimaryCamera = properties["isVisibleInPrimaryCamera"];
+    if (isVisibleInPrimaryCamera.isValid()) {
+        bool value = isVisibleInPrimaryCamera.toBool();
+        setIsVisibleInPrimaryCamera(value);
+        needRenderItemUpdate = true;
+    }
+
     auto isVisibleInSecondaryCamera = properties["isVisibleInSecondaryCamera"];
     if (isVisibleInSecondaryCamera.isValid()) {
         bool value = isVisibleInSecondaryCamera.toBool();
@@ -229,6 +237,8 @@ void Base3DOverlay::setProperties(const QVariantMap& originalProperties) {
  * @property {boolean} drawInFront=false - If <code>true</code>, the overlay is rendered in front of other overlays that don't
  *     have <code>drawInFront</code> set to <code>true</code>, and in front of entities.
  * @property {boolean} grabbable=false - Signal to grabbing scripts whether or not this overlay can be grabbed.
+ * @property {boolean} isVisibleInPrimaryCamera=true - If <code>true</code>, the overlay is rendered in primary
+ *     camera views.
  * @property {boolean} isVisibleInSecondaryCamera=false - If <code>true</code>, the overlay is rendered in secondary
  *     camera views.
  * @property {Uuid} parentID=null - The avatar, entity, or overlay that the overlay is parented to.
@@ -268,6 +278,9 @@ QVariant Base3DOverlay::getProperty(const QString& property) {
     }
     if (property == "grabbable") {
         return _isGrabbable;
+    }
+    if (property == "isVisibleInPrimaryCamera") {
+        return _isVisibleInPrimaryCamera;
     }
     if (property == "isVisibleInSecondaryCamera") {
         return _isVisibleInSecondaryCamera;

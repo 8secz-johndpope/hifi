@@ -368,6 +368,7 @@ EntityPropertyFlags EntityItemProperties::getChangedProperties() const {
     CHECK_PROPERTY_CHANGE(PROP_MATERIAL_MAPPING_SCALE, materialMappingScale);
     CHECK_PROPERTY_CHANGE(PROP_MATERIAL_MAPPING_ROT, materialMappingRot);
     CHECK_PROPERTY_CHANGE(PROP_MATERIAL_DATA, materialData);
+    CHECK_PROPERTY_CHANGE(PROP_VISIBLE_IN_PRIMARY_CAMERA, isVisibleInPrimaryCamera);
     CHECK_PROPERTY_CHANGE(PROP_VISIBLE_IN_SECONDARY_CAMERA, isVisibleInSecondaryCamera);
 
     // Certifiable Properties
@@ -491,6 +492,7 @@ EntityPropertyFlags EntityItemProperties::getChangedProperties() const {
  *     {@link Entities.EntityType|Model} and {@link Entities.EntityType|Shape} entities. Shadows are cast if inside a 
  *     {@link Entities.EntityType|Zone} entity with <code>castShadows</code> enabled in its 
  *     {@link Entities.EntityProperties-Zone|keyLight} property.
+ * @property {boolean} isVisibleInPrimaryCamera=true - Whether or not the entity is rendered in the primary camera. If <code>true</code> then the entity is rendered.
  * @property {boolean} isVisibleInSecondaryCamera=true - Whether or not the entity is rendered in the secondary camera. If <code>true</code> then the entity is rendered.
  *
  * @property {Vec3} position=0,0,0 - The position of the entity.
@@ -1242,6 +1244,7 @@ QScriptValue EntityItemProperties::copyToScriptValue(QScriptEngine* engine, bool
     COPY_PROPERTY_TO_QSCRIPTVALUE(PROP_LOCKED, locked);
     COPY_PROPERTY_TO_QSCRIPTVALUE(PROP_USER_DATA, userData);
     COPY_PROPERTY_TO_QSCRIPTVALUE(PROP_ALPHA, alpha);
+    COPY_PROPERTY_TO_QSCRIPTVALUE(PROP_VISIBLE_IN_PRIMARY_CAMERA, isVisibleInPrimaryCamera);
     COPY_PROPERTY_TO_QSCRIPTVALUE(PROP_VISIBLE_IN_SECONDARY_CAMERA, isVisibleInSecondaryCamera);
 
     // Certifiable Properties
@@ -1582,6 +1585,7 @@ void EntityItemProperties::copyFromScriptValue(const QScriptValue& object, bool 
     COPY_PROPERTY_FROM_QSCRIPTVALUE(materialMappingScale, vec2, setMaterialMappingScale);
     COPY_PROPERTY_FROM_QSCRIPTVALUE(materialMappingRot, float, setMaterialMappingRot);
     COPY_PROPERTY_FROM_QSCRIPTVALUE(materialData, QString, setMaterialData);
+    COPY_PROPERTY_FROM_QSCRIPTVALUE(isVisibleInPrimaryCamera, bool, setIsVisibleInPrimaryCamera);
     COPY_PROPERTY_FROM_QSCRIPTVALUE(isVisibleInSecondaryCamera, bool, setIsVisibleInSecondaryCamera);
 
     // Certifiable Properties
@@ -1962,6 +1966,7 @@ void EntityItemProperties::entityPropertyFlagsFromScriptValue(const QScriptValue
         ADD_PROPERTY_TO_MAP(PROP_MATERIAL_MAPPING_ROT, MaterialMappingRot, materialMappingRot, float);
         ADD_PROPERTY_TO_MAP(PROP_MATERIAL_DATA, MaterialData, materialData, QString);
 
+        ADD_PROPERTY_TO_MAP(PROP_VISIBLE_IN_PRIMARY_CAMERA, IsVisibleInPrimaryCamera, isVisibleInPrimaryCamera, bool);
         ADD_PROPERTY_TO_MAP(PROP_VISIBLE_IN_SECONDARY_CAMERA, IsVisibleInSecondaryCamera, isVisibleInSecondaryCamera, bool);
 
         // Certifiable Properties
@@ -2392,6 +2397,8 @@ OctreeElement::AppendState EntityItemProperties::encodeEntityEditPacket(PacketTy
             APPEND_ENTITY_PROPERTY(PROP_CLONE_LIMIT, properties.getCloneLimit());
             APPEND_ENTITY_PROPERTY(PROP_CLONE_DYNAMIC, properties.getCloneDynamic());
             APPEND_ENTITY_PROPERTY(PROP_CLONE_AVATAR_ENTITY, properties.getCloneAvatarEntity());
+
+            APPEND_ENTITY_PROPERTY(PROP_VISIBLE_IN_PRIMARY_CAMERA, properties.getIsVisibleInPrimaryCamera());
         }
 
         if (propertyCount > 0) {
@@ -2764,6 +2771,8 @@ bool EntityItemProperties::decodeEntityEditPacket(const unsigned char* data, int
     READ_ENTITY_PROPERTY_TO_PROPERTIES(PROP_CLONE_DYNAMIC, bool, setCloneDynamic);
     READ_ENTITY_PROPERTY_TO_PROPERTIES(PROP_CLONE_AVATAR_ENTITY, bool, setCloneAvatarEntity);
 
+    READ_ENTITY_PROPERTY_TO_PROPERTIES(PROP_VISIBLE_IN_PRIMARY_CAMERA, bool, setIsVisibleInPrimaryCamera);
+
     return valid;
 }
 
@@ -3054,6 +3063,7 @@ void EntityItemProperties::markAllChanged() {
     _cloneAvatarEntityChanged = true;
     _cloneOriginIDChanged = true;
 
+    _isVisibleInPrimaryCameraChanged = true;
     _isVisibleInSecondaryCameraChanged = true;
 }
 
@@ -3332,6 +3342,9 @@ QList<QString> EntityItemProperties::listChangedProperties() {
     }
     if (materialDataChanged()) {
         out += "materialData";
+    }
+    if (isVisibleInPrimaryCameraChanged()) {
+        out += "isVisibleInPrimaryCamera";
     }
     if (isVisibleInSecondaryCameraChanged()) {
         out += "isVisibleInSecondaryCamera";

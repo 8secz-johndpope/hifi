@@ -250,6 +250,7 @@ enum EntityPropertyList {
     PROP_MATERIAL_DATA,
 
     PROP_VISIBLE_IN_SECONDARY_CAMERA, // not sent over the wire, only used locally
+    PROP_VISIBLE_IN_PRIMARY_CAMERA,
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // ATTENTION: add new properties to end of list just ABOVE this line
