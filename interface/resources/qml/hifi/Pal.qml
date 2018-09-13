@@ -298,6 +298,16 @@ Rectangle {
                             }
                         }
                     }
+                    Rectangle {
+                        id: connectionsOnlineDot;
+                        visible: false;
+                        width: 10;
+                        height: width;
+                        radius: width;
+                        color: "#EF3B4E"
+                        anchors.left: parent.left;
+                        anchors.verticalCenter: parent.verticalCenter;
+                    }
                     // "CONNECTIONS" text
                     RalewaySemiBold {
                         id: connectionsTabSelectorText;
@@ -305,7 +315,11 @@ Rectangle {
                         // Text size
                         size: hifi.fontSizes.tabularData;
                         // Anchors
-                        anchors.fill: parent;
+                        anchors.left: connectionsOnlineDot.visible ? connectionsOnlineDot.right : parent.left;
+                        anchors.leftMargin: connectionsOnlineDot.visible ? 4 : 0;
+                        anchors.top: parent.top;
+                        anchors.bottom: parent.bottom;
+                        anchors.right: parent.right;
                         // Style
                         font.capitalization: Font.AllUppercase;
                         color: activeTab === "connectionsTab" ? hifi.colors.blueAccent : hifi.colors.baseGray;
@@ -326,7 +340,7 @@ Rectangle {
                         anchors.left: connectionsTabSelectorTextContainer.left;
                         anchors.top: connectionsTabSelectorTextContainer.top;
                         anchors.topMargin: 1;
-                        anchors.leftMargin: connectionsTabSelectorTextMetrics.width + 42;
+                        anchors.leftMargin: connectionsTabSelectorTextMetrics.width + 42 + connectionsOnlineDot.width + connectionsTabSelectorText.anchors.leftMargin;
                         RalewayRegular {
                             id: connectionsHelpText;
                             text: "[?]";
@@ -1266,6 +1280,9 @@ Rectangle {
             break;
         case 'http.response':
             http.handleHttpResponse(message);
+            break;
+        case 'changeConnectionsDotStatus':
+            connectionsOnlineDot.visible = message.shouldShowDot;
             break;
         default:
             console.log('Unrecognized message:', JSON.stringify(message));
