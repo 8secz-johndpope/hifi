@@ -271,6 +271,8 @@ Rectangle {
                             connectionsUserModel.getFirstPage();
                         }
                         activeTab = "connectionsTab";
+                        connectionsOnlineDot.visible = false;
+                        pal.sendToScript({method: 'hideNotificationDot'});
                         connectionsHelpText.color = hifi.colors.blueAccent;
                     }
                 }

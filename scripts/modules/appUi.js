@@ -103,6 +103,7 @@ function AppUi(properties) {
     that.notificationPollTimeoutMs = 60000;
     that.notificationPollEndpoint = false;
     that.notificationPollCallback = that.ignore;
+    that.notificationPollCaresAboutSince = false;
     //
     // END Notification Handling Defaults
     //
@@ -144,6 +145,13 @@ function AppUi(properties) {
     var METAVERSE_BASE = Account.metaverseServerURL;
     that.notificationPoll = function () {
         var url = METAVERSE_BASE + that.notificationPollEndpoint;
+
+        if (that.notificationPollCaresAboutSince) {
+            url = url + "&since=" + (new Date().getTime());
+        }
+
+        console.debug(that.buttonName, 'polling for notifications at endpoint', url);
+
         request({
             uri: url
         }, function (error, response) {

@@ -321,6 +321,9 @@ function fromQml(message) { // messages are {method, params}, like json-rpc. See
         break;
     case 'http.request':
         break; // Handled by request-service.
+    case 'hideNotificationDot':
+        ui.messagesWaiting(false);
+        break;
     default:
         print('Unrecognized message from Pal.qml:', JSON.stringify(message));
     }
@@ -729,7 +732,10 @@ function createUpdateInterval() {
 var previousContextOverlay = ContextOverlay.enabled;
 var previousRequestsDomainListData = Users.requestsDomainListData;
 function palOpened() {
-    ui.notificationPoll();
+    ui.sendMessage({
+        method: 'changeConnectionsDotStatus',
+        shouldShowDot: shouldShowDot
+    });
 
     previousContextOverlay = ContextOverlay.enabled;
     previousRequestsDomainListData = Users.requestsDomainListData;
@@ -811,15 +817,17 @@ function avatarSessionChanged(avatarID) {
     sendToQml({ method: 'palIsStale', params: [avatarID, 'avatarSessionChanged'] });
 }
 
+var shouldShowDot = false;
 function notificationPollCallback(data) {
-    var shouldShowDot = data.data.users[0].location;
+    shouldShowDot = data.data.users[0].location;
 
-    ui.messagesWaiting(shouldShowDot);
-
-    ui.sendMessage({
-        method: 'changeConnectionsDotStatus',
-        shouldShowDot: shouldShowDot
-    });
+    if (!ui.isOpen) {
+        ui.messagesWaiting(shouldShowDot);
+        ui.sendMessage({
+            method: 'changeConnectionsDotStatus',
+            shouldShowDot: shouldShowDot
+        });
+    }
 }
 
 function startup() {
@@ -830,9 +838,10 @@ function startup() {
         onOpened: palOpened,
         onClosed: off,
         onMessage: fromQml,
-        notificationPollEndpoint: "/api/v1/users?filter=connections&per_page=1&sort=location,DESC",
+        notificationPollEndpoint: "/api/v1/users?filter=connections&status=online&per_page=1",
         notificationPollTimeoutMs: 60000,
-        notificationPollCallback: notificationPollCallback
+        notificationPollCallback: notificationPollCallback,
+        notificationPollCaresAboutSince: true
     });
     Window.domainChanged.connect(clearLocalQMLDataAndClosePAL);
     Window.domainConnectionRefused.connect(clearLocalQMLDataAndClosePAL);
