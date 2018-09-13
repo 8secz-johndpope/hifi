@@ -364,8 +364,8 @@ function getProfilePicture(username, callback) { // callback(url) if successfull
     });
 }
 var SAFETY_LIMIT = 400;
-function getAvailableConnections(domain, callback) { // callback([{usename, location}...]) if successfull. (Logs otherwise)
-    var url = METAVERSE_BASE + '/api/v1/users?per_page=' + SAFETY_LIMIT + '&';
+function getAvailableConnections(domain, callback, numResultsPerPage) { // callback([{usename, location}...]) if successfull. (Logs otherwise)
+    var url = METAVERSE_BASE + '/api/v1/users?per_page=' + (numResultsPerPage || SAFETY_LIMIT) + '&';
     if (domain) {
         url += 'status=' + domain.slice(1, -1); // without curly braces
     } else {
@@ -728,10 +728,11 @@ function createUpdateInterval() {
 
 var previousContextOverlay = ContextOverlay.enabled;
 var previousRequestsDomainListData = Users.requestsDomainListData;
-function on() {
+function palOpened() {
+    ui.notificationPoll();
 
     previousContextOverlay = ContextOverlay.enabled;
-    previousRequestsDomainListData = Users.requestsDomainListData
+    previousRequestsDomainListData = Users.requestsDomainListData;
     ContextOverlay.enabled = false;
     Users.requestsDomainListData = true;
 
@@ -810,14 +811,30 @@ function avatarSessionChanged(avatarID) {
     sendToQml({ method: 'palIsStale', params: [avatarID, 'avatarSessionChanged'] });
 }
 
+function notificationPollCallback(data) {
+    var shouldShowDot = data.data.users[0].location;
+
+    ui.messagesWaiting(shouldShowDot);
+
+    if (ui.hasOutboundEventBridge) {
+        ui.sendMessage({
+            method: 'changeDotStatus',
+            shouldShowDot: shouldShowDot
+        });
+    }
+}
+
 function startup() {
     ui = new AppUi({
         buttonName: "PEOPLE",
         sortOrder: 7,
         home: "hifi/Pal.qml",
-        onOpened: on,
+        onOpened: palOpened,
         onClosed: off,
-        onMessage: fromQml
+        onMessage: fromQml,
+        notificationPollEndpoint: "/api/v1/users?filter=connections&per_page=1&sort=location,DESC",
+        notificationPollTimeoutMs: 60000,
+        notificationPollCallback: notificationPollCallback
     });
     Window.domainChanged.connect(clearLocalQMLDataAndClosePAL);
     Window.domainConnectionRefused.connect(clearLocalQMLDataAndClosePAL);
