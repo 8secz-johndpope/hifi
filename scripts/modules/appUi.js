@@ -102,8 +102,15 @@ function AppUi(properties) {
     that.notificationPollTimeout = false;
     that.notificationPollTimeoutMs = 60000;
     that.notificationPollEndpoint = false;
+    that.notificationPollStopPaginatingConditionMet = false;
+    that.notificationDataProcessPage = function (data) {
+        return data;
+    };
     that.notificationPollCallback = that.ignore;
     that.notificationPollCaresAboutSince = false;
+    that.notificationDisplayBanner = function (message) {
+        Window.displayAnnouncement(message);
+    };
     //
     // END Notification Handling Defaults
     //
@@ -143,6 +150,8 @@ function AppUi(properties) {
     // START Notification Handling
     //
     var METAVERSE_BASE = Account.metaverseServerURL;
+    var currentDataPageToRetrieve = 1;
+    var concatenatedServerResponse = new Array();
     that.notificationPoll = function () {
         if (!that.notificationPollEndpoint) {
             return;
@@ -162,18 +171,34 @@ function AppUi(properties) {
 
         console.debug(that.buttonName, 'polling for notifications at endpoint', url);
 
-        request({
-            uri: url
-        }, function (error, response) {
-            that.notificationPollTimeout = Script.setTimeout(that.notificationPoll, that.notificationPollTimeoutMs);
-
+        function requestCallback(error, response) {
             if (error || (response.status !== 'success')) {
                 print("Error: unable to get", url, error || response.status);
+                that.notificationPollTimeout = Script.setTimeout(that.notificationPoll, that.notificationPollTimeoutMs);
                 return;
             }
 
-            that.notificationPollCallback(response);
-        });
+            if (!that.notificationPollStopPaginatingConditionMet || that.notificationPollStopPaginatingConditionMet(response)) {
+                that.notificationPollTimeout = Script.setTimeout(that.notificationPoll, that.notificationPollTimeoutMs);
+
+                var notificationData;
+                if (concatenatedServerResponse.length) {
+                    notificationData = concatenatedServerResponse;
+                } else {
+                    notificationData = that.notificationDataProcessPage(response);
+                }
+                console.debug(that.buttonName, 'notification data for processing:', JSON.stringify(notificationData));
+                that.notificationPollCallback(notificationData);
+                currentDataPageToRetrieve = 1;
+                concatenatedServerResponse = new Array();
+            } else {
+                concatenatedServerResponse = concatenatedServerResponse.concat(that.notificationDataProcessPage(response));
+                currentDataPageToRetrieve++;
+                request({ uri: (url + "&page=" + currentDataPageToRetrieve) }, requestCallback);
+            }
+        }
+
+        request({ uri: url }, requestCallback);
     };
 
     // This won't do anything if there isn't a notification endpoint set

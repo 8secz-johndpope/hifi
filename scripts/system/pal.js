@@ -818,9 +818,14 @@ function avatarSessionChanged(avatarID) {
     sendToQml({ method: 'palIsStale', params: [avatarID, 'avatarSessionChanged'] });
 }
 
+function notificationDataProcessPage(data) {
+    return data.data.users;
+}
+
 var shouldShowDot = false;
-function notificationPollCallback(data) {
-    shouldShowDot = data.data.users[0].location;
+var firstBannerNotificationShown = false;
+function notificationPollCallback(onlineUsersArray) {
+    shouldShowDot = onlineUsersArray.length > 0;
 
     if (!ui.isOpen) {
         ui.messagesWaiting(shouldShowDot);
@@ -828,7 +833,25 @@ function notificationPollCallback(data) {
             method: 'changeConnectionsDotStatus',
             shouldShowDot: shouldShowDot
         });
+
+        var message;
+        if (!firstBannerNotificationShown) {
+            message = onlineUsersArray.length + " of your connections are online. Open PEOPLE to join them!";
+            ui.notificationDisplayBanner(message);
+            firstBannerNotificationShown = true;
+        } else {
+            for (var i = 0; i < onlineUsersArray.length; i++) {
+                message = onlineUsersArray[i].username + " is available in " +
+                    onlineUsersArray[i].location.root.name + ". Open PEOPLE to join them!";
+                ui.notificationDisplayBanner(message);
+            }
+        }
     }
+}
+
+function isReturnedDataEmpty(data) {
+    var usersArray = data.data.users;
+    return usersArray.length === 0;
 }
 
 function startup() {
@@ -839,9 +862,11 @@ function startup() {
         onOpened: palOpened,
         onClosed: off,
         onMessage: fromQml,
-        notificationPollEndpoint: "/api/v1/users?filter=connections&status=online&per_page=1",
+        notificationPollEndpoint: "/api/v1/users?filter=connections&status=online&per_page=10",
         notificationPollTimeoutMs: 60000,
+        notificationDataProcessPage: notificationDataProcessPage,
         notificationPollCallback: notificationPollCallback,
+        notificationPollStopPaginatingConditionMet: isReturnedDataEmpty,
         notificationPollCaresAboutSince: true
     });
     Window.domainChanged.connect(clearLocalQMLDataAndClosePAL);
