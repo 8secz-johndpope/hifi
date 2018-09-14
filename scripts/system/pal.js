@@ -322,7 +322,8 @@ function fromQml(message) { // messages are {method, params}, like json-rpc. See
     case 'http.request':
         break; // Handled by request-service.
     case 'hideNotificationDot':
-        ui.messagesWaiting(false);
+        shouldShowDot = false;
+        ui.messagesWaiting(shouldShowDot);
         break;
     default:
         print('Unrecognized message from Pal.qml:', JSON.stringify(message));

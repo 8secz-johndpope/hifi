@@ -144,6 +144,16 @@ function AppUi(properties) {
     //
     var METAVERSE_BASE = Account.metaverseServerURL;
     that.notificationPoll = function () {
+        if (!that.notificationPollEndpoint) {
+            return;
+        }
+
+        // User is "appearing offline"
+        if (GlobalServices.findableBy === "none") {
+            that.notificationPollTimeout = Script.setTimeout(that.notificationPoll, that.notificationPollTimeoutMs);
+            return;
+        }
+
         var url = METAVERSE_BASE + that.notificationPollEndpoint;
 
         if (that.notificationPollCaresAboutSince) {
@@ -166,8 +176,14 @@ function AppUi(properties) {
         });
     };
 
-    // Kickoff the first notification poll timer if we've been given an endpoint.
-    if (that.notificationPollEndpoint) {
+    // This won't do anything if there isn't a notification endpoint set
+    that.notificationPoll();
+
+    function availabilityChanged() {
+        if (that.notificationPollTimeout) {
+            Script.clearTimeout(that.notificationPollTimeout);
+            that.notificationPollTimeout = false;
+        }
         that.notificationPoll();
     }
     //
@@ -263,6 +279,7 @@ function AppUi(properties) {
         } : that.ignore;
     that.onScriptEnding = function onScriptEnding() {
         // Close if necessary, clean up any remaining handlers, and remove the button.
+        GlobalServices.findableByChanged.disconnect(availabilityChanged);
         if (that.isOpen) {
             that.close();
         }
@@ -282,5 +299,6 @@ function AppUi(properties) {
     that.tablet.screenChanged.connect(that.onScreenChanged);
     that.button.clicked.connect(that.onClicked);
     Script.scriptEnding.connect(that.onScriptEnding);
+    GlobalServices.findableByChanged.connect(availabilityChanged);
 }
 module.exports = AppUi;
