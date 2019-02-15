@@ -98,6 +98,19 @@ if (Menu.isOptionChecked(MENU_ITEM)) {
     runDefaultsTogether();
 }
 
+// These uncertified scripts are to be loaded as part of the default set, and always
+// run separately (i.e. not combined) from the other default scripts.
+// These scripts are guaranteed to not move from these URLs.
+// These scripts are loaded from a remote URL (rather than disk) so as to avoid
+// code duplication between the hifi and hifi-content repositories.
+// Certified versions of these applications can be purchased from Marketplace.
+function loadExperienceTeamScripts() {
+    Script.load("https://hifi-content.s3.amazonaws.com/Experiences/Releases/" + 
+        "marketPlaceItems/appreciate/2019-02-14_10-00-00/appResources/appData/appreciate_app.js");
+}
+
+loadExperienceTeamScripts();
+
 function menuItemEvent(menuItem) {
     if (menuItem === MENU_ITEM) {
         var isChecked = Menu.isOptionChecked(MENU_ITEM);
