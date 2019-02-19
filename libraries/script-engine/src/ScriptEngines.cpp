@@ -29,8 +29,17 @@ static const QString DESKTOP_LOCATION = QStandardPaths::writableLocation(QStanda
 static const bool HIFI_SCRIPT_DEBUGGABLES { true };
 static const QString SETTINGS_KEY { "RunningScripts" };
 static const QUrl DEFAULT_SCRIPTS_LOCATION { "file:///~//defaultScripts.js" };
+
+// The uncertified scripts below are to be loaded as part of the default set, and always
+// run separately (i.e. not combined) from the other default scripts.
+// Certified versions of these applications can be purchased from Marketplace.
+// When other versions of this script are run (i.e. from Marketplace),
+// this default version will be killed.
+static const QUrl APPRECIATE_SCRIPT_LOCATION { "file:///~//system//experiences//appreciate//appResources//appData//appreciate_app.js" };
+
+static const QVariantList DEFAULT_SCRIPTS_LIST { QVariant(DEFAULT_SCRIPTS_LOCATION), QVariant(APPRECIATE_SCRIPT_LOCATION) };
 // Using a QVariantList so this is human-readable in the settings file
-static Setting::Handle<QVariantList> runningScriptsHandle(SETTINGS_KEY, { QVariant(DEFAULT_SCRIPTS_LOCATION) });
+static Setting::Handle<QVariantList> runningScriptsHandle(SETTINGS_KEY, DEFAULT_SCRIPTS_LIST);
 
 const int RELOAD_ALL_SCRIPTS_TIMEOUT = 1000;
 
