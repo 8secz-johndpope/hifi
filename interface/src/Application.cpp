@@ -84,6 +84,7 @@
 #include <EntityScriptServerLogClient.h>
 #include <EntityScriptingInterface.h>
 #include "ui/overlays/ContextOverlayInterface.h"
+#include "ui/WindowWidget/WindowWidgetScriptingInterface.h"
 #include <ErrorDialog.h>
 #include <FileScriptingInterface.h>
 #include <Finally.h>
@@ -972,6 +973,7 @@ bool setupEssentials(int& argc, char** argv, bool runningMarkerExisted) {
     DependencyManager::set<KeyboardScriptingInterface>();
     DependencyManager::set<GrabManager>();
     DependencyManager::set<AvatarPackager>();
+    DependencyManager::set<WindowWidgetScriptingInterface>();
     PlatformHelper::setup();
     
     QObject::connect(PlatformHelper::instance(), &PlatformHelper::systemWillWake, [] {
@@ -2937,6 +2939,7 @@ Application::~Application() {
     DependencyManager::destroy<SoundCache>();
     DependencyManager::destroy<OctreeStatsProvider>();
     DependencyManager::destroy<GeometryCache>();
+    DependencyManager::destroy<WindowWidgetScriptingInterface>();
 
     DependencyManager::get<ResourceManager>()->cleanup();
 
@@ -3499,6 +3502,7 @@ void Application::onDesktopRootContextCreated(QQmlContext* surfaceContext) {
     surfaceContext->setContextProperty("WalletScriptingInterface", DependencyManager::get<WalletScriptingInterface>().data());
     surfaceContext->setContextProperty("HiFiAbout", AboutUtil::getInstance());
     surfaceContext->setContextProperty("ResourceRequestObserver", DependencyManager::get<ResourceRequestObserver>().data());
+    surfaceContext->setContextProperty("WindowWidget", DependencyManager::get<WindowWidgetScriptingInterface>().data());
 
     if (auto steamClient = PluginManager::getInstance()->getSteamClientPlugin()) {
         surfaceContext->setContextProperty("Steam", new SteamScriptingInterface(engine, steamClient.get()));
@@ -7561,6 +7565,8 @@ void Application::registerScriptEngineWithApplicationServices(const ScriptEngine
     scriptEngine->registerGlobalObject("AddressManager", DependencyManager::get<AddressManager>().data());
     scriptEngine->registerGlobalObject("HifiAbout", AboutUtil::getInstance());
     scriptEngine->registerGlobalObject("ResourceRequestObserver", DependencyManager::get<ResourceRequestObserver>().data());
+    scriptEngine->registerGlobalObject("WindowWidget", DependencyManager::get<WindowWidgetScriptingInterface>().data());
+    registerWindowWidgetMetaType(scriptEngine.data());
 
     registerInteractiveWindowMetaType(scriptEngine.data());
 
